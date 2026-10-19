@@ -38,8 +38,10 @@ struct RecoveryInput: Sendable {
     var sleep: SleepNight?
     var sleepScore: SleepScore?
     var baselines: PersonalBaselines
-    /// Strain of the previous day (heavy days lower next-day recovery).
+    /// Strain of the previous day (an all-out day downgrades the readiness suggestion).
     var previousDayStrain: DailyStrain?
+    /// Acute:chronic training load as of the previous day, if known (a ratio > 1.5 downgrades "Push").
+    var trainingLoad: TrainingLoad? = nil
 }
 
 /// Inputs for a workout's strain.
@@ -49,6 +51,8 @@ struct WorkoutStrainInput: Sendable {
     var heartRate: [MetricSample]
     var zones: HeartRateZones
     var restingHeartRate: Double?
+    /// Selects the Banister TRIMP coefficient; nil/other uses the mean of the male and female curves.
+    var sex: BiologicalSex? = nil
 }
 
 /// Inputs for best-effort / personal-best detection.
@@ -112,4 +116,8 @@ protocol ScoreEngine: Sendable {
 
     /// Rule-based insights, highest priority first.
     func insights(_ input: InsightInput) -> [Insight]
+
+    /// Pace at a similar heart rate over the `weeks` weeks ending on `day` (Progress → Running).
+    /// Nil when there are too few qualifying runs.
+    func aerobicEfficiency(runs: [Workout], endingOn day: LocalDay, weeks: Int) -> AerobicEfficiencyTrend?
 }

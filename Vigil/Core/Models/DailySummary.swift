@@ -4,7 +4,7 @@ import Foundation
 /// the widget don't recompute 90 days on every launch. Any part may be missing.
 struct DailySummary: Hashable, Codable, Sendable {
     /// Bump when the engine changes in a way that invalidates cached summaries.
-    static let currentEngineVersion = 1
+    static let currentEngineVersion = 2
 
     var day: LocalDay
     var computedAt: Date
