@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Run detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 2400px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <section aria-label="Route map" style="position: relative; height: 400px; background: #E9EDE8; overflow: hidden">
+    <svg width="390" height="400" viewBox="0 0 390 400" role="img" aria-label="{{mapLabel}}" style="position: absolute; inset: 0">
+      <path d="M-10 330 C80 300 160 350 240 320 S360 290 400 300 L400 410 L-10 410 Z" fill="#CFE0F2"></path>
+      <rect x="40" y="120" width="96" height="70" rx="22" fill="#D3E8CF"></rect>
+      <rect x="250" y="90" width="110" height="60" rx="26" fill="#D3E8CF"></rect>
+      <path d="M-10 70 L400 110 M-10 250 L400 215 M95 -10 L120 410 M300 -10 L280 410" stroke="#FFFFFF" stroke-width="9" fill="none"></path>
+      <path d="M-10 160 L400 160 M200 -10 L195 410 M30 -10 L60 410 M-10 300 L400 270" stroke="#FFFFFF" stroke-width="4" fill="none"></path>
+      <path d="{{r0}}" stroke="{{c0}}" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="{{r1}}" stroke="{{c1}}" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="{{r2}}" stroke="{{c2}}" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="{{r3}}" stroke="{{c3}}" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <path d="{{r4}}" stroke="{{c4}}" stroke-width="6" stroke-linecap="round" fill="none"></path>
+      <circle cx="{{sx}}" cy="{{sy}}" r="8" fill="#1DB872" stroke="#FFFFFF" stroke-width="3"></circle>
+      <circle cx="{{ex}}" cy="{{ey}}" r="8" fill="#12141A" stroke="#FFFFFF" stroke-width="3"></circle>
+    </svg>
+    <a href="TrainRun.dc.html" aria-label="Back to runs" style="position: absolute; top: 54px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: rgba(255,255,255,0.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 4px 14px rgba(18,20,26,0.12); display: flex; align-items: center; justify-content: center; color: #12141A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <div role="radiogroup" aria-label="Color route by" style="position: absolute; top: 54px; right: 16px; display: flex; gap: 2px; padding: 3px; border-radius: 22px; background: rgba(255,255,255,0.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 4px 14px rgba(18,20,26,0.12)">
+      <sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+        <button role="radio" aria-checked="{{m.on}}" onClick="{{m.pick}}" style="height: 38px; padding: 0 14px; border: 0; border-radius: 19px; background: {{m.bg}}; color: {{m.fg}}; font-family: inherit; font-size: 13.5px; font-weight: 750">{{m.k}}</button>
+      </sc-for>
+    </div>
+    <div style="position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: rgba(255,255,255,0.9); font-size: 12px; font-weight: 700; color: #4A505C">
+      <span>{{legLo}}</span>
+      <div style="flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px"><span style="height: 8px; border-radius: 4px 0 0 4px; background: {{c0}}"></span><span style="height: 8px; background: {{c1}}"></span><span style="height: 8px; background: {{c2}}"></span><span style="height: 8px; background: {{c3}}"></span><span style="height: 8px; border-radius: 0 4px 4px 0; background: {{c4}}"></span></div>
+      <span>{{legHi}}</span>
+    </div>
+  </section>
+
+  <section aria-label="Run summary" style="margin: 0; padding: 20px 20px 0; display: flex; flex-direction: column; gap: 6px">
+    <span style="font-size: 14px; font-weight: 650; color: #646A78">Monday, Oct 19 · 07:12 – 07:54</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.02em">Outdoor Run</h1>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 17px; background: #12141A; color: #FFFFFF; font-size: 13.5px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5C04A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0zM5 4h3M16 4h3M5 4a3 3 0 0 0 3 4M19 4a3 3 0 0 1-3 4M12 12v4M8.5 20h7M10 16h4v4h-4z"></path></svg>Personal best · Fastest 5K 26:02</span>
+    </div>
+  </section>
+
+  <section aria-label="Totals" style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 6px 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0; border-bottom: 1px solid #EEEFF2"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Distance</span><span style="font-size: 20px; font-weight: 750">8.04 <span style="font-size: 13px; color: #646A78">km</span></span></div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0; border-bottom: 1px solid #EEEFF2"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Duration</span><span style="font-size: 20px; font-weight: 750">42:18</span></div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0; border-bottom: 1px solid #EEEFF2"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Avg pace</span><span style="font-size: 20px; font-weight: 750">5:16 <span style="font-size: 13px; color: #646A78">/km</span></span></div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Elevation</span><span style="font-size: 20px; font-weight: 750">46 <span style="font-size: 13px; color: #646A78">m</span></span></div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Calories</span><span style="font-size: 20px; font-weight: 750">586 <span style="font-size: 13px; color: #646A78">kcal</span></span></div>
+    <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 0"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Avg / max HR</span><span style="font-size: 20px; font-weight: 750">152<span style="font-size: 13px; color: #646A78">/178</span></span></div>
+  </section>
+
+  <section aria-label="Strain for this run" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; align-items: center; gap: 16px">
+    <div style="position: relative; width: 64px; height: 64px; flex: none"><svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="none" stroke="#FFE9E1" stroke-width="12"></circle><circle cx="50" cy="50" r="42" fill="none" stroke="#FF6A3D" stroke-width="12" stroke-linecap="round" stroke-dasharray="108.2 263.9" transform="rotate(-90 50 50)"></circle></svg><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700">41</span></div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 750">Strain 41 · Moderate</span><span style="font-size: 13.5px; font-weight: 600; color: #646A78; line-height: 1.4">Training load 118 · two-thirds of today's strain</span></div>
+  </section>
+
+  <section aria-label="Splits" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Splits</h2><span style="font-size: 13px; font-weight: 600; color: #646A78">per km</span></div>
+    <div style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 46px 44px; gap: 10px; padding-bottom: 8px; font-size: 12px; font-weight: 700; color: #646A78; border-bottom: 1px solid #EEEFF2"><span>km</span><span>Pace</span><span style="text-align: right">HR</span><span style="text-align: right">Elev</span></div>
+    <sc-for list="{{splits}}" as="s" hint-placeholder-count="9">
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 46px 44px; gap: 10px; align-items: center; min-height: 40px; border-bottom: 1px solid #F4F2FA">
+        <span style="font-size: 14px; font-weight: 700; color: #4A505C">{{s.k}}</span>
+        <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 15px; font-weight: 750; min-width: 38px">{{s.p}}</span><div style="flex: 1; height: 8px; border-radius: 4px; background: #F4F2FA"><div style="width: {{s.w}}; height: 8px; border-radius: 4px; background: {{s.c}}"></div></div></div>
+        <span style="text-align: right; font-size: 14px; font-weight: 650">{{s.hr}}</span>
+        <span style="text-align: right; font-size: 14px; font-weight: 650; color: #4A505C">{{s.el}}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <section aria-label="Charts" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 750">Pace</span><span style="font-size: 13px; font-weight: 600; color: #646A78">avg 5:16 · best 4:52 /km</span></div>
+      <svg width="322" height="84" viewBox="0 0 322 84" aria-hidden="true"><path d="M0 42H322" stroke="#E2E4E9" stroke-dasharray="4 4"></path><path d="{{paceArea}}" fill="#E7F0FF"></path><path d="{{paceLine}}" fill="none" stroke="#2E7CF6" stroke-width="2.2" stroke-linejoin="round"></path></svg>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 750">Heart rate</span><span style="font-size: 13px; font-weight: 600; color: #646A78">avg 152 · max 178 bpm</span></div>
+      <svg width="322" height="84" viewBox="0 0 322 84" aria-hidden="true"><path d="{{hrArea}}" fill="#FCECEC"></path><path d="{{hrLine}}" fill="none" stroke="#E5484D" stroke-width="2.2" stroke-linejoin="round"></path></svg>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 750">Elevation</span><span style="font-size: 13px; font-weight: 600; color: #646A78">+46 m · −40 m</span></div>
+      <svg width="322" height="64" viewBox="0 0 322 64" aria-hidden="true"><path d="{{elArea}}" fill="#E6E2D6"></path><path d="{{elLine}}" fill="none" stroke="#8C7B55" stroke-width="2" stroke-linejoin="round"></path></svg>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; color: #646A78"><span>0 km</span><span>2</span><span>4</span><span>6</span><span>8 km</span></div>
+  </section>
+
+  <section aria-label="Heart rate zones" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Heart rate zones</h2>
+    <sc-for list="{{zones}}" as="z" hint-placeholder-count="5">
+      <div style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 48px 38px; align-items: center; gap: 10px">
+        <span style="font-size: 13px; font-weight: 800; color: #4A505C">{{z.n}}</span>
+        <div style="height: 14px; border-radius: 7px; background: #F4F2FA"><div style="width: {{z.w}}; height: 14px; border-radius: 7px; background: {{z.c}}"></div></div>
+        <span style="text-align: right; font-size: 14px; font-weight: 750">{{z.t}}</span>
+        <span style="text-align: right; font-size: 13px; font-weight: 600; color: #646A78">{{z.p}}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <section aria-label="Running form" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Running form</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Cadence</span><span style="font-size: 20px; font-weight: 750">172 <span style="font-size: 13px; color: #646A78">spm</span></span></div>
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Stride length</span><span style="font-size: 20px; font-weight: 750">1.10 <span style="font-size: 13px; color: #646A78">m</span></span></div>
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Ground contact</span><span style="font-size: 20px; font-weight: 750">248 <span style="font-size: 13px; color: #646A78">ms</span></span></div>
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Vertical oscillation</span><span style="font-size: 20px; font-weight: 750">8.6 <span style="font-size: 13px; color: #646A78">cm</span></span></div>
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Running power</span><span style="font-size: 20px; font-weight: 750">268 <span style="font-size: 13px; color: #646A78">W</span></span></div>
+      <div style="padding: 14px; border-radius: 18px; background: #F5F6F8; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Source</span><span style="font-size: 15px; font-weight: 700; line-height: 1.3">Apple Watch Series 12</span></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2400}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { mode: 'pace' }; }
+  renderVals() {
+    var self = this;
+    var pace = [331, 318, 314, 309, 312, 320, 315, 306, 298];
+    var hrS = [138, 147, 151, 154, 155, 156, 158, 163, 165];
+    var elS = ['+4', '+12', '−6', '+8', '+10', '−14', '+6', '+6', '0'];
+    var fmt = function (s) { return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); };
+    var splits = pace.map(function (p, i) {
+      return { k: i === 8 ? '0.04' : String(i + 1), p: fmt(p), hr: String(hrS[i]), el: elS[i], w: Math.round((350 - p) / 55 * 100) + '%', c: p <= 309 ? '#2E7CF6' : '#9EC2FF' };
+    });
+    // samples every 0.1 km
+    var N = 81, s = 21, pS = [], hS = [], eS = [], e = 18;
+    for (var i = 0; i < N; i++) {
+      s = (s * 9301 + 49297) % 233280; var r = s / 233280;
+      var k = Math.min(8, Math.floor(i / 10));
+      pS.push(pace[k] + (r - 0.5) * 22 + (i % 23 === 5 ? 14 : 0));
+      hS.push(Math.min(178, (i < 6 ? 110 + i * 5 : hrS[k]) + (r - 0.5) * 6));
+      var del = [0.4, 1.2, -0.6, 0.8, 1.0, -1.4, 0.6, 0.6, 0][k];
+      e += del + (r - 0.5) * 0.8; eS.push(e);
+    }
+    var mk = function (arr, w, h, lo, hi, inv) {
+      var pts = arr.map(function (v, i) { var y = (v - lo) / (hi - lo); if (inv) { y = 1 - y; } return [(i / (arr.length - 1) * w), h - y * h]; });
+      var line = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+      return { line: line, area: line + ' L' + w + ' ' + h + ' L0 ' + h + ' Z' };
+    };
+    var pc = mk(pS, 322, 84, 280, 360, true), hc = mk(hS, 322, 84, 100, 185, false), ec = mk(eS, 322, 64, 0, 40, false);
+    // route
+    var R = 120, pts = [];
+    for (var j = 0; j < N; j++) {
+      var t = 0.08 + j / (N - 1) * (Math.PI * 2 - 0.2);
+      pts.push([195 + 128 * Math.cos(t) + 16 * Math.cos(3 * t), 200 + 96 * Math.sin(t) + 18 * Math.sin(2 * t)]);
+    }
+    var mode = this.state.mode;
+    var vals = mode === 'pace' ? pS : hS;
+    var bucket = function (v) {
+      if (mode === 'pace') { return v > 330 ? 0 : v > 318 ? 1 : v > 310 ? 2 : v > 302 ? 3 : 4; }
+      return v < 118 ? 0 : v < 138 ? 1 : v < 157 ? 2 : v < 177 ? 3 : 4;
+    };
+    var paths = ['', '', '', '', ''];
+    for (var q = 1; q < N; q++) {
+      var b = bucket((vals[q] + vals[q - 1]) / 2);
+      paths[b] += 'M' + pts[q - 1][0].toFixed(1) + ' ' + pts[q - 1][1].toFixed(1) + 'L' + pts[q][0].toFixed(1) + ' ' + pts[q][1].toFixed(1) + ' ';
+    }
+    var cols = mode === 'pace' ? ['#F5C04A', '#E8903C', '#C8507A', '#7046C9', '#2B3FBF'] : ['#7DA7E8', '#2F9E8F', '#FFB21E', '#FF6A3D', '#E5484D'];
+    var modes = [['pace', 'Pace'], ['hr', 'Heart rate']].map(function (m) { var on = m[0] === mode; return { k: m[1], on: on ? 'true' : 'false', bg: on ? '#12141A' : 'transparent', fg: on ? '#FFFFFF' : '#12141A', pick: function () { self.setState({ mode: m[0] }); } }; });
+    return {
+      modes: modes, splits: splits,
+      r0: paths[0], r1: paths[1], r2: paths[2], r3: paths[3], r4: paths[4],
+      c0: cols[0], c1: cols[1], c2: cols[2], c3: cols[3], c4: cols[4],
+      legLo: mode === 'pace' ? 'Slower' : 'Zone 1', legHi: mode === 'pace' ? 'Faster' : 'Zone 5',
+      mapLabel: 'Route map, 8.04 km loop, colored by ' + (mode === 'pace' ? 'pace' : 'heart rate'),
+      sx: pts[0][0].toFixed(1), sy: pts[0][1].toFixed(1), ex: pts[N - 1][0].toFixed(1), ey: pts[N - 1][1].toFixed(1),
+      paceLine: pc.line, paceArea: pc.area, hrLine: hc.line, hrArea: hc.area, elLine: ec.line, elArea: ec.area,
+      zones: [
+        { n: 'Z1', t: '2:10', p: '5%', w: '5%', c: '#7DA7E8' },
+        { n: 'Z2', t: '6:40', p: '16%', w: '16%', c: '#2F9E8F' },
+        { n: 'Z3', t: '19:05', p: '45%', w: '45%', c: '#FFB21E' },
+        { n: 'Z4', t: '12:48', p: '30%', w: '30%', c: '#FF6A3D' },
+        { n: 'Z5', t: '1:35', p: '4%', w: '4%', c: '#E5484D' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

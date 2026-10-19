@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Goals</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <div style="position: absolute; top: 62px; left: 16px; right: 24px; display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 14px">
+    <a href="Onb5-About.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.06); display: flex; align-items: center; justify-content: center; color: #12141A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <div aria-label="Step 3 of 4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px"><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #D5D8DE"></span></div>
+  </div>
+
+  <div style="position: absolute; top: 128px; left: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #646A78">Step 3 of 4</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 30px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.1">Set your goals</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 1.45; font-weight: 500; color: #4A505C">Vigil measures your week against these. Change them any time in Profile.</p>
+  </div>
+
+  <div style="position: absolute; top: 262px; left: 16px; right: 16px; display: flex; flex-direction: column; gap: 12px">
+    <sc-for list="{{goals}}" as="g" hint-placeholder-count="3">
+      <div style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); padding: 18px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span style="width: 40px; height: 40px; border-radius: 12px; background: {{g.tint}}; color: {{g.ink}}; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{g.icon}}"></path></svg></span>
+          <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 16px; font-weight: 750">{{g.title}}</span><span style="font-size: 13px; font-weight: 600; color: #646A78">{{g.hint}}</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px">
+          <button aria-label="{{g.decLabel}}" onClick="{{g.dec}}" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #F4F2FA; color: #12141A; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+          <div style="text-align: center"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.02em">{{g.value}}</span> <span style="font-size: 15px; font-weight: 650; color: #646A78">{{g.unit}}</span></div>
+          <button aria-label="{{g.incLabel}}" onClick="{{g.inc}}" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #F4F2FA; color: #12141A; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5v14"></path></svg></button>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position: absolute; left: 24px; right: 24px; bottom: 40px">
+    <a href="Onb7-Import.dc.html" style="width: 100%; height: 56px; border-radius: 28px; background: #6B4EFF; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; text-decoration: none">Continue</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sleep: 480, run: 25, lift: 3 }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var bump = function (k, d, lo, hi) { return function () { var o = {}; o[k] = Math.max(lo, Math.min(hi, st[k] + d)); self.setState(o); }; };
+    var hm = Math.floor(st.sleep / 60) + 'h ' + (st.sleep % 60 < 10 ? '0' : '') + (st.sleep % 60) + 'm';
+    return {
+      goals: [
+        { title: 'Nightly sleep', hint: 'Time asleep, not time in bed', value: hm, unit: '', tint: '#EEEAFF', ink: '#4B42D6', icon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z', dec: bump('sleep', -15, 300, 660), inc: bump('sleep', 15, 300, 660), decLabel: 'Less sleep', incLabel: 'More sleep' },
+        { title: 'Weekly running', hint: 'Distance from all runs', value: String(st.run), unit: 'km', tint: '#E7F0FF', ink: '#2E7CF6', icon: 'M13 4.5a1.8 1.8 0 1 1 0 .1M8 21l3-6 3 2v4M6 11l3-3h4l2 4 3 1', dec: bump('run', -5, 0, 200), inc: bump('run', 5, 0, 200), decLabel: 'Less distance', incLabel: 'More distance' },
+        { title: 'Weekly lifting', hint: 'Strength workouts from any app', value: String(st.lift), unit: st.lift === 1 ? 'session' : 'sessions', tint: '#FFE9E1', ink: '#B5480F', icon: 'M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11', dec: bump('lift', -1, 0, 7), inc: bump('lift', 1, 0, 7), decLabel: 'Fewer sessions', incLabel: 'More sessions' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

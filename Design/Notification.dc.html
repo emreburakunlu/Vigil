@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Lock Screen notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #2A3442; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #FFFFFF; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+  <div aria-hidden="true" style="position: absolute; left: -120px; top: 420px; width: 520px; height: 520px; border-radius: 260px; background: #354253"></div>
+  <div aria-hidden="true" style="position: absolute; left: 140px; top: 560px; width: 420px; height: 420px; border-radius: 210px; background: #3E4C5F"></div>
+
+  <div style="position: absolute; top: 96px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 2px">
+    <span style="font-size: 20px; font-weight: 650; color: rgba(255,255,255,0.86)">Monday, October 19</span>
+    <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 96px; font-weight: 600; letter-spacing: -0.03em; line-height: 1">7:04</span>
+  </div>
+
+  <div style="position: absolute; left: 12px; right: 12px; top: 520px; display: flex; flex-direction: column; gap: 8px">
+    <div style="padding: 14px; border-radius: 24px; background: rgba(245,246,248,0.84); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); color: #12141A; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start">
+      <svg width="38" height="38" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#12141A"></rect><path d="M5.5 16c4.5-6.5 16.5-6.5 21 0-4.5 6.5-16.5 6.5-21 0z" fill="none" stroke="#FFFFFF" stroke-width="2"></path><circle cx="16" cy="16" r="3.4" fill="#1DB872"></circle></svg>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="display: flex; justify-content: space-between"><span style="font-size: 15px; font-weight: 750">Good morning</span><span style="font-size: 13px; font-weight: 600; color: #4A505C">now</span></div>
+        <span style="font-size: 15px; font-weight: 500; line-height: 1.35">Recovery 78% · Slept 7h 42m · Push day ready.</span>
+      </div>
+    </div>
+    <div style="margin: 0 10px; padding: 12px 14px; border-radius: 20px; background: rgba(245,246,248,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); color: #12141A; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: center">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#12141A"></rect><path d="M5.5 16c4.5-6.5 16.5-6.5 21 0-4.5 6.5-16.5 6.5-21 0z" fill="none" stroke="#FFFFFF" stroke-width="2"></path><circle cx="16" cy="16" r="3.4" fill="#1DB872"></circle></svg>
+      <div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 14px; font-weight: 600">Bedtime in 30 min to hit your 8h target</span><span style="font-size: 12.5px; font-weight: 600; color: #4A505C; white-space: nowrap">22:30</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

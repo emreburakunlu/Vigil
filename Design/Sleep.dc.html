@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Sleep</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#EEF0FA}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 390px; height: 2440px; position: relative; overflow: hidden; background: #0E1022; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #EEF0FA; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 58px 20px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 15px; font-weight: 600; color: #A3A8C3">Sun 18 → Mon 19 Oct</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1">Last night</h1>
+    </div>
+    <div style="display: flex; gap: 6px">
+      <button aria-label="Previous night" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <a href="SleepCalendar.dc.html" aria-label="Sleep calendar" style="width: 44px; height: 44px; border-radius: 22px; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg></a>
+      <button aria-label="Next night" disabled style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA; padding: 0; opacity: 0.35"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+    </div>
+  </header>
+
+  <section aria-label="Sleep score" style="margin: 18px 16px 0; background: #171A33; border-radius: 26px; padding: 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 20px">
+      <div style="position: relative; width: 116px; height: 116px; flex: none">
+        <svg width="116" height="116" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#262A4D" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#9D8CFF" stroke-width="9" stroke-linecap="round" stroke-dasharray="227.0 270.2" transform="rotate(-90 50 50)"></circle></svg>
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; line-height: 1">84</span><span style="font-size: 12px; font-weight: 700; color: #A3A8C3; letter-spacing: 0.04em">SCORE</span></div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: #A3A8C3; letter-spacing: 0.05em; text-transform: uppercase">Total sleep</span>
+        <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1">7h 42m</span>
+        <div style="height: 8px; border-radius: 4px; background: #262A4D; overflow: hidden"><div style="width: 96%; height: 8px; border-radius: 4px; background: #9D8CFF"></div></div>
+        <span style="font-size: 13.5px; font-weight: 600; color: #A3A8C3">18 min short of your 8h target</span>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; background: #1F2342"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A8C3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg><div style="display: flex; flex-direction: column"><span style="font-size: 12.5px; font-weight: 650; color: #A3A8C3">Bedtime</span><span style="font-size: 17px; font-weight: 750">22:58</span></div></div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; background: #1F2342"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A8C3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"></path></svg><div style="display: flex; flex-direction: column"><span style="font-size: 12.5px; font-weight: 650; color: #A3A8C3">Woke up</span><span style="font-size: 17px; font-weight: 750">07:04</span></div></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 14px">
+      <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #A3A8C3">In bed</span><span style="font-size: 17px; font-weight: 750">8h 06m</span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #A3A8C3">Efficiency</span><span style="font-size: 17px; font-weight: 750">95%</span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #A3A8C3">Interruptions</span><span style="font-size: 17px; font-weight: 750">3</span></div>
+    </div>
+  </section>
+
+  <section aria-label="Sleep stages" style="margin: 14px 16px 0; background: #171A33; border-radius: 26px; padding: 20px 16px 16px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Sleep stages</h2>
+    <div style="display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 8px">
+      <div style="display: flex; flex-direction: column; font-size: 12px; font-weight: 700; color: #A3A8C3">
+        <span style="height: 22px; line-height: 22px">Awake</span><span style="height: 14px"></span>
+        <span style="height: 22px; line-height: 22px">REM</span><span style="height: 14px"></span>
+        <span style="height: 22px; line-height: 22px">Core</span><span style="height: 14px"></span>
+        <span style="height: 22px; line-height: 22px">Deep</span>
+      </div>
+      <svg width="272" height="130" viewBox="0 0 272 130" role="img" aria-label="Hypnogram of last night from 22:58 to 07:04">
+        <path d="M0 11H272M0 47H272M0 83H272M0 119H272" stroke="rgba(255,255,255,0.05)" stroke-width="22"></path>
+        <path d="{{links}}" stroke="rgba(238,240,250,0.28)" stroke-width="1"></path>
+        <path d="{{pA}}" fill="#FF9F6E"></path>
+        <path d="{{pR}}" fill="#7FD1F5"></path>
+        <path d="{{pC}}" fill="#6E93FF"></path>
+        <path d="{{pD}}" fill="#B19BFF"></path>
+      </svg>
+    </div>
+    <div style="display: flex; justify-content: space-between; padding-left: 54px; font-size: 12px; font-weight: 650; color: #A3A8C3"><span>23:00</span><span>01:00</span><span>03:00</span><span>05:00</span><span>07:00</span></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 4px">
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="4">
+        <div style="padding: 12px; border-radius: 18px; background: #1F2342; display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; align-items: center; gap: 7px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{s.c}}"></span><span style="font-size: 13.5px; font-weight: 700; color: #C9CDE3">{{s.name}}</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between"><span style="font-size: 19px; font-weight: 750">{{s.t}}</span><span style="font-size: 15px; font-weight: 700; color: {{s.c}}">{{s.p}}</span></div>
+          <div style="position: relative; height: 6px; border-radius: 3px; background: #2A2E52">
+            <div style="position: absolute; top: -3px; height: 12px; left: {{s.bandL}}; width: {{s.bandW}}; border-radius: 3px; background: rgba(255,255,255,0.13)"></div>
+            <div style="position: absolute; top: -4px; left: {{s.mark}}; width: 4px; height: 14px; border-radius: 2px; background: {{s.c}}"></div>
+          </div>
+          <span style="font-size: 12px; font-weight: 600; color: #8A90AE">Typical {{s.typ}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Sleep vitals" style="margin: 14px 16px 0; background: #171A33; border-radius: 26px; padding: 18px 16px 6px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Sleep vitals</h2><span style="font-size: 13px; font-weight: 600; color: #A3A8C3">Baseline</span></div>
+    <sc-for list="{{vitals}}" as="v" hint-placeholder-count="5">
+      <a href="Metric.dc.html" style="display: grid; grid-template-columns: minmax(0, 1fr) auto 64px; align-items: center; gap: 10px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.07); text-decoration: none; color: #EEF0FA">
+        <span style="font-size: 15px; font-weight: 650">{{v.name}}</span>
+        <span style="font-size: 16px; font-weight: 750">{{v.value}} <span style="display: inline-flex; font-size: 13px; color: {{v.tone}}">{{v.delta}}</span></span>
+        <span style="text-align: right; font-size: 13.5px; font-weight: 600; color: #A3A8C3">{{v.base}}</span>
+      </a>
+    </sc-for>
+  </section>
+
+  <section aria-label="Sleep debt" style="margin: 14px 16px 0; background: #171A33; border-radius: 26px; padding: 18px 16px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start">
+      <div style="display: flex; flex-direction: column; gap: 3px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Sleep debt</h2><span style="font-size: 13px; font-weight: 600; color: #A3A8C3">Shortfall vs. 8h, last 7 nights</span></div>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 700; color: #FFB48F">4h 33m</span>
+    </div>
+    <div style="position: relative; height: 110px">
+      <div style="position: absolute; left: 0; right: 0; top: 14px; border-top: 1.5px dashed rgba(238,240,250,0.45)"></div>
+      <span style="position: absolute; right: 0; top: -6px; font-size: 11px; font-weight: 700; color: #A3A8C3; background: #171A33; padding-left: 4px">8h</span>
+      <div style="position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end">
+        <sc-for list="{{debt}}" as="d" hint-placeholder-count="7">
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; height: 110px">
+            <div style="height: {{d.gap}}; border-radius: 6px 6px 0 0; border: 1.5px dashed #FF9F6E; border-bottom: 0; box-sizing: border-box"></div>
+            <div style="height: {{d.h}}; border-radius: {{d.r}}; background: #4F7BFF"></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #A3A8C3"><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span></div>
+  </section>
+
+  <section aria-label="Sleep trends" style="margin: 14px 16px 0; background: #171A33; border-radius: 26px; padding: 18px 16px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Trends</h2>
+      <div style="display: flex; gap: 2px; background: #0E1022; border-radius: 12px; padding: 3px">
+        <sc-for list="{{ranges}}" as="r" hint-placeholder-count="3">
+          <button onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="min-width: 48px; height: 34px; border: 0; border-radius: 9px; background: {{r.bg}}; color: #EEF0FA; font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 8px">{{r.k}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+      <sc-for list="{{metrics}}" as="m" hint-placeholder-count="3">
+        <button onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="height: 38px; border-radius: 12px; border: 1px solid {{m.bd}}; background: {{m.bg}}; color: #EEF0FA; font-family: inherit; font-size: 13.5px; font-weight: 700; padding: 0">{{m.k}}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">{{headline}}</span><span style="font-size: 13.5px; font-weight: 600; color: #A3A8C3">{{sub}}</span></div>
+    <div style="position: relative; height: 140px; display: grid; grid-template-columns: repeat({{n}}, minmax(0, 1fr)); gap: {{gap}}; align-items: start">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="7">
+        <div style="height: 140px; position: relative"><div style="position: absolute; left: 0; right: 0; top: {{b.top}}; height: {{b.h}}; border-radius: {{b.r}}; background: {{b.c}}"></div></div>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; color: #A3A8C3"><sc-for list="{{ticks}}" as="t" hint-placeholder-count="3"><span>{{t}}</span></sc-for></div>
+  </section>
+
+  <section aria-label="Insights" style="margin: 26px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <h2 style="margin: 0 4px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700">Insights</h2>
+    <div style="display: flex; gap: 12px; padding: 16px; background: #171A33; border-radius: 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06)"><span style="width: 36px; height: 36px; flex: none; border-radius: 11px; background: #262A4D; color: #B7B1FF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path></svg></span><p style="margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600">You sleep 35 min more on rest days than after lifting.</p></div>
+    <div style="display: flex; gap: 12px; padding: 16px; background: #171A33; border-radius: 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06)"><span style="width: 36px; height: 36px; flex: none; border-radius: 11px; background: #262A4D; color: #B7B1FF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span><p style="margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600">Your bedtime varied by 48 min this week, up from 31 min last week.</p></div>
+    <div style="display: flex; gap: 12px; padding: 16px; background: #171A33; border-radius: 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06)"><span style="width: 36px; height: 36px; flex: none; border-radius: 11px; background: #262A4D; color: #B7B1FF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3M6.3 6.3L4.2 4.2M19.8 19.8l-2.1-2.1"></path><circle cx="12" cy="12" r="4"></circle></svg></span><p style="margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600">Deep sleep is 18% higher on nights you're in bed before 23:00.</p></div>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 16px; right: 16px; bottom: 28px; height: 66px; border-radius: 33px; background: rgba(30,33,62,0.84); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; box-sizing: border-box; gap: 2px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5a8.5 8.5 0 1 1 15 0"></path><path d="M12 13l4-4"></path><circle cx="12" cy="13.5" r="1.5"></circle></svg>Today</a>
+    <a href="Sleep.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; background: rgba(255,255,255,0.12); color: #FFFFFF; text-decoration: none; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>Sleep</a>
+    <a href="TrainRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>Train</a>
+    <a href="ProgressRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Progress</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2440}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { range: '30D', metric: 'Duration' }; }
+  renderVals() {
+    var self = this;
+    var segs = [['A',0,6],['C',6,30],['D',30,78],['C',78,110],['R',110,128],['C',128,150],['D',150,182],['C',182,218],['A',218,224],['C',224,250],['R',250,280],['C',280,322],['D',322,332],['C',332,364],['R',364,384],['C',384,400],['A',400,408],['C',408,440],['R',440,478],['C',478,482],['A',482,486]];
+    var W = 272, T = 486, lane = { A: 0, R: 36, C: 72, D: 108 };
+    var X = function (m) { return (m / T * W).toFixed(1); };
+    var p = { A: '', R: '', C: '', D: '' }, links = '';
+    segs.forEach(function (s, i) {
+      var x = X(s[1]), w = ((s[2] - s[1]) / T * W).toFixed(1), y = lane[s[0]];
+      p[s[0]] += 'M' + x + ' ' + (y + 3) + 'h' + w + 'v16h-' + w + 'Z ';
+      if (i) { var py = lane[segs[i - 1][0]]; links += 'M' + x + ' ' + (Math.min(py, y) + 11) + 'V' + (Math.max(py, y) + 11) + ' '; }
+    });
+    var stages = [
+      { name: 'Awake', t: '24m', p: '5%', c: '#FF9F6E', bandL: '5%', bandW: '20%', mark: '17%', typ: '1–5% of night' },
+      { name: 'REM', t: '1h 46m', p: '22%', c: '#7FD1F5', bandL: '33%', bandW: '17%', mark: '37%', typ: '20–25%' },
+      { name: 'Core', t: '4h 26m', p: '55%', c: '#6E93FF', bandL: '45%', bandW: '27%', mark: '68%', typ: '45–55%' },
+      { name: 'Deep', t: '1h 30m', p: '18%', c: '#B19BFF', bandL: '33%', bandW: '17%', mark: '44%', typ: '13–23%' }
+    ];
+    var vitals = [
+      { name: 'HRV', value: '68 ms', delta: '↑', tone: '#7EE2A8', base: '61 ms' },
+      { name: 'Resting heart rate', value: '52 bpm', delta: '↓', tone: '#7EE2A8', base: '55 bpm' },
+      { name: 'Respiratory rate', value: '14.6', delta: '', tone: '#A3A8C3', base: '14.6' },
+      { name: 'Wrist temperature', value: '+0.21 °C', delta: '↑', tone: '#FFB48F', base: '±0.20' },
+      { name: 'Blood oxygen', value: '96%', delta: '', tone: '#A3A8C3', base: '95–98%' }
+    ];
+    var nights = [425, 410, 470, 435, 455, 430, 462];
+    var debt = nights.map(function (v) {
+      var h = Math.round((v - 300) / 180 * 96);
+      var full = 96;
+      return { h: h + 'px', gap: Math.max(0, full - h) + 'px', r: v >= 480 ? '6px' : '0 0 6px 6px' };
+    });
+    var cfg = { '7D': { n: 7, gap: '10px', ticks: ['Oct 13', 'Oct 16', 'Oct 19'] }, '30D': { n: 30, gap: '3px', ticks: ['Sep 20', 'Oct 5', 'Oct 19'] }, '90D': { n: 90, gap: '1px', ticks: ['Jul 22', 'Sep 5', 'Oct 19'] } };
+    var c = cfg[this.state.range], m = this.state.metric;
+    var s = 17, bars = [], durs = [], scores = [], beds = [];
+    for (var i = 0; i < c.n; i++) {
+      s = (s * 9301 + 49297) % 233280; var r = s / 233280;
+      var d = Math.round(445 + Math.sin(i / 1.7) * 22 + (r - 0.5) * 50);
+      var b = Math.round(-20 + Math.sin(i / 2.3) * 22 + (r - 0.5) * 40);
+      durs.push(d); scores.push(Math.max(55, Math.min(95, Math.round(70 + (d - 440) / 3 + (r - 0.5) * 12)))); beds.push(b);
+    }
+    if (this.state.range === '7D') { durs = nights.slice(); }
+    var rad = c.n > 40 ? '1px' : (c.n > 10 ? '3px' : '6px');
+    var headline, sub;
+    if (m === 'Duration') {
+      bars = durs.map(function (v) { var h = Math.round((v - 300) / 240 * 140); return { top: (140 - h) + 'px', h: h + 'px', r: rad, c: v >= 480 ? '#9D8CFF' : '#4F7BFF' }; });
+      var avg = Math.round(durs.reduce(function (a, b) { return a + b; }, 0) / durs.length);
+      headline = Math.floor(avg / 60) + 'h ' + (avg % 60) + 'm'; sub = 'average asleep';
+    } else if (m === 'Score') {
+      bars = scores.map(function (v) { var h = Math.round(v / 100 * 140); return { top: (140 - h) + 'px', h: h + 'px', r: rad, c: v >= 80 ? '#9D8CFF' : (v >= 65 ? '#5E67C9' : '#3C4180') }; });
+      headline = String(Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length)); sub = 'average score';
+    } else {
+      bars = beds.map(function (b, i) { var start = 120 + b, end = start + durs[i] + 24; var top = Math.round((start - 60) / 600 * 140), h = Math.round((end - start) / 600 * 140); return { top: top + 'px', h: h + 'px', r: rad, c: '#7FD1F5' }; });
+      headline = '± 41 min'; sub = 'bedtime variation · 22:00 → 08:00';
+    }
+    var ranges = ['7D', '30D', '90D'].map(function (k) { var on = k === self.state.range; return { k: k, on: on ? 'true' : 'false', bg: on ? '#2F3360' : 'transparent', pick: function () { self.setState({ range: k }); } }; });
+    var metrics = ['Duration', 'Score', 'Consistency'].map(function (k) { var on = k === m; return { k: k, on: on ? 'true' : 'false', bg: on ? '#262A4D' : 'transparent', bd: on ? '#9D8CFF' : 'rgba(255,255,255,0.12)', pick: function () { self.setState({ metric: k }); } }; });
+    return { pA: p.A, pR: p.R, pC: p.C, pD: p.D, links: links, stages: stages, vitals: vitals, debt: debt, ranges: ranges, metrics: metrics, bars: bars, n: String(c.n), gap: c.gap, ticks: c.ticks, headline: headline, sub: sub };
+  }
+}
+</script>
+</body>
+</html>

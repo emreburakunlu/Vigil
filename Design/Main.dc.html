@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 1760px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 58px 20px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 15px; font-weight: 600; color: #646A78">Monday, October 19</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1">Today</h1>
+    </div>
+    <div style="display: flex; gap: 6px">
+      <button aria-label="Previous day" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.06); display: flex; align-items: center; justify-content: center; color: #12141A; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <button aria-label="Choose a date" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.06); display: flex; align-items: center; justify-content: center; color: #12141A; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg></button>
+      <button aria-label="Next day" disabled style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.06); display: flex; align-items: center; justify-content: center; color: #12141A; padding: 0; opacity: 0.35"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+    </div>
+  </header>
+
+  <div aria-label="Swipe to change day" style="margin: 14px 16px 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px">
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+      <button aria-label="{{d.label}}" style="height: 62px; border: 0; border-radius: 18px; background: {{d.bg}}; color: {{d.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-family: inherit; padding: 0">
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; opacity: 0.75">{{d.w}}</span>
+        <span style="font-size: 17px; font-weight: 700">{{d.n}}</span>
+        <span style="width: 6px; height: 6px; border-radius: 3px; background: {{d.dot}}"></span>
+      </button>
+    </sc-for>
+  </div>
+
+  <section aria-label="Daily scores" style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 26px; padding: 20px 10px 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+    <a href="Recovery.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 98px; height: 98px">
+        <svg width="98" height="98" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#DCF6E8" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#1DB872" stroke-width="9" stroke-linecap="round" stroke-dasharray="210.7 270.2" transform="rotate(-90 50 50)"></circle></svg>
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 29px; font-weight: 700; letter-spacing: -0.02em">78<span style="font-size: 15px; font-weight: 600">%</span></span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1px">
+        <span style="font-size: 15px; font-weight: 700">Recovery</span>
+        <span style="font-size: 13px; font-weight: 650; color: #157A40">Green</span>
+      </div>
+    </a>
+    <a href="Sleep.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 98px; height: 98px">
+        <svg width="98" height="98" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#EEEAFF" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#7B61FF" stroke-width="9" stroke-linecap="round" stroke-dasharray="227.0 270.2" transform="rotate(-90 50 50)"></circle></svg>
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 29px; font-weight: 700; letter-spacing: -0.02em">84</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1px">
+        <span style="font-size: 15px; font-weight: 700">Sleep</span>
+        <span style="font-size: 13px; font-weight: 650; color: #4B42D6">7h 42m</span>
+      </div>
+    </a>
+    <a href="Strain.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 98px; height: 98px">
+        <svg width="98" height="98" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#FFE9E1" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#FF6A3D" stroke-width="9" stroke-linecap="round" stroke-dasharray="167.5 270.2" transform="rotate(-90 50 50)"></circle></svg>
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 29px; font-weight: 700; letter-spacing: -0.02em">62</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1px">
+        <span style="font-size: 15px; font-weight: 700">Strain</span>
+        <span style="font-size: 13px; font-weight: 650; color: #B5480F">Moderate</span>
+      </div>
+    </a>
+  </section>
+
+  <section aria-label="Readiness" style="margin: 12px 16px 0; background: #FFFFFF; border-radius: 26px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #646A78">Readiness</span>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">Updated 07:04</span>
+    </div>
+    <p style="margin: 0; font-size: 18px; font-weight: 650; line-height: 1.35; letter-spacing: -0.01em; text-wrap: pretty">HRV 12% above your baseline. Good day for intervals.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #F4F2FA; border-radius: 16px; padding: 4px">
+      <div aria-current="true" style="height: 40px; border-radius: 12px; background: #157A40; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13l6-6 6 6M6 19l6-6 6 6"></path></svg>Push</div>
+      <div style="height: 40px; border-radius: 12px; color: #646A78; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 650">Maintain</div>
+      <div style="height: 40px; border-radius: 12px; color: #646A78; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 650">Take it easy</div>
+    </div>
+  </section>
+
+  <section aria-label="Today's workouts" style="margin: 28px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Today's workouts</h2>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">From Apple Health</span>
+    </div>
+    <a href="RunDetail.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); text-decoration: none; color: #12141A">
+      <div style="width: 56px; height: 56px; border-radius: 16px; background: #E7F0FF; flex: none; overflow: hidden; position: relative">
+        <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><path d="M0 18H56M0 38H56M20 0V56M40 0V56" stroke="#D6E3F5" stroke-width="1"></path><path d="M12 44 C10 32 18 30 20 22 C22 12 34 10 40 16 C46 22 42 30 36 34 C30 38 30 44 24 46 C20 47 15 47 12 44 Z" fill="none" stroke="#2E7CF6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="44" r="3.2" fill="#FFFFFF" stroke="#2E7CF6" stroke-width="2"></circle></svg>
+      </div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+        <span style="font-size: 16px; font-weight: 700">Outdoor Run</span>
+        <span style="font-size: 13.5px; font-weight: 500; color: #646A78">07:12 · 42:18 · Strain 41</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+        <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700">8.04 km</span>
+        <span style="font-size: 13px; font-weight: 600; color: #646A78">5:16 /km</span>
+      </div>
+    </a>
+    <a href="LiftDetail.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); text-decoration: none; color: #12141A">
+      <div style="width: 56px; height: 56px; border-radius: 16px; background: #FFE9E1; flex: none; display: flex; align-items: center; justify-content: center; color: #B5480F">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>
+      </div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+        <span style="font-size: 16px; font-weight: 700">Upper Body</span>
+        <span style="font-size: 13.5px; font-weight: 500; color: #646A78">18:30 · 58 min · via Hevy</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+        <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700">412 kcal</span>
+        <span style="font-size: 13px; font-weight: 600; color: #646A78">avg 128 bpm</span>
+      </div>
+    </a>
+  </section>
+
+  <section aria-label="Activity" style="margin: 28px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Activity</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px; padding: 18px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05)">
+      <svg width="112" height="112" viewBox="0 0 112 112" role="img" aria-label="Activity rings: Move 107%, Exercise 100%, Stand 75%" style="flex: none"><circle cx="56" cy="56" r="49" fill="none" stroke="#FCE3E7" stroke-width="11"></circle><circle cx="56" cy="56" r="49" fill="none" stroke="#EF4B5F" stroke-width="11" stroke-linecap="round" stroke-dasharray="307.9 307.9" transform="rotate(-90 56 56)"></circle><circle cx="56" cy="56" r="36" fill="none" stroke="#E8F6D9" stroke-width="11"></circle><circle cx="56" cy="56" r="36" fill="none" stroke="#6CBF1F" stroke-width="11" stroke-linecap="round" stroke-dasharray="226.2 226.2" transform="rotate(-90 56 56)"></circle><circle cx="56" cy="56" r="23" fill="none" stroke="#DDF5FA" stroke-width="11"></circle><circle cx="56" cy="56" r="23" fill="none" stroke="#1FB5D1" stroke-width="11" stroke-linecap="round" stroke-dasharray="108.4 144.5" transform="rotate(-90 56 56)"></circle></svg>
+      <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px">
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Steps</span><span style="font-size: 18px; font-weight: 750">11,284</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Move</span><span style="font-size: 18px; font-weight: 750">642<span style="font-size: 13px; font-weight: 600; color: #646A78">/600 kcal</span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Exercise</span><span style="font-size: 18px; font-weight: 750">64<span style="font-size: 13px; font-weight: 600; color: #646A78">/30 min</span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 650; color: #646A78">Stand</span><span style="font-size: 18px; font-weight: 750">9<span style="font-size: 13px; font-weight: 600; color: #646A78">/12 h</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Vitals" style="margin: 28px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Vitals</h2>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">vs. 30-day baseline</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{vitals}}" as="v" hint-placeholder-count="4">
+        <a href="Metric.dc.html" style="display: flex; flex-direction: column; gap: 8px; padding: 14px 14px 12px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); text-decoration: none; color: #12141A">
+          <span style="font-size: 13px; font-weight: 650; color: #646A78">{{v.name}}</span>
+          <div style="display: flex; align-items: baseline; gap: 4px"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">{{v.value}}</span><span style="font-size: 13px; font-weight: 600; color: #646A78">{{v.unit}}</span></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px">
+            <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 13px; font-weight: 700; color: {{v.tone}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{v.arrow}}"></path></svg>{{v.delta}}</span>
+            <svg width="62" height="22" viewBox="0 0 62 22" aria-hidden="true"><path d="{{v.spark}}" fill="none" stroke="{{v.sparkColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="This week" style="margin: 28px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.01em">Last 7 days</h2>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">Oct 13 – 19</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; padding: 18px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05)">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Running</span><span style="font-size: 15px; font-weight: 700">18.4 <span style="font-weight: 600; color: #646A78">/ 25 km</span></span></div>
+        <div style="height: 10px; border-radius: 5px; background: #ECE9F5; overflow: hidden"><div style="width: 74%; height: 10px; border-radius: 5px; background: #2E7CF6"></div></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Lifting</span><span style="font-size: 15px; font-weight: 700">2 <span style="font-weight: 600; color: #646A78">/ 3 sessions</span></span></div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><div style="height: 10px; border-radius: 5px; background: #FF6A3D"></div><div style="height: 10px; border-radius: 5px; background: #FF6A3D"></div><div style="height: 10px; border-radius: 5px; background: #ECE9F5"></div></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Average sleep</span><span style="font-size: 15px; font-weight: 700">7h 21m <span style="font-weight: 600; color: #646A78">/ 8h</span></span></div>
+        <div style="height: 10px; border-radius: 5px; background: #ECE9F5; overflow: hidden"><div style="width: 92%; height: 10px; border-radius: 5px; background: #7B61FF"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 16px; right: 16px; bottom: 28px; height: 66px; border-radius: 33px; background: rgba(255,255,255,0.82); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(18,20,26,0.12), 0 0 0 1px rgba(18,20,26,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; box-sizing: border-box; gap: 2px">
+    <a href="Main.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; background: rgba(123,97,255,0.16); color: #4B32D6; text-decoration: none; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5a8.5 8.5 0 1 1 15 0"></path><path d="M12 13l4-4"></path><circle cx="12" cy="13.5" r="1.5"></circle></svg>Today</a>
+    <a href="Sleep.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>Sleep</a>
+    <a href="TrainRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>Train</a>
+    <a href="ProgressRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Progress</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1760}}'>
+class Component extends DCLogic {
+  spark(vals) {
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), w = 60, h = 18;
+    return vals.map(function (v, i) {
+      return (i ? 'L' : 'M') + (1 + i * w / (vals.length - 1)).toFixed(1) + ' ' + (2 + h - (v - lo) / ((hi - lo) || 1) * h).toFixed(1);
+    }).join(' ');
+  }
+  renderVals() {
+    var rec = [64, 41, 72, 55, 83, 69, 78];
+    var names = ['TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN', 'MON'];
+    var days = rec.map(function (r, i) {
+      var sel = i === 6;
+      var dot = r >= 67 ? '#1DB872' : (r >= 34 ? '#FFB21E' : '#E5484D');
+      return { w: names[i], n: String(13 + i), label: names[i] + ' ' + (13 + i) + ', recovery ' + r + '%', bg: sel ? '#12141A' : 'transparent', fg: sel ? '#FFFFFF' : '#12141A', dot: dot };
+    });
+    var up = 'M12 19V5M6 11l6-6 6 6', down = 'M12 5v14M6 13l6 6 6-6', flat = 'M5 12h14';
+    var vitals = [
+      { name: 'HRV', value: '68', unit: 'ms', delta: '+12%', tone: '#157A40', arrow: up, spark: this.spark([58, 61, 57, 63, 60, 64, 62, 66, 68]), sparkColor: '#1DB872' },
+      { name: 'Resting HR', value: '52', unit: 'bpm', delta: '−3 bpm', tone: '#157A40', arrow: down, spark: this.spark([56, 55, 57, 54, 55, 53, 54, 52, 52]), sparkColor: '#1DB872' },
+      { name: 'Respiratory rate', value: '14.6', unit: 'br/min', delta: 'Steady', tone: '#646A78', arrow: flat, spark: this.spark([14.5, 14.7, 14.6, 14.4, 14.7, 14.6, 14.5, 14.6, 14.6]), sparkColor: '#9AA0AC' },
+      { name: 'Wrist temp', value: '+0.21', unit: '°C', delta: '+0.21 °C', tone: '#8A5E00', arrow: up, spark: this.spark([-0.1, 0.0, -0.05, 0.08, 0.02, 0.1, 0.05, 0.15, 0.21]), sparkColor: '#FFB21E' }
+    ];
+    return { days: days, vitals: vitals };
+  }
+}
+</script>
+</body>
+</html>

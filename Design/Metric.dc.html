@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Metric detail (HRV)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 1120px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 54px 16px 0; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.06); display: flex; align-items: center; justify-content: center; color: #12141A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 1px">
+      <h1 style="margin: 0; font-size: 17px; font-weight: 750">Heart rate variability</h1>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">HRV · SDNN</span>
+    </div>
+    <span></span>
+  </header>
+
+  <nav aria-label="Metrics" style="margin-top: 16px; padding: 0 16px; display: flex; gap: 8px; overflow: hidden; white-space: nowrap">
+    <a href="Metric.dc.html" aria-current="page" style="flex: none; height: 38px; padding: 0 16px; border-radius: 19px; background: #12141A; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">HRV</a>
+    <a href="Metric.dc.html" style="flex: none; height: 38px; padding: 0 16px; border-radius: 19px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.07); color: #12141A; display: flex; align-items: center; font-size: 14px; font-weight: 650; text-decoration: none">Resting HR</a>
+    <a href="Metric.dc.html" style="flex: none; height: 38px; padding: 0 16px; border-radius: 19px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.07); color: #12141A; display: flex; align-items: center; font-size: 14px; font-weight: 650; text-decoration: none">Respiratory rate</a>
+    <a href="Metric.dc.html" style="flex: none; height: 38px; padding: 0 16px; border-radius: 19px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.07); color: #12141A; display: flex; align-items: center; font-size: 14px; font-weight: 650; text-decoration: none">Temperature</a>
+    <a href="Metric.dc.html" style="flex: none; height: 38px; padding: 0 16px; border-radius: 19px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(18,20,26,0.07); color: #12141A; display: flex; align-items: center; font-size: 14px; font-weight: 650; text-decoration: none">Blood oxygen</a>
+  </nav>
+
+  <section aria-label="HRV chart" style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 14px">
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; background: #F4F2FA; border-radius: 14px; padding: 3px">
+      <sc-for list="{{ranges}}" as="r" hint-placeholder-count="5">
+        <button onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="height: 36px; border: 0; border-radius: 11px; background: {{r.bg}}; box-shadow: {{r.sh}}; color: #12141A; font-family: inherit; font-size: 14px; font-weight: 700; padding: 0">{{r.k}}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #646A78">Average</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05">{{avg}} <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 17px; font-weight: 650; color: #646A78">ms</span></span>
+      <span style="font-size: 14px; font-weight: 600; color: #646A78">{{span}}</span>
+    </div>
+    <div style="position: relative; height: 190px">
+      <svg width="290" height="190" viewBox="0 0 290 190" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+        <path d="M0 0.5H290M0 63.5H290M0 126.5H290M0 189.5H290" stroke="#ECEDF0" stroke-width="1"></path>
+        <rect x="0" y="{{bandY}}" width="290" height="{{bandH}}" fill="#DCF6E8"></rect>
+        <path d="{{path}}" fill="none" stroke="#1DB872" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        <circle cx="{{endX}}" cy="{{endY}}" r="5" fill="#FFFFFF" stroke="#1DB872" stroke-width="3"></circle>
+      </svg>
+      <div style="position: absolute; right: 0; top: -7px; display: flex; flex-direction: column; justify-content: space-between; height: 204px; font-size: 11px; font-weight: 650; color: #646A78; text-align: right"><span>90</span><span>70</span><span>50</span><span>30</span></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; padding-right: 32px; font-size: 12px; font-weight: 650; color: #646A78">
+      <sc-for list="{{ticks}}" as="t" hint-placeholder-count="4"><span>{{t}}</span></sc-for>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 650; color: #4A505C"><span style="width: 14px; height: 14px; border-radius: 4px; background: #DCF6E8; box-shadow: inset 0 0 0 1px #BFE3CC"></span>Your baseline · 55–67 ms (30-day)</div>
+  </section>
+
+  <section aria-label="Summary" style="margin: 14px 16px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #646A78">Average</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700">{{avg}}<span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 13px; color: #646A78"> ms</span></span></div>
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #646A78">Minimum</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700">{{min}}<span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 13px; color: #646A78"> ms</span></span></div>
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #646A78">Maximum</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700">{{max}}<span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 13px; color: #646A78"> ms</span></span></div>
+  </section>
+
+  <section aria-label="Latest reading" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 6px 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column">
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid #EEEFF2"><span style="font-size: 15px; font-weight: 650">Last night (sleep average)</span><span style="font-size: 15px; font-weight: 750">68 ms <span style="color: #157A40">↑ 12%</span></span></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid #EEEFF2"><span style="font-size: 15px; font-weight: 650">30-day baseline</span><span style="font-size: 15px; font-weight: 750">61 ms</span></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px"><span style="font-size: 15px; font-weight: 650">Source</span><span style="font-size: 15px; font-weight: 600; color: #646A78">Apple Watch Series 12</span></div>
+  </section>
+
+  <p style="margin: 16px 28px 0; font-size: 14px; line-height: 1.5; font-weight: 500; color: #4A505C; text-wrap: pretty">HRV is the variation in time between heartbeats, measured by your watch while you sleep. Higher than your own baseline usually means you're well recovered. Compare it with yourself, not with others.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { range: 'M' }; }
+  renderVals() {
+    var self = this;
+    var cfg = {
+      D: { n: 10, span: 'Last night · 00:41 – 07:02', ticks: ['00:00', '02:00', '04:00', '06:00'], seed: 2 },
+      W: { n: 7, span: 'Oct 13 – 19, 2026', ticks: ['Tue', 'Thu', 'Sat', 'Mon'], seed: 4 },
+      M: { n: 30, span: 'Sep 20 – Oct 19, 2026', ticks: ['Sep 20', 'Sep 30', 'Oct 10', 'Oct 19'], seed: 3 },
+      '6M': { n: 26, span: 'Apr 20 – Oct 19, 2026', ticks: ['May', 'Jul', 'Aug', 'Oct'], seed: 8 },
+      Y: { n: 12, span: 'Nov 2025 – Oct 2026', ticks: ['Nov', 'Feb', 'Jun', 'Oct'], seed: 9 }
+    };
+    var c = cfg[this.state.range];
+    var s = c.seed, vals = [];
+    for (var i = 0; i < c.n; i++) {
+      s = (s * 9301 + 49297) % 233280;
+      vals.push(Math.round(61 + Math.sin(i / 2.2 + c.seed) * 7 + (s / 233280 - 0.5) * 18));
+    }
+    vals[c.n - 1] = 68;
+    var w = 290, h = 190, lo = 30, hi = 90;
+    var X = function (i) { return 4 + i * (w - 8) / (c.n - 1); };
+    var Y = function (v) { return h - (v - lo) / (hi - lo) * h; };
+    var path = vals.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
+    var sum = vals.reduce(function (a, b) { return a + b; }, 0);
+    var ranges = ['D', 'W', 'M', '6M', 'Y'].map(function (k) {
+      var on = k === self.state.range;
+      return { k: k, on: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', sh: on ? '0 1px 3px rgba(18,20,26,0.12)' : 'none', pick: function () { self.setState({ range: k }); } };
+    });
+    return {
+      ranges: ranges, span: c.span, ticks: c.ticks, path: path,
+      avg: String(Math.round(sum / vals.length)), min: String(Math.min.apply(null, vals)), max: String(Math.max.apply(null, vals)),
+      bandY: Y(67).toFixed(1), bandH: (Y(55) - Y(67)).toFixed(1), endX: X(c.n - 1).toFixed(1), endY: Y(68).toFixed(1)
+    };
+  }
+}
+</script>
+</body>
+</html>

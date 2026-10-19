@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Importing history</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+@keyframes vspin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <div style="position: absolute; top: 62px; left: 70px; right: 24px; height: 44px; display: flex; align-items: center">
+    <div aria-label="Step 4 of 4" style="width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px"><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #12141A"></span><span style="height: 5px; border-radius: 3px; background: #12141A"></span></div>
+  </div>
+
+  <div style="position: absolute; top: 122px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 18px">
+    <div role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" aria-label="Import progress" style="position: relative; width: 176px; height: 176px">
+      <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true"><circle cx="88" cy="88" r="76" fill="#FFFFFF" stroke="#E2E4E9" stroke-width="12"></circle><circle cx="88" cy="88" r="76" fill="none" stroke="#12141A" stroke-width="12" stroke-linecap="round" stroke-dasharray="305.6 477.5" transform="rotate(-90 88 88)"></circle></svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1">64<span style="font-size: 22px">%</span></span><span style="font-size: 13px; font-weight: 650; color: #646A78">about 30 s left</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 32px; text-align: center">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.1">Reading your last 90 days</h1>
+      <p style="margin: 0; font-size: 15.5px; line-height: 1.45; font-weight: 500; color: #4A505C">Vigil is learning your normal so every score is measured against you.</p>
+    </div>
+  </div>
+
+  <ul aria-label="Import steps" style="position: absolute; top: 446px; left: 16px; right: 16px; margin: 0; padding: 4px 16px; list-style: none; background: #FFFFFF; border-radius: 24px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05)">
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #EEEFF2"><span style="width: 24px; height: 24px; border-radius: 12px; background: #1DB872; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="flex: 1; font-size: 15px; font-weight: 650">Sleep</span><span style="font-size: 14px; font-weight: 600; color: #646A78">88 nights</span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #EEEFF2"><span style="width: 24px; height: 24px; border-radius: 12px; background: #1DB872; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="flex: 1; font-size: 15px; font-weight: 650">Heart rate, HRV &amp; vitals</span><span style="font-size: 14px; font-weight: 600; color: #646A78">Done</span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #EEEFF2"><span style="width: 24px; height: 24px; border-radius: 12px; border: 3px solid #E2E4E9; border-top-color: #12141A; box-sizing: border-box; animation: vspin 0.9s linear infinite"></span><span style="flex: 1; font-size: 15px; font-weight: 700">Workouts &amp; routes</span><span style="font-size: 14px; font-weight: 600; color: #646A78">31 of 46</span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #EEEFF2"><span style="width: 24px; height: 24px; border-radius: 12px; border: 2px dashed #C9CCD3; box-sizing: border-box"></span><span style="flex: 1; font-size: 15px; font-weight: 600; color: #646A78">Building your baselines</span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 48px"><span style="width: 24px; height: 24px; border-radius: 12px; border: 2px dashed #C9CCD3; box-sizing: border-box"></span><span style="flex: 1; font-size: 15px; font-weight: 600; color: #646A78">Calculating scores</span></li>
+  </ul>
+
+  <div style="position: absolute; left: 24px; right: 24px; bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+    <a href="Main.dc.html" aria-disabled="true" style="width: 100%; height: 56px; border-radius: 28px; background: #D5D8DE; color: #4A505C; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; text-decoration: none">Open Vigil</a>
+    <span style="font-size: 13px; font-weight: 600; color: #646A78">Stays on this iPhone. Nothing is uploaded.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

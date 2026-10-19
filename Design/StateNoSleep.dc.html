@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · No sleep recorded</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#EEF0FA}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0E1022; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #EEF0FA; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 58px 20px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 15px; font-weight: 600; color: #A3A8C3">Sun 18 → Mon 19 Oct</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1">Last night</h1>
+    </div>
+    <div style="display: flex; gap: 6px">
+      <a href="SleepNight.dc.html" aria-label="Previous night" style="width: 44px; height: 44px; border-radius: 22px; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+      <a href="SleepCalendar.dc.html" aria-label="Sleep calendar" style="width: 44px; height: 44px; border-radius: 22px; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg></a>
+    </div>
+  </header>
+
+  <section aria-label="No sleep recorded" style="margin: 18px 16px 0; background: #171A33; border-radius: 26px; padding: 28px 20px 20px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center">
+    <div style="width: 96px; height: 96px; border-radius: 48px; border: 3px dashed #3A3F6B; display: flex; align-items: center; justify-content: center; color: #8A90AE"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></div>
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700">No sleep recorded</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.45; font-weight: 500; color: #C9CDE3; text-wrap: pretty">Apple Health has no sleep data for last night. Today's Recovery uses HRV and resting heart rate only.</p>
+    <ul style="margin: 4px 0 0; padding: 14px 16px; list-style: none; width: 100%; box-sizing: border-box; border-radius: 18px; background: #1F2342; display: flex; flex-direction: column; gap: 10px; text-align: left">
+      <li style="display: flex; gap: 10px; font-size: 14px; font-weight: 600; color: #C9CDE3"><span style="color: #9D8CFF">•</span>Your watch wasn't worn to bed</li>
+      <li style="display: flex; gap: 10px; font-size: 14px; font-weight: 600; color: #C9CDE3"><span style="color: #9D8CFF">•</span>The battery ran out overnight</li>
+      <li style="display: flex; gap: 10px; font-size: 14px; font-weight: 600; color: #C9CDE3"><span style="color: #9D8CFF">•</span>Sleep tracking is off in the Watch app</li>
+    </ul>
+    <a href="SleepNight.dc.html" style="margin-top: 4px; width: 100%; height: 50px; border-radius: 25px; background: #EEF0FA; color: #0E1022; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 750; text-decoration: none">See the night before</a>
+  </section>
+
+  <section aria-label="Sleep debt" style="margin: 14px 16px 0; background: #171A33; border-radius: 22px; padding: 16px 18px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center">
+    <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Sleep debt</span><span style="font-size: 13px; font-weight: 600; color: #A3A8C3">6 of the last 7 nights recorded</span></div>
+    <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700; color: #FFB48F">3h 55m</span>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 16px; right: 16px; bottom: 28px; height: 66px; border-radius: 33px; background: rgba(30,33,62,0.84); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; box-sizing: border-box; gap: 2px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5a8.5 8.5 0 1 1 15 0"></path><path d="M12 13l4-4"></path><circle cx="12" cy="13.5" r="1.5"></circle></svg>Today</a>
+    <a href="Sleep.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; background: rgba(255,255,255,0.12); color: #FFFFFF; text-decoration: none; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>Sleep</a>
+    <a href="TrainRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>Train</a>
+    <a href="ProgressRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Progress</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #A3A8C3; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

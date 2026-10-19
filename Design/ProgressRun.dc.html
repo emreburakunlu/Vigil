@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Progress · Running</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 1880px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 58px 20px 0">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1">Progress</h1>
+  </header>
+
+  <nav aria-label="Progress area" style="margin: 14px 16px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; background: #E4E6EA; border-radius: 16px; padding: 4px">
+    <a href="ProgressRun.dc.html" aria-current="page" style="height: 40px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(18,20,26,0.12); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 750; text-decoration: none; color: #12141A">Running</a>
+    <a href="ProgressLift.dc.html" style="height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 650; text-decoration: none; color: #4A505C">Lifting</a>
+    <a href="ProgressBody.dc.html" style="height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 650; text-decoration: none; color: #4A505C">Body</a>
+  </nav>
+
+  <div role="radiogroup" aria-label="Time range" style="margin: 12px 16px 0; display: flex; gap: 8px">
+    <sc-for list="{{ranges}}" as="r" hint-placeholder-count="4">
+      <button role="radio" aria-checked="{{r.on}}" onClick="{{r.pick}}" style="flex: 1; height: 38px; border-radius: 19px; border: 0; background: {{r.bg}}; color: {{r.fg}}; box-shadow: 0 0 0 1px rgba(18,20,26,0.07); font-family: inherit; font-size: 14px; font-weight: 700; padding: 0">{{r.k}}</button>
+    </sc-for>
+  </div>
+
+  <section aria-label="Distance" style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Distance</h2>
+      <div style="display: flex; gap: 2px; background: #F4F2FA; border-radius: 11px; padding: 3px">
+        <sc-for list="{{periods}}" as="p" hint-placeholder-count="2">
+          <button onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: {{p.bg}}; box-shadow: {{p.sh}}; color: #12141A; font-family: inherit; font-size: 13px; font-weight: 700">{{p.k}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 700">{{distTotal}} km</span><span style="font-size: 13.5px; font-weight: 600; color: #646A78">{{distSub}}</span></div>
+    <div style="position: relative; height: 150px">
+      <div style="position: absolute; left: 0; right: 0; top: {{goalTop}}; border-top: 1.5px dashed #12141A; opacity: {{goalOp}}"></div>
+      <span style="position: absolute; right: 0; top: {{goalLabelTop}}; font-size: 11px; font-weight: 750; background: #FFFFFF; padding-left: 4px; opacity: {{goalOp}}">Goal 25</span>
+      <div style="position: absolute; inset: 0; display: grid; grid-template-columns: repeat({{dn}}, minmax(0, 1fr)); gap: {{dgap}}; align-items: end">
+        <sc-for list="{{dist}}" as="d" hint-placeholder-count="13">
+          <div style="height: {{d.h}}; border-radius: 5px; background: {{d.c}}"></div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; color: #646A78"><sc-for list="{{ticks}}" as="t" hint-placeholder-count="3"><span>{{t}}</span></sc-for></div>
+  </section>
+
+  <section aria-label="Pace trend" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Average pace</h2><span style="font-size: 13.5px; font-weight: 700; color: #157A40">12 s/km faster</span></div>
+    <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 700">5:21 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #646A78">/km this week</span></span>
+    <svg width="322" height="100" viewBox="0 0 322 100" aria-hidden="true"><path d="M0 25H322M0 50H322M0 75H322" stroke="#F0F1F3"></path><path d="{{paceLine}}" fill="none" stroke="#2E7CF6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="318" cy="{{paceEnd}}" r="5" fill="#FFFFFF" stroke="#2E7CF6" stroke-width="3"></circle></svg>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; color: #646A78"><span>slower ↓ · faster ↑</span><span>weekly average</span></div>
+  </section>
+
+  <section aria-label="VO2 max trend" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">VO₂ max</h2><span style="font-size: 13.5px; font-weight: 700; color: #157A40">+1.7 since Jul</span></div>
+    <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 700">47.8 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #646A78">mL/kg/min · Above average</span></span>
+    <svg width="322" height="90" viewBox="0 0 322 90" aria-hidden="true"><path d="{{vo2Area}}" fill="#EAF6EE"></path><path d="{{vo2Line}}" fill="none" stroke="#1DB872" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </section>
+
+  <section aria-label="Personal bests" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px 18px 6px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column">
+    <h2 style="margin: 0 0 6px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Personal bests</h2>
+    <sc-for list="{{pbs}}" as="b" hint-placeholder-count="6">
+      <sc-if value="{{b.has}}" hint-placeholder-val="{{true}}">
+        <a href="RunDetail.dc.html" style="display: grid; grid-template-columns: minmax(0, 1fr) auto 20px; align-items: center; gap: 10px; min-height: 56px; border-top: 1px solid #EEEFF2; text-decoration: none; color: #12141A">
+          <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; font-weight: 700">{{b.name}}</span><span style="font-size: 12.5px; font-weight: 600; color: #646A78">{{b.date}}</span></div>
+          <span style="display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 750"><sc-if value="{{b.isNew}}" hint-placeholder-val="{{false}}"><span style="height: 22px; padding: 0 8px; border-radius: 11px; background: #12141A; color: #FFFFFF; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; display: flex; align-items: center">NEW</span></sc-if>{{b.val}}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      </sc-if>
+      <sc-if value="{{b.none}}" hint-placeholder-val="{{false}}">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto 20px; align-items: center; gap: 10px; min-height: 56px; border-top: 1px solid #EEEFF2">
+          <span style="font-size: 15px; font-weight: 700">{{b.name}}</span>
+          <span style="font-size: 14px; font-weight: 600; color: #646A78">Not run yet</span>
+          <span></span>
+        </div>
+      </sc-if>
+    </sc-for>
+  </section>
+
+  <section aria-label="Training load" style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 24px; padding: 18px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start">
+      <div style="display: flex; flex-direction: column; gap: 3px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 19px; font-weight: 700">Training load</h2><span style="font-size: 13px; font-weight: 600; color: #646A78">7-day ÷ 28-day load</span></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">1.12</span><span style="font-size: 12.5px; font-weight: 700; color: #157A40">Productive</span></div>
+    </div>
+    <div style="position: relative; height: 150px">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 32px; background: #FCE7E7; border-radius: 8px 8px 0 0"></div>
+      <span style="position: absolute; left: 8px; top: 7px; font-size: 11.5px; font-weight: 800; color: #C42B30">Too much, too fast · above 1.5</span>
+      <div style="position: absolute; left: 0; right: 0; top: 54px; height: 53px; background: #EAF6EE"></div>
+      <span style="position: absolute; left: 8px; top: 58px; font-size: 11.5px; font-weight: 800; color: #157A40">0.8 – 1.3</span>
+      <svg width="322" height="150" viewBox="0 0 322 150" aria-hidden="true" style="position: absolute; inset: 0"><path d="{{ratioLine}}" fill="none" stroke="#12141A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="318" cy="{{ratioEnd}}" r="5" fill="#FFFFFF" stroke="#12141A" stroke-width="3"></circle></svg>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; color: #646A78"><sc-for list="{{ticks}}" as="t" hint-placeholder-count="3"><span>{{t}}</span></sc-for></div>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 16px; right: 16px; bottom: 28px; height: 66px; border-radius: 33px; background: rgba(255,255,255,0.82); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(18,20,26,0.12), 0 0 0 1px rgba(18,20,26,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; box-sizing: border-box; gap: 2px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5a8.5 8.5 0 1 1 15 0"></path><path d="M12 13l4-4"></path><circle cx="12" cy="13.5" r="1.5"></circle></svg>Today</a>
+    <a href="Sleep.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>Sleep</a>
+    <a href="TrainRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>Train</a>
+    <a href="ProgressRun.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; background: rgba(123,97,255,0.16); color: #4B32D6; text-decoration: none; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Progress</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1880}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { range: '3M', period: 'Weekly' }; }
+  gen(seed, n, base, amp, drift) {
+    var s = seed, out = [];
+    for (var i = 0; i < n; i++) { s = (s * 9301 + 49297) % 233280; out.push(base + drift * (i / Math.max(1, n - 1)) + Math.sin(i / 1.9 + seed) * amp * 0.5 + (s / 233280 - 0.5) * amp); }
+    return out;
+  }
+  path(vals, w, h, lo, hi) {
+    return vals.map(function (v, i) { return (i ? 'L' : 'M') + (4 + i * (w - 8) / (vals.length - 1)).toFixed(1) + ' ' + (h - (v - lo) / (hi - lo) * h).toFixed(1); }).join(' ');
+  }
+  renderVals() {
+    var self = this, st = this.state;
+    var weeks = { '4W': 4, '3M': 13, '6M': 26, '1Y': 52 }[st.range];
+    var ticks = { '4W': ['Sep 28', 'Oct 5', 'Oct 19'], '3M': ['Jul 20', 'Sep 1', 'Oct 19'], '6M': ['Apr 20', 'Jul 20', 'Oct 19'], '1Y': ['Oct 2025', 'Apr', 'Oct 2026'] }[st.range];
+    var weekly = this.gen(4, weeks, 17, 9, 6).map(function (v) { return Math.max(4, Math.round(v * 10) / 10); });
+    weekly[weeks - 1] = 18.4;
+    var monthly = st.period === 'Monthly';
+    var bars = weekly, gmax = 32, goal = 25;
+    if (monthly) {
+      bars = [];
+      for (var i = 0; i < weeks; i += 4) { bars.push(weekly.slice(i, i + 4).reduce(function (a, b) { return a + b; }, 0) * (4 / Math.max(1, weekly.slice(i, i + 4).length))); }
+      gmax = 120; goal = 108;
+    }
+    var total = weekly.reduce(function (a, b) { return a + b; }, 0);
+    var dist = bars.map(function (v, i) { return { h: Math.round(v / gmax * 150) + 'px', c: i === bars.length - 1 ? '#2E7CF6' : (v >= goal ? '#5B8DEB' : '#B7CCF2') }; });
+    var pace = this.gen(9, weeks, 333, 10, -12); pace[weeks - 1] = 321;
+    var vo2 = this.gen(2, weeks, 46.1, 0.8, 1.7); vo2[weeks - 1] = 47.8;
+    var vo2Line = this.path(vo2, 322, 90, 43, 50);
+    var ratio = this.gen(6, weeks * 2, 1.0, 0.35, 0.05).map(function (v) { return Math.max(0.55, Math.min(1.62, v)); }); ratio[ratio.length - 1] = 1.12;
+    var rY = function (v) { return 150 - (v - 0.4) / (1.8 - 0.4) * 150; };
+    var ranges = ['4W', '3M', '6M', '1Y'].map(function (k) { var on = k === st.range; return { k: k, on: on ? 'true' : 'false', bg: on ? '#12141A' : '#FFFFFF', fg: on ? '#FFFFFF' : '#12141A', pick: function () { self.setState({ range: k }); } }; });
+    var periods = ['Weekly', 'Monthly'].map(function (k) { var on = k === st.period; return { k: k, on: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', sh: on ? '0 1px 3px rgba(18,20,26,0.12)' : 'none', pick: function () { self.setState({ period: k }); } }; });
+    var gTop = Math.round(150 - goal / gmax * 150);
+    return {
+      ranges: ranges, periods: periods, ticks: ticks,
+      dist: dist, dn: String(dist.length), dgap: dist.length > 20 ? '2px' : '6px',
+      goalTop: gTop + 'px', goalLabelTop: (gTop - 16) + 'px', goalOp: '1',
+      distTotal: String(Math.round(total)), distSub: monthly ? 'monthly totals · goal ' + goal + ' km/mo' : 'avg ' + (total / weeks).toFixed(1) + ' km/week',
+      paceLine: this.path(pace, 322, 100, 345, 310), paceEnd: (100 - (321 - 345) / (310 - 345) * 100).toFixed(1),
+      vo2Line: vo2Line, vo2Area: vo2Line + ' L318 90 L4 90 Z',
+      ratioLine: ratio.map(function (v, i) { return (i ? 'L' : 'M') + (4 + i * 314 / (ratio.length - 1)).toFixed(1) + ' ' + rY(v).toFixed(1); }).join(' '),
+      ratioEnd: rY(1.12).toFixed(1),
+      pbs: [
+        { has: true, none: false, isNew: false, name: 'Fastest 1K', date: 'Sep 22, 2026', val: '4:41' },
+        { has: true, none: false, isNew: true, name: 'Fastest 5K', date: 'Today', val: '26:02' },
+        { has: true, none: false, isNew: false, name: 'Fastest 10K', date: 'Sep 6, 2026', val: '55:48' },
+        { has: false, none: true, isNew: false, name: 'Half marathon', date: '', val: '' },
+        { has: false, none: true, isNew: false, name: 'Marathon', date: '', val: '' },
+        { has: true, none: false, isNew: false, name: 'Longest run', date: 'Sep 27, 2026', val: '14.2 km' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Sleep calendar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#EEF0FA}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 390px; height: 880px; position: relative; overflow: hidden; background: #0E1022; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #EEF0FA; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 54px 16px 0; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px">
+    <a href="Sleep.dc.html" aria-label="Back to Sleep" style="width: 44px; height: 44px; border-radius: 22px; background: #1B1E3A; display: flex; align-items: center; justify-content: center; color: #EEF0FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; text-align: center; font-size: 17px; font-weight: 750">Sleep calendar</h1>
+    <span></span>
+  </header>
+
+  <div style="margin: 20px 16px 0; display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="September 2026" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: transparent; color: #A3A8C3; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 24px; font-weight: 700">October 2026</h2>
+    <button aria-label="November 2026" disabled style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: transparent; color: #A3A8C3; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0.35"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+  </div>
+
+  <section aria-label="October 2026 nights" style="margin: 10px 12px 0; background: #171A33; border-radius: 26px; padding: 14px 8px 12px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06)">
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: 12px; font-weight: 750; color: #A3A8C3; margin-bottom: 6px"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 6px">
+      <sc-for list="{{cells}}" as="c" hint-placeholder-count="35">
+        <div style="height: 64px; display: flex; justify-content: center">
+          <sc-if value="{{c.has}}" hint-placeholder-val="{{true}}">
+            <a href="SleepNight.dc.html" aria-label="{{c.label}}" style="width: 46px; height: 64px; border-radius: 14px; background: {{c.sel}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #EEF0FA">
+              <span style="font-size: 12px; font-weight: 700; color: {{c.dayColor}}">{{c.day}}</span>
+              <div style="position: relative; width: 34px; height: 34px">
+                <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="14" fill="none" stroke="#2A2E52" stroke-width="4"></circle><circle cx="17" cy="17" r="14" fill="none" stroke="{{c.col}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{c.dash}}" transform="rotate(-90 17 17)"></circle></svg>
+                <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 800">{{c.score}}</span>
+              </div>
+            </a>
+          </sc-if>
+          <sc-if value="{{c.empty}}" hint-placeholder-val="{{false}}">
+            <div style="width: 46px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px">
+              <span style="font-size: 12px; font-weight: 700; color: {{c.dayColor}}">{{c.day}}</span>
+              <span style="width: 34px; height: 34px; border-radius: 17px; border: 2px dashed {{c.ring}}; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #8A90AE">{{c.mark}}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; margin-top: 12px; font-size: 12.5px; font-weight: 650; color: #C9CDE3">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #B7B1FF"></span>85+ Great</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #7C73F0"></span>70–84 Good</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #FFB48F"></span>50–69 Fair</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #FF6B6B"></span>&lt;50 Poor</span>
+    </div>
+  </section>
+
+  <section aria-label="Month summary" style="margin: 14px 16px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <div style="background: #171A33; border-radius: 20px; padding: 14px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #A3A8C3">Average score</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">78</span></div>
+    <div style="background: #171A33; border-radius: 20px; padding: 14px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #A3A8C3">Average asleep</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">7h 19m</span></div>
+    <div style="background: #171A33; border-radius: 20px; padding: 14px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #A3A8C3">Nights at target</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">5 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #A3A8C3">of 18</span></span></div>
+    <div style="background: #171A33; border-radius: 20px; padding: 14px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 650; color: #A3A8C3">Best night</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">92 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #A3A8C3">Oct 10</span></span></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":880}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var scores = [81, 74, 66, 88, 79, 71, null, 83, 77, 92, 86, 69, 58, 76, 80, 72, 87, 79, 84];
+    var cells = [], i;
+    for (i = 0; i < 3; i++) { cells.push({ has: false, empty: false, day: '', mark: '', ring: 'transparent', dayColor: '#A3A8C3', label: '' }); }
+    for (var d = 1; d <= 31; d++) {
+      var sc = d <= 19 ? scores[d - 1] : undefined;
+      if (sc) {
+        var col = sc >= 85 ? '#B7B1FF' : (sc >= 70 ? '#7C73F0' : (sc >= 50 ? '#FFB48F' : '#FF6B6B'));
+        var sel = d === 14;
+        cells.push({ has: true, empty: false, day: String(d), score: String(sc), col: col, dash: (sc / 100 * 87.96).toFixed(1) + ' 87.96', sel: sel ? '#2F3360' : 'transparent', dayColor: sel ? '#FFFFFF' : '#C9CDE3', label: 'October ' + d + ', sleep score ' + sc });
+      } else {
+        var missing = sc === null;
+        cells.push({ has: false, empty: true, day: String(d), mark: missing ? '—' : '', ring: missing ? '#3A3F6B' : 'rgba(255,255,255,0.06)', dayColor: missing ? '#A3A8C3' : '#5C6286', label: '' });
+      }
+    }
+    return { cells: cells };
+  }
+}
+</script>
+</body>
+</html>

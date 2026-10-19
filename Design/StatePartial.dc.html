@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Partial data</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased">
+
+  <header style="padding: 58px 20px 0; display: flex; flex-direction: column; gap: 2px">
+    <span style="font-size: 15px; font-weight: 600; color: #646A78">Thursday, October 15</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1">Today</h1>
+  </header>
+
+  <section aria-label="Daily scores" style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 26px; padding: 18px 10px 16px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+    <a href="Recovery.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 88px; height: 88px"><svg width="88" height="88" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#FBF1D9" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#FFB21E" stroke-width="9" stroke-linecap="round" stroke-dasharray="172.9 270.2" transform="rotate(-90 50 50)"></circle></svg><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">64<span style="font-size: 14px">%</span></span></div>
+      <div style="display: flex; flex-direction: column; align-items: center"><span style="font-size: 14.5px; font-weight: 700">Recovery</span><span style="font-size: 12.5px; font-weight: 650; color: #8A5E00">3 of 5 signals</span></div>
+    </a>
+    <a href="Sleep.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 88px; height: 88px"><svg width="88" height="88" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#EEEAFF" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#7B61FF" stroke-width="9" stroke-linecap="round" stroke-dasharray="191.8 270.2" transform="rotate(-90 50 50)"></circle></svg><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">71</span></div>
+      <div style="display: flex; flex-direction: column; align-items: center"><span style="font-size: 14.5px; font-weight: 700">Sleep</span><span style="font-size: 12.5px; font-weight: 650; color: #4B42D6">7h 15m</span></div>
+    </a>
+    <a href="Strain.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #12141A">
+      <div style="position: relative; width: 88px; height: 88px"><svg width="88" height="88" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="#FFE9E1" stroke-width="9"></circle><circle cx="50" cy="50" r="43" fill="none" stroke="#FF6A3D" stroke-width="9" stroke-linecap="round" stroke-dasharray="48.6 270.2" transform="rotate(-90 50 50)"></circle></svg><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">18</span></div>
+      <div style="display: flex; flex-direction: column; align-items: center"><span style="font-size: 14.5px; font-weight: 700">Strain</span><span style="font-size: 12.5px; font-weight: 650; color: #B5480F">So far</span></div>
+    </a>
+  </section>
+
+  <div role="note" style="margin: 12px 16px 0; padding: 14px 16px; border-radius: 20px; background: #FBF1D9; display: flex; gap: 12px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A5E00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 3.5l9.5 16.5h-19z"></path><path d="M12 10v4.5M12 17.2v.1"></path></svg>
+    <p style="margin: 0; font-size: 14px; line-height: 1.45; font-weight: 600; color: #4A3500">Your watch didn't record respiratory rate or wrist temperature last night. Recovery uses HRV, resting heart rate and sleep.</p>
+  </div>
+
+  <section aria-label="Vitals" style="margin: 22px 16px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 21px; font-weight: 700">Vitals</h2>
+      <span style="font-size: 13px; font-weight: 600; color: #646A78">vs. 30-day baseline</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <a href="Metric.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); text-decoration: none; color: #12141A"><span style="font-size: 13px; font-weight: 650; color: #646A78">HRV</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">58 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #646A78">ms</span></span><span style="font-size: 13px; font-weight: 700; color: #B5480F">↓ 5%</span></a>
+      <a href="Metric.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 1px 2px rgba(18,20,26,0.04), 0 0 0 1px rgba(18,20,26,0.05); text-decoration: none; color: #12141A"><span style="font-size: 13px; font-weight: 650; color: #646A78">Resting HR</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700">54 <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #646A78">bpm</span></span><span style="font-size: 13px; font-weight: 700; color: #646A78">Steady</span></a>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 20px; border: 2px dashed #D5D8DE"><span style="font-size: 13px; font-weight: 650; color: #646A78">Respiratory rate</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700; color: #9AA0AC">—</span><span style="font-size: 13px; font-weight: 650; color: #646A78">Not recorded</span></div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 20px; border: 2px dashed #D5D8DE"><span style="font-size: 13px; font-weight: 650; color: #646A78">Wrist temp</span><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700; color: #9AA0AC">—</span><span style="font-size: 13px; font-weight: 650; color: #646A78">Not recorded</span></div>
+    </div>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 16px; right: 16px; bottom: 28px; height: 66px; border-radius: 33px; background: rgba(255,255,255,0.82); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(18,20,26,0.12), 0 0 0 1px rgba(18,20,26,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; box-sizing: border-box; gap: 2px">
+    <a href="Main.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; background: rgba(123,97,255,0.16); color: #4B32D6; text-decoration: none; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5a8.5 8.5 0 1 1 15 0"></path><path d="M12 13l4-4"></path><circle cx="12" cy="13.5" r="1.5"></circle></svg>Today</a>
+    <a href="Sleep.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>Sleep</a>
+    <a href="TrainRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>Train</a>
+    <a href="ProgressRun.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Progress</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 27px; color: #646A78; text-decoration: none; font-size: 11px; font-weight: 650"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

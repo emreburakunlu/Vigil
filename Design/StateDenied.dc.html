@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vigil · Health access off</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Figtree:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (prefers-reduced-motion: no-preference){@keyframes vRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes vDraw{from{stroke-dasharray:0 1200}}@keyframes vLine{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}@keyframes vGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes vPop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.2)}100%{transform:scale(1)}}@keyframes vDock{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}@keyframes vBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}header,section,h1,h1+p{animation:vRise .6s cubic-bezier(.22,1,.36,1) both}h1+p{animation-delay:.12s}section:nth-of-type(2){animation-delay:0.19s}section:nth-of-type(3){animation-delay:0.26s}section:nth-of-type(4){animation-delay:0.33s}section:nth-of-type(5){animation-delay:0.40s}section:nth-of-type(6){animation-delay:0.47s}section:nth-of-type(7){animation-delay:0.54s}section:nth-of-type(8){animation-delay:0.61s}section:nth-of-type(9){animation-delay:0.68s}circle[stroke-linecap="round"][stroke-dasharray]{animation:vDraw 1.4s cubic-bezier(.22,1,.36,1) .25s both}path[fill="none"][stroke-linejoin="round"]{stroke-dasharray:1600;animation:vLine 1.8s cubic-bezier(.4,0,.2,1) .3s both}[style*="align-items: end"]>div{transform-origin:50% 100%;animation:vGrow .9s cubic-bezier(.22,1,.36,1) .3s both}circle[r="5"][fill="#FFFFFF"]{transform-box:fill-box;transform-origin:center;animation:vPop .55s 1.6s both}svg[aria-label^="Three rings"]{animation:vBreath 4.5s ease-in-out 1.6s infinite}nav[aria-label="Tabs"]{animation:vDock .7s cubic-bezier(.22,1,.36,1) .2s both}a,button{transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s}a:active,button:active{transform:scale(.96)}}
+a{color:#12141A}a:hover{color:#000}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F4F2FA; font-family: 'Figtree', system-ui, -apple-system, sans-serif; color: #12141A; -webkit-font-smoothing: antialiased">
+
+  <div style="position: absolute; top: 120px; left: 0; right: 0; display: flex; justify-content: center">
+    <div style="position: relative; width: 132px; height: 132px; border-radius: 40px; background: #FFFFFF; box-shadow: 0 16px 40px rgba(18,20,26,0.08), 0 0 0 1px rgba(18,20,26,0.05); display: flex; align-items: center; justify-content: center">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#C9CCD3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"></path></svg>
+      <span style="position: absolute; right: -8px; bottom: -8px; width: 44px; height: 44px; border-radius: 22px; background: #E5484D; border: 4px solid #F4F2FA; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+    </div>
+  </div>
+
+  <div style="position: absolute; top: 292px; left: 28px; right: 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.12; text-wrap: balance">Vigil can't read Apple Health</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 1.45; font-weight: 500; color: #4A505C; text-wrap: pretty">Access is turned off, so there's nothing to score. Your data stays where it is.</p>
+  </div>
+
+  <ol aria-label="How to turn access on" style="position: absolute; top: 432px; left: 16px; right: 16px; margin: 0; padding: 6px 16px; list-style: none; background: #FFFFFF; border-radius: 22px; box-shadow: 0 0 0 1px rgba(18,20,26,0.05)">
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 50px; border-bottom: 1px solid #EEEFF2"><span style="width: 26px; height: 26px; border-radius: 13px; background: #12141A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex: none">1</span><span style="font-size: 15px; font-weight: 600">Open <b>Settings</b> › <b>Health</b></span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 50px; border-bottom: 1px solid #EEEFF2"><span style="width: 26px; height: 26px; border-radius: 13px; background: #12141A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex: none">2</span><span style="font-size: 15px; font-weight: 600">Tap <b>Data Access &amp; Devices</b> › <b>Vigil</b></span></li>
+    <li style="display: flex; align-items: center; gap: 12px; min-height: 50px"><span style="width: 26px; height: 26px; border-radius: 13px; background: #12141A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex: none">3</span><span style="font-size: 15px; font-weight: 600">Turn on <b>Turn On All</b></span></li>
+  </ol>
+
+  <div style="position: absolute; left: 24px; right: 24px; bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+    <a href="Main.dc.html" style="width: 100%; height: 56px; border-radius: 28px; background: #6B4EFF; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 700; text-decoration: none">Open Settings<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></a>
+    <a href="Onb4-Health.dc.html" style="min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 650; color: #4A505C; text-decoration: none">Why Vigil needs this</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
