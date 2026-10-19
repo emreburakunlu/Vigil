@@ -122,8 +122,13 @@ struct RecoveryScore: Hashable, Codable, Sendable {
     /// Signals used vs. possible ("3 of 5 signals").
     var signalsUsed: Int
     var signalsTotal: Int
+    /// Days of history still needed before HRV / resting-HR baselines are established
+    /// ("Calibrating · 4 more nights"); nil once calibrated. Optional so older payloads decode.
+    var calibrationDaysRemaining: Int? = nil
 
     var isPartial: Bool { signalsUsed < signalsTotal }
+    /// True while the personal baselines are still being built (fewer than `Baseline.minimumSamples` days).
+    var isCalibrating: Bool { (calibrationDaysRemaining ?? 0) > 0 }
 }
 
 // MARK: - Heart-rate zones
@@ -195,6 +200,8 @@ struct WorkoutStrain: Hashable, Codable, Sendable {
     /// Heart-rate based training load (TRIMP-like, unbounded; "Training load 118").
     var trainingLoad: Double
     var zoneDurations: ZoneDurations
+    /// The workout's active energy, kcal (used to separate workouts from everyday movement).
+    var activeEnergyKilocalories: Double? = nil
 }
 
 /// Strain for a whole day.
@@ -236,9 +243,9 @@ enum TrainingLoadRisk: String, Codable, Sendable {
 /// Acute (7-day) vs. chronic (28-day) load on one day.
 struct TrainingLoadPoint: Hashable, Codable, Sendable, Identifiable {
     var day: LocalDay
-    /// Mean daily load over the last 7 days.
+    /// Exponentially weighted daily load, 7-day span (α = 2 / 8).
     var acute: Double
-    /// Mean daily load over the last 28 days.
+    /// Exponentially weighted daily load, 28-day span (α = 2 / 29).
     var chronic: Double
     var id: LocalDay { day }
 }
