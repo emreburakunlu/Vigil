@@ -51,15 +51,19 @@ struct SummaryBuilder: Sendable {
             }
             let workoutStrains = (workoutsByDay[day] ?? []).map { workout in
                 engine.workoutStrain(WorkoutStrainInput(workout: workout, heartRate: data.workoutHeartRate[workout.id] ?? [],
-                                                        zones: zones, restingHeartRate: vitalsByDay[day]?.restingHeartRate))
+                                                        zones: zones, restingHeartRate: vitalsByDay[day]?.restingHeartRate,
+                                                        sex: settings.profile.sex))
             }
             let strain = engine.dailyStrain(day: day, workouts: workoutStrains, activity: activityByDay[day])
+            let yesterday = day.adding(days: -1, calendar: calendar)
+            let loadBeforeToday = strains.isEmpty ? nil : engine.trainingLoad(
+                dailyLoads: strains.mapValues(\.trainingLoad), asOf: yesterday, historyDays: 1)
             strains[day] = strain
             let vitals = vitalsByDay[day]
             let hasRecoverySignal = vitals.map { !$0.recordedMetrics.isEmpty } ?? false
             let recovery = (hasRecoverySignal || night != nil)
                 ? engine.recovery(RecoveryInput(day: day, vitals: vitals, sleep: night, sleepScore: sleepScore, baselines: baselines,
-                                                previousDayStrain: strains[day.adding(days: -1, calendar: calendar)]))
+                                                previousDayStrain: strains[yesterday], trainingLoad: loadBeforeToday))
                 : nil
             result.append(DailySummary(day: day, computedAt: now, engineVersion: engine.version, baselines: baselines,
                                        vitals: vitals, activity: activityByDay[day], sleepNightID: night?.id,

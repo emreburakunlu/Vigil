@@ -36,6 +36,10 @@ final class VigilRepository {
 
     var today: LocalDay { LocalDay(now(), calendar: calendar) }
 
+    /// Best efforts found inside each run, keyed by workout id. Runs never change once recorded,
+    /// so each run's distance timeline is read and scanned only once per launch.
+    private var bestEffortsByRun: [UUID: [PersonalBest]] = [:]
+
     private var builder: SummaryBuilder { SummaryBuilder(engine: engine, calendar: calendar) }
 
     // MARK: Access
@@ -68,6 +72,14 @@ final class VigilRepository {
         let summary = built.last ?? DailySummary(day: day, computedAt: now())
         try? summaries.upsert(summary)
         return summary
+    }
+
+    /// Strain for one workout, using that day's resting heart rate when the summary has it.
+    private func strain(for workout: Workout, heartRate: [MetricSample], zones: HeartRateZones) -> WorkoutStrain {
+        let day = LocalDay(workout.start, calendar: calendar)
+        let restingHeartRate = summaries.summary(for: day)?.vitals?.restingHeartRate
+        return engine.workoutStrain(WorkoutStrainInput(workout: workout, heartRate: heartRate, zones: zones,
+                                                       restingHeartRate: restingHeartRate, sex: settings.settings.profile.sex))
     }
 
     /// Current heart-rate zones.
@@ -186,7 +198,7 @@ final class VigilRepository {
         var result: [WorkoutSummary] = []
         for workout in workouts.reversed() {
             let hr = try await dataSource.heartRateSamples(in: workout.interval)
-            let strain = engine.workoutStrain(WorkoutStrainInput(workout: workout, heartRate: hr, zones: zones, restingHeartRate: nil))
+            let strain = strain(for: workout, heartRate: hr, zones: zones)
             result.append(WorkoutSummary(workout: workout, strain: strain))
         }
         return result
@@ -198,10 +210,12 @@ final class VigilRepository {
         let details = try await dataSource.runDetails(for: id)
         let zones = heartRateZones()
         let heartRate = details.heartRate.isEmpty ? try await dataSource.heartRateSamples(in: workout.interval) : details.heartRate
-        let strain = engine.workoutStrain(WorkoutStrainInput(workout: workout, heartRate: heartRate, zones: zones, restingHeartRate: nil))
-        let bests = engine.personalBests(runs: [RunEffortInput(workout: workout, cumulativeDistance: details.cumulativeDistance)], asOf: now())
-        let allBests = try await personalBests()
-        let setHere = bests.filter { candidate in allBests.contains { $0.category == candidate.category && $0.workoutID == workout.id } }
+        let strain = strain(for: workout, heartRate: heartRate, zones: zones)
+        if bestEffortsByRun[workout.id] == nil {
+            bestEffortsByRun[workout.id] = engine.personalBests(
+                runs: [RunEffortInput(workout: workout, cumulativeDistance: details.cumulativeDistance)], asOf: now())
+        }
+        let setHere = try await personalBests().filter { $0.workoutID == workout.id }
         return RunDetail(workout: workout, details: details, splits: engine.splits(details: details, units: settings.settings.units),
                          zones: zones, zoneDurations: strain.zoneDurations, strain: strain, personalBests: setHere)
     }
@@ -211,7 +225,7 @@ final class VigilRepository {
         guard let workout = try await dataSource.workout(id: id) else { throw HealthDataError.notFound }
         let heartRate = try await dataSource.heartRateSamples(in: workout.interval)
         let zones = heartRateZones()
-        let strain = engine.workoutStrain(WorkoutStrainInput(workout: workout, heartRate: heartRate, zones: zones, restingHeartRate: nil))
+        let strain = strain(for: workout, heartRate: heartRate, zones: zones)
         return LiftDetail(workout: workout, heartRate: heartRate, zones: zones, zoneDurations: strain.zoneDurations, strain: strain)
     }
 
@@ -255,7 +269,41 @@ final class VigilRepository {
     func personalBests() async throws -> [PersonalBest] {
         let interval = DateInterval(start: calendar.date(byAdding: .year, value: -1, to: now()) ?? now(), end: now())
         let runs = try await dataSource.workouts(in: interval, kinds: [.run])
-        return engine.personalBests(runs: runs.map { RunEffortInput(workout: $0, cumulativeDistance: []) }, asOf: now())
+        var best: [PersonalBestCategory: PersonalBest] = [:]
+        for run in runs {
+            let efforts: [PersonalBest]
+            if let cached = bestEffortsByRun[run.id] {
+                efforts = cached
+            } else {
+                let timeline = (try? await dataSource.runDetails(for: run.id).cumulativeDistance) ?? []
+                efforts = engine.personalBests(runs: [RunEffortInput(workout: run, cumulativeDistance: timeline)], asOf: now())
+                bestEffortsByRun[run.id] = efforts
+            }
+            for effort in efforts where Self.isBetter(effort, than: best[effort.category]) {
+                best[effort.category] = effort
+            }
+        }
+        let newSince = now().addingTimeInterval(-7 * 86_400)
+        return best.values
+            .map { var pb = $0; pb.isNew = pb.date >= newSince; return pb }
+            .sorted { PersonalBestCategory.allCases.firstIndex(of: $0.category)! < PersonalBestCategory.allCases.firstIndex(of: $1.category)! }
+    }
+
+    /// Faster time wins for distance categories, longer distance for `longestRun`; ties go to the earlier run.
+    private static func isBetter(_ candidate: PersonalBest, than current: PersonalBest?) -> Bool {
+        guard let current else { return true }
+        if let a = candidate.duration, let b = current.duration {
+            return a < b || (a == b && candidate.date < current.date)
+        }
+        return candidate.distanceMeters > current.distanceMeters
+            || (candidate.distanceMeters == current.distanceMeters && candidate.date < current.date)
+    }
+
+    /// Pace at similar heart rate, weekly, for Progress → Running.
+    func aerobicEfficiency(endingOn day: LocalDay, weeks: Int) async throws -> AerobicEfficiencyTrend? {
+        let start = day.adding(days: -(weeks * 7 - 1), calendar: calendar)
+        let runs = try await dataSource.workouts(in: LocalDay.interval(from: start, through: day, calendar: calendar), kinds: [.run])
+        return engine.aerobicEfficiency(runs: runs, endingOn: day, weeks: weeks)
     }
 
     /// Rule-based insights for `day`.
