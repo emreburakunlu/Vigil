@@ -24,6 +24,9 @@ final class WidgetSnapshotService {
     }
 
     /// Coalesces bursts (several HealthKit observers fire together) into one snapshot write.
+    /// The last snapshot written, if any (used to put real values in the morning notification).
+    func currentSnapshot() -> WidgetSnapshot? { store.load() }
+
     func scheduleRefresh() {
         pending?.cancel()
         let delay = debounce

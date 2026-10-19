@@ -24,8 +24,12 @@ struct RootView: View {
         }
         .task(id: settingsStore.settings.onboarding.completed) { await checkAccess() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await checkAccess() } }
+            if phase == .active { Task { await checkAccess(); await container.refreshIfStale() } }
         }
+        .onChange(of: settingsStore.settings.units) { container.settingsDidChange() }
+        .onChange(of: settingsStore.settings.goals) { container.settingsDidChange() }
+        .onChange(of: settingsStore.settings.profile) { container.settingsDidChange() }
+        .onChange(of: settingsStore.settings.notifications) { container.settingsDidChange() }
     }
 
     private func checkAccess() async {

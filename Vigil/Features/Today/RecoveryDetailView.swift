@@ -54,6 +54,7 @@ final class RecoveryDetailModel {
     private func loadHistory(_ repository: VigilRepository, endingOn end: LocalDay, todayScore: Int?) async {
         let days = LocalDay.range(from: end.adding(days: -29), through: end)
         var values: [LocalDay: Int] = [:]
+        try? await repository.ensureSummaries(from: days[0], through: end)
         for summary in repository.summaries.summaries(from: days[0], through: end) {
             if let recovery = summary.recovery { values[summary.day] = recovery.value }
         }

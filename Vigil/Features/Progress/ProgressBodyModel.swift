@@ -79,9 +79,11 @@ final class ProgressBodyModel {
         // Recovery vs. load: cached summaries only (≈ 90 days), capped to the range.
         let days = min(range.weeks * 7, 90)
         let start = today.adding(days: -(days - 1), calendar: calendar)
+        try? await repository.ensureSummaries(from: start, through: today)
         let summaries = repository.summaries.summaries(from: start, through: today)
         let maxLoad = max(summaries.compactMap { $0.strain?.trainingLoad }.max() ?? 0, 1)
-        let recoveryLoad = summaries.map {
+        // Days with neither a recovery score nor training are empty placeholders, not data.
+        let recoveryLoad = summaries.filter { $0.recovery != nil || ($0.strain?.trainingLoad ?? 0) > 0 }.map {
             ProgressRecoveryLoadDay(date: $0.day.startDate(in: calendar), recovery: $0.recovery.map { Double($0.value) },
                                     load: ($0.strain?.trainingLoad ?? 0) / maxLoad * 100)
         }

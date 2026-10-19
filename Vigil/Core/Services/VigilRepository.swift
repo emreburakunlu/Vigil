@@ -145,6 +145,8 @@ final class VigilRepository {
 
     /// Asleep time and score per night for `start...end` (calendar, trends).
     func sleepHistory(from start: LocalDay, through end: LocalDay) async throws -> [SleepNightSummary] {
+        // Same scores as the night detail: fill the cache first instead of scoring without baselines.
+        try await ensureSummaries(from: start, through: end)
         let nights = try await dataSource.sleepNights(in: LocalDay.interval(from: start, through: end, calendar: calendar)).filter(\.isPrimary)
         let byDay = Dictionary(nights.map { ($0.day, $0) }, uniquingKeysWith: { _, b in b })
         let cached = Dictionary(summaries.summaries(from: start, through: end).map { ($0.day, $0) }, uniquingKeysWith: { _, b in b })
@@ -259,10 +261,30 @@ final class VigilRepository {
     /// Acute vs. chronic training load ending on `day` with `historyDays` of chart history.
     func trainingLoad(endingOn day: LocalDay, historyDays: Int = 56) async throws -> TrainingLoad {
         let first = day.adding(days: -(historyDays + 28), calendar: calendar)
+        try await ensureSummaries(from: first, through: day)
         let cached = summaries.summaries(from: first, through: day)
         var loads = Dictionary(cached.compactMap { s in s.strain.map { (s.day, $0.trainingLoad) } }, uniquingKeysWith: { _, b in b })
         if let todayStrain = try await summary(for: day).strain { loads[day] = todayStrain.trainingLoad }
         return engine.trainingLoad(dailyLoads: loads, asOf: day, historyDays: historyDays)
+    }
+
+    /// Builds and caches summaries for any day in `start...end` that has none (or a stale engine version),
+    /// in one batch. Charts that read many days of cached scores (training load, recovery history)
+    /// call this so they never show gaps just because those days were never opened.
+    func ensureSummaries(from start: LocalDay, through end: LocalDay) async throws {
+        let end = min(end, today)
+        guard start <= end else { return }
+        let cached = Set(summaries.summaries(from: start, through: end)
+            .filter { $0.engineVersion == engine.version }.map(\.day))
+        let missing = LocalDay.range(from: start, through: end, calendar: calendar).filter { !cached.contains($0) }
+        guard let firstMissing = missing.first else { return }
+        let interval = LocalDay.interval(from: firstMissing.adding(days: -Baseline.windowDays, calendar: calendar),
+                                         through: end, calendar: calendar)
+        let data = try await HealthDataBundle.fetch(from: dataSource, interval: interval)
+        let built = builder.summaries(for: LocalDay.range(from: firstMissing, through: end, calendar: calendar),
+                                      data: data, settings: settings.settings, now: now())
+        let missingSet = Set(missing)
+        try? summaries.upsert(built.filter { missingSet.contains($0.day) })
     }
 
     /// Personal bests across the last year of runs.

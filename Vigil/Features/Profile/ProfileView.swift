@@ -221,17 +221,13 @@ struct ProfileView: View {
     private func setNotification(_ change: @escaping (inout NotificationPreferences, Bool) -> Void) -> (Bool) -> Void {
         { value in
             updateNotifications { change(&$0, value) }
-            if value { Task { _ = await container.notifications.requestAuthorizationIfNeeded(); await reschedule() } }
+            // RootView reschedules on every notification-settings change; this only asks permission.
+            if value { Task { _ = await container.notifications.requestAuthorizationIfNeeded(); container.settingsDidChange() } }
         }
     }
 
     private func updateNotifications(_ change: (inout NotificationPreferences) -> Void) {
         settingsStore.update { change(&$0.notifications) }
-        Task { await reschedule() }
-    }
-
-    private func reschedule() async {
-        await container.notifications.sync(settings: settingsStore.settings, snapshot: WidgetSnapshotStore().load())
     }
 
     @ViewBuilder

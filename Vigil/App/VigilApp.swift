@@ -2,13 +2,22 @@ import SwiftUI
 
 @main
 struct VigilApp: App {
-    @State private var container = AppContainer.forCurrentLaunch()
+    @State private var container: AppContainer
+
+    init() {
+        let container = AppContainer.forCurrentLaunch()
+        _container = State(initialValue: container)
+        // Must be installed before launch finishes so a tap on a notification is delivered.
+        NotificationDelegate.install { [router = container.router] url in
+            if let link = DeepLink(url: url) { router.open(link) }
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .vigilEnvironment(container)
-                .task { await container.start() }
+                .task(id: container.settings.settings.onboarding.completed) { await container.start() }
         }
     }
 }

@@ -59,6 +59,7 @@ final class ProgressLiftingModel {
         // One fetch for runs and lifts (heatmap needs both). Strain comes from cached summaries: no per-workout HR reads.
         let workouts = try await repository.dataSource.workouts(in: interval, kinds: [.run, .strength])
         let lifts = workouts.filter { $0.kind == .strength }
+        try await repository.ensureSummaries(from: first, through: today)
         let cached = repository.summaries.summaries(from: first, through: today)
         var strainByWorkout: [UUID: Double] = [:]
         for summary in cached {
