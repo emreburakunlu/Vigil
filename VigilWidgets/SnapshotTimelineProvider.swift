@@ -1,35 +1,56 @@
 import SwiftUI
 import WidgetKit
 
-/// Timeline entry wrapping the app-written snapshot (nil = the app hasn't produced one yet).
+/// Timeline entry wrapping what the widget should show at `date`.
 struct SnapshotEntry: TimelineEntry {
     var date: Date
-    var snapshot: WidgetSnapshot?
+    var state: WidgetDisplayState
 
-    /// True when the snapshot belongs to an earlier day (show "Open Vigil to update").
-    func isStale(calendar: Calendar = .current) -> Bool {
-        guard let snapshot else { return true }
-        return !calendar.isDate(snapshot.day, inSameDayAs: date)
+    init(date: Date, snapshot: WidgetSnapshot?, groupAvailable: Bool = true) {
+        self.date = date
+        self.state = WidgetSnapshot.displayState(snapshot: snapshot, at: date, groupAvailable: groupAvailable)
+    }
+
+    /// Snapshot to render, or nil when the widget should ask the user to open Vigil.
+    var snapshot: WidgetSnapshot? {
+        if case .ready(let snapshot) = state { snapshot } else { nil }
     }
 }
 
-/// Reads the snapshot from the App Group. The app calls `WidgetCenter.reloadAllTimelines()`
-/// after writing, so the timeline only needs a safety refresh at the next midnight.
+/// Reads the snapshot from the App Group. The app calls `WidgetCenter.reloadAllTimelines()` after writing,
+/// so the provider only schedules (a) a flip to "Open Vigil to update" when the snapshot turns 36 h old and
+/// (b) a safety refresh a few hours out.
 struct SnapshotTimelineProvider: TimelineProvider {
-    var store = WidgetSnapshotStore()
+    /// Safety refresh interval when the app does not push a reload.
+    static let refreshInterval: TimeInterval = 3 * 3600
 
     func placeholder(in context: Context) -> SnapshotEntry {
         SnapshotEntry(date: .now, snapshot: .placeholder())
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SnapshotEntry) -> Void) {
-        completion(SnapshotEntry(date: .now, snapshot: context.isPreview ? .placeholder() : (store.load() ?? .placeholder())))
+        if context.isPreview {
+            completion(SnapshotEntry(date: .now, snapshot: .placeholder()))
+        } else {
+            completion(SnapshotEntry(date: .now, snapshot: Self.load(), groupAvailable: Self.groupAvailable))
+        }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SnapshotEntry>) -> Void) {
-        let now = Date.now
-        let entry = SnapshotEntry(date: now, snapshot: store.load())
-        let midnight = Calendar.current.nextDate(after: now, matching: DateComponents(hour: 0, minute: 5), matchingPolicy: .nextTime) ?? now.addingTimeInterval(3600)
-        completion(Timeline(entries: [entry], policy: .after(midnight)))
+        completion(Self.timeline(now: .now, snapshot: Self.load(), groupAvailable: Self.groupAvailable))
+    }
+
+    static var groupAvailable: Bool { AppGroup.containerURL != nil }
+
+    static func load() -> WidgetSnapshot? {
+        groupAvailable ? WidgetSnapshotStore().load() : nil
+    }
+
+    static func timeline(now: Date, snapshot: WidgetSnapshot?, groupAvailable: Bool) -> Timeline<SnapshotEntry> {
+        var entries = [SnapshotEntry(date: now, snapshot: snapshot, groupAvailable: groupAvailable)]
+        if groupAvailable, let snapshot, snapshot.staleDate > now {
+            entries.append(SnapshotEntry(date: snapshot.staleDate, snapshot: snapshot))
+        }
+        return Timeline(entries: entries, policy: .after(now.addingTimeInterval(refreshInterval)))
     }
 }
