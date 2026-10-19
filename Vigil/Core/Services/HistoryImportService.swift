@@ -54,12 +54,9 @@ final class HistoryImportService {
         let activity = try await source.dailyActivity(in: interval)
         try Task.checkCancellation()
         let workouts = try await source.workouts(in: interval, kinds: nil)
-        var heartRate: [UUID: [MetricSample]] = [:]
-        for (index, workout) in workouts.enumerated() {
-            try Task.checkCancellation()
-            heartRate[workout.id] = try await source.heartRateSamples(in: workout.interval)
-            progress(ImportProgress(phase: .workouts, fraction: 0.45 + 0.3 * Double(index + 1) / Double(max(workouts.count, 1)),
-                                    nightsImported: nights.count, workoutsImported: index + 1, workoutsTotal: workouts.count))
+        let heartRate = try await HealthDataBundle.heartRate(for: workouts, from: source) { done in
+            progress(ImportProgress(phase: .workouts, fraction: 0.45 + 0.3 * Double(done) / Double(max(workouts.count, 1)),
+                                    nightsImported: nights.count, workoutsImported: done, workoutsTotal: workouts.count))
         }
         progress(ImportProgress(phase: .baselines, fraction: 0.8, nightsImported: nights.count,
                                 workoutsImported: workouts.count, workoutsTotal: workouts.count))

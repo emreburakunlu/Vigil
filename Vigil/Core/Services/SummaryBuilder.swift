@@ -16,10 +16,31 @@ struct HealthDataBundle: Sendable {
         async let activity = source.dailyActivity(in: interval)
         async let workouts = source.workouts(in: interval, kinds: nil)
         var bundle = try await HealthDataBundle(nights: nights, vitals: vitals, activity: activity, workouts: workouts)
-        for workout in bundle.workouts {
-            bundle.workoutHeartRate[workout.id] = try await source.heartRateSamples(in: workout.interval)
-        }
+        bundle.workoutHeartRate = try await heartRate(for: bundle.workouts, from: source)
         return bundle
+    }
+
+    /// Heart-rate samples for each workout, fetched a few at a time in parallel.
+    /// `onEach` is called with the number of workouts finished so far.
+    static func heartRate(for workouts: [Workout], from source: any HealthDataSource, maxConcurrent: Int = 6,
+                          isolation: isolated (any Actor)? = #isolation,
+                          onEach: (Int) -> Void = { _ in }) async throws -> [UUID: [MetricSample]] {
+        try await withThrowingTaskGroup(of: (UUID, [MetricSample]).self) { group in
+            var result: [UUID: [MetricSample]] = [:]
+            var pending = workouts[...]
+            func addNext() {
+                guard let workout = pending.popFirst() else { return }
+                group.addTask { (workout.id, try await source.heartRateSamples(in: workout.interval)) }
+            }
+            for _ in 0..<maxConcurrent { addNext() }
+            while let (id, samples) = try await group.next() {
+                result[id] = samples
+                onEach(result.count)
+                try Task.checkCancellation()
+                addNext()
+            }
+            return result
+        }
     }
 }
 
