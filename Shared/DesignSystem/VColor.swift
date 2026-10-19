@@ -3,15 +3,17 @@ import UIKit
 
 // MARK: - Semantic colour tokens
 //
-// GENERATED STRUCTURE, HAND-OWNED VALUES. Owner: design-system agent.
-// Light values are taken from Design/*.dc.html. Dark values are TEMPORARY placeholders
-// to be replaced by the design-system agent.
+// Owner: design-system agent. Light values come from Design/*.dc.html; dark values are the
+// designed dark palette (near-black with a faint violet tint, cards elevated one step, accents
+// lightened to keep >= 4.5:1 text contrast on their surfaces — verified with a WCAG script).
 //
 // Rules for feature code:
 //  - Use only these tokens (`.foregroundStyle(.vInk)`, `.background(Color.vCard)`); never `Color(red:...)`,
 //    hex literals, or system colours like `.blue` / `.gray`.
 //  - Tokens are dynamic `UIColor`s, so they follow the window's `overrideUserInterfaceStyle`
-//    (set from Settings → Appearance by `AppearanceController`) as well as SwiftUI's `colorScheme`.
+//    (Settings -> Appearance, see `AppearanceModifier`) as well as SwiftUI's `colorScheme`.
+//  - The Sleep tab forces the dark scheme (`MainTabView`), so every token — not just `vNight*` — is
+//    already night-coloured there.
 
 /// Token storage (one `UIColor` provider per token). Access tokens via `Color.vX` / `.vX`.
 enum VColorStorage {
@@ -19,23 +21,29 @@ enum VColorStorage {
     // MARK: Surfaces
 
     /// Screen background.
-    static let vBackground = Color.vDynamic(light: (0xF4F2FA, 1), dark: (0x0E1022, 1))
-    /// Card / grouped section background.
-    static let vCard = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0x171A33, 1))
+    static let vBackground = Color.vDynamic(light: (0xF4F2FA, 1), dark: (0x0C0D16, 1))
+    /// Card / grouped section background (elevated one step above the background in dark).
+    static let vCard = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0x16182A, 1))
     /// Inset tile inside a card (stat tiles, info boxes).
-    static let vCardRaised = Color.vDynamic(light: (0xF5F6F8, 1), dark: (0x1F2342, 1))
+    static let vCardRaised = Color.vDynamic(light: (0xF5F6F8, 1), dark: (0x1E2136, 1))
     /// Progress-bar tracks, empty heat-map cells, neutral chips.
-    static let vFill = Color.vDynamic(light: (0xECE9F5, 1), dark: (0x262A4D, 1))
+    static let vFill = Color.vDynamic(light: (0xECE9F5, 1), dark: (0x272A42, 1))
     /// Segmented control track.
-    static let vControlTrack = Color.vDynamic(light: (0xE4E6EA, 1), dark: (0x262A4D, 1))
+    static let vControlTrack = Color.vDynamic(light: (0xE4E6EA, 1), dark: (0x1E2136, 1))
     /// Selected segment thumb.
-    static let vControlThumb = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0x3A3F6B, 1))
+    static let vControlThumb = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0x3A3F63, 1))
     /// List row separators.
-    static let vSeparator = Color.vDynamic(light: (0xEEEFF2, 1), dark: (0x2A2E52, 1))
+    static let vSeparator = Color.vDynamic(light: (0xEEEFF2, 1), dark: (0x262940, 1))
     /// 1 pt outline drawn around cards.
-    static let vHairline = Color.vDynamic(light: (0x12141A, 0.05), dark: (0xFFFFFF, 0.06))
+    static let vHairline = Color.vDynamic(light: (0x12141A, 0.05), dark: (0xFFFFFF, 0.07))
     /// Soft card shadow colour.
-    static let vShadow = Color.vDynamic(light: (0x12141A, 0.04), dark: (0x000000, 0.30))
+    static let vShadow = Color.vDynamic(light: (0x12141A, 0.04), dark: (0x000000, 0.4))
+    /// Segmented-control thumb shadow.
+    static let vShadowStrong = Color.vDynamic(light: (0x12141A, 0.12), dark: (0x000000, 0.5))
+    /// Chart grid lines.
+    static let vChartGrid = Color.vDynamic(light: (0xF0F1F3, 1), dark: (0x262940, 1))
+    /// Dashed baseline / reference line in charts.
+    static let vChartBaseline = Color.vDynamic(light: (0xE2E4E9, 1), dark: (0x3A3F63, 1))
 
     // MARK: Ink (text & icons)
 
@@ -45,11 +53,11 @@ enum VColorStorage {
     static let vInkLabel = Color.vDynamic(light: (0x4A505C, 1), dark: (0xC9CDE3, 1))
     /// Secondary text: dates, captions, units.
     static let vInkSecondary = Color.vDynamic(light: (0x646A78, 1), dark: (0xA3A8C3, 1))
-    /// Tertiary text, neutral sparklines, chevrons.
-    static let vInkTertiary = Color.vDynamic(light: (0x9AA0AC, 1), dark: (0x6E7396, 1))
+    /// Tertiary text, neutral sparklines, chevrons (decorative / non-essential only in light).
+    static let vInkTertiary = Color.vDynamic(light: (0x9AA0AC, 1), dark: (0x7F85A8, 1))
     /// Disabled controls, inactive dots.
     static let vInkDisabled = Color.vDynamic(light: (0xC9CCD3, 1), dark: (0x4A4F72, 1))
-    /// Inverted fill: selected day chip, primary button.
+    /// Inverted fill: selected day chip, dark button.
     static let vInverseFill = Color.vDynamic(light: (0x12141A, 1), dark: (0xF4F2FA, 1))
     /// Text/icons drawn on `vInverseFill`.
     static let vInkOnInverse = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0x12141A, 1))
@@ -62,57 +70,71 @@ enum VColorStorage {
     static let vAccent = Color.vDynamic(light: (0x4B32D6, 1), dark: (0x9D8CFF, 1))
     /// Selected tab pill background.
     static let vAccentTint = Color.vDynamic(light: (0x7B61FF, 0.16), dark: (0x9D8CFF, 0.22))
+    /// Solid brand button fill (onboarding CTA).
+    static let vPrimaryButton = Color.vDynamic(light: (0x6B4EFF, 1), dark: (0x6F58F5, 1))
+    /// Disabled primary button fill.
+    static let vButtonDisabled = Color.vDynamic(light: (0xD5D8DE, 1), dark: (0x2A2E4A, 1))
+    /// Disabled primary button label.
+    static let vButtonDisabledInk = Color.vDynamic(light: (0x4A505C, 1), dark: (0x8A90AE, 1))
+    /// Floating tab bar material tint.
+    static let vTabBarBackground = Color.vDynamic(light: (0xFFFFFF, 0.82), dark: (0x1E213E, 0.84))
+    /// Floating tab bar drop shadow.
+    static let vTabBarShadow = Color.vDynamic(light: (0x12141A, 0.12), dark: (0x000000, 0.5))
 
     // MARK: Scores
 
     /// Recovery ring / green band.
     static let vRecovery = Color.vDynamic(light: (0x1DB872, 1), dark: (0x2FD38A, 1))
     /// Recovery ring track, positive chip background.
-    static let vRecoveryTint = Color.vDynamic(light: (0xDCF6E8, 1), dark: (0x17382A, 1))
+    static let vRecoveryTint = Color.vDynamic(light: (0xDCF6E8, 1), dark: (0x143325, 1))
     /// Text on recovery tint; positive deltas.
     static let vRecoveryInk = Color.vDynamic(light: (0x157A40, 1), dark: (0x7EE2A8, 1))
     /// Sleep ring.
     static let vSleep = Color.vDynamic(light: (0x7B61FF, 1), dark: (0x9D8CFF, 1))
     /// Sleep ring track, sleep chip background.
-    static let vSleepTint = Color.vDynamic(light: (0xEEEAFF, 1), dark: (0x262A4D, 1))
+    static let vSleepTint = Color.vDynamic(light: (0xEEEAFF, 1), dark: (0x25244A, 1))
     /// Text on sleep tint.
     static let vSleepInk = Color.vDynamic(light: (0x4B42D6, 1), dark: (0xB7B1FF, 1))
     /// Strain ring.
     static let vStrain = Color.vDynamic(light: (0xFF6A3D, 1), dark: (0xFF7F57, 1))
     /// Strain ring track, strain chip background.
-    static let vStrainTint = Color.vDynamic(light: (0xFFE9E1, 1), dark: (0x3D2219, 1))
+    static let vStrainTint = Color.vDynamic(light: (0xFFE9E1, 1), dark: (0x3A2118, 1))
     /// Text on strain tint.
     static let vStrainInk = Color.vDynamic(light: (0xB5480F, 1), dark: (0xFFB48F, 1))
 
     // MARK: Training
 
     /// Running: highlighted bars, routes, run chips.
-    static let vRun = Color.vDynamic(light: (0x2E7CF6, 1), dark: (0x5B9BFF, 1))
+    static let vRun = Color.vDynamic(light: (0x2E7CF6, 1), dark: (0x6AA5FF, 1))
     /// Running: non-highlighted bars.
     static let vRunSoft = Color.vDynamic(light: (0x9EC2FF, 1), dark: (0x3C5F99, 1))
     /// Running chip background.
     static let vRunTint = Color.vDynamic(light: (0xE7F0FF, 1), dark: (0x1A2A4A, 1))
+    /// Text on run tint.
+    static let vRunInk = Color.vDynamic(light: (0x1A5FD0, 1), dark: (0x9CC3FF, 1))
     /// Lifting: highlighted bars and chips.
     static let vLift = Color.vDynamic(light: (0xFF6A3D, 1), dark: (0xFF7F57, 1))
     /// Lifting: non-highlighted bars.
     static let vLiftSoft = Color.vDynamic(light: (0xF8C4A3, 1), dark: (0x6B3A26, 1))
     /// Lifting chip background.
-    static let vLiftTint = Color.vDynamic(light: (0xFFE9E1, 1), dark: (0x3D2219, 1))
+    static let vLiftTint = Color.vDynamic(light: (0xFFE9E1, 1), dark: (0x3A2118, 1))
 
     // MARK: Status
 
     /// Better-than-baseline delta text.
     static let vPositive = Color.vDynamic(light: (0x157A40, 1), dark: (0x7EE2A8, 1))
     /// Positive chip background.
-    static let vPositiveTint = Color.vDynamic(light: (0xDCF6E8, 1), dark: (0x17382A, 1))
+    static let vPositiveTint = Color.vDynamic(light: (0xDCF6E8, 1), dark: (0x143325, 1))
     /// Yellow recovery band, caution.
     static let vWarning = Color.vDynamic(light: (0xFFB21E, 1), dark: (0xFFC24D, 1))
     /// Text for caution deltas.
     static let vWarningInk = Color.vDynamic(light: (0x8A5E00, 1), dark: (0xFFD27A, 1))
     /// Caution chip / banner background.
     static let vWarningTint = Color.vDynamic(light: (0xFBF1D9, 1), dark: (0x3A2E12, 1))
-    /// Red recovery band, errors, destructive.
+    /// Red recovery band, errors, destructive fills.
     static let vDanger = Color.vDynamic(light: (0xE5484D, 1), dark: (0xFF6B6B, 1))
+    /// Text for errors and destructive labels.
+    static let vDangerInk = Color.vDynamic(light: (0xC42B30, 1), dark: (0xFF8F8F, 1))
     /// Danger chip / banner background.
     static let vDangerTint = Color.vDynamic(light: (0xFCECEC, 1), dark: (0x3D1A1C, 1))
 
@@ -151,24 +173,45 @@ enum VColorStorage {
     /// Zone 5 · Maximum.
     static let vZone5 = Color.vDynamic(light: (0xE5484D, 1), dark: (0xFF6B6B, 1))
 
-    // MARK: Night palette (Sleep tab is dark in both appearances)
+    // MARK: Activity rings (Move / Exercise / Stand)
+
+    /// Move ring.
+    static let vMove = Color.vDynamic(light: (0xEF4B5F, 1), dark: (0xFF6378, 1))
+    /// Move ring track.
+    static let vMoveTint = Color.vDynamic(light: (0xFCE3E7, 1), dark: (0x3D1A22, 1))
+    /// Exercise ring.
+    static let vExercise = Color.vDynamic(light: (0x6CBF1F, 1), dark: (0x8AD94A, 1))
+    /// Exercise ring track.
+    static let vExerciseTint = Color.vDynamic(light: (0xE8F6D9, 1), dark: (0x22331A, 1))
+    /// Stand ring.
+    static let vStand = Color.vDynamic(light: (0x1FB5D1, 1), dark: (0x3CCDE8, 1))
+    /// Stand ring track.
+    static let vStandTint = Color.vDynamic(light: (0xDDF5FA, 1), dark: (0x14313A, 1))
+
+    // MARK: Night palette (Sleep tab; the tab also forces the dark colour scheme, so these hold in both appearances)
 
     /// Sleep tab background.
     static let vNightBackground = Color.vDynamic(light: (0x0E1022, 1), dark: (0x0A0B18, 1))
     /// Sleep tab cards.
     static let vNightCard = Color.vDynamic(light: (0x171A33, 1), dark: (0x14162B, 1))
     /// Tiles inside sleep cards; header buttons.
-    static let vNightCardRaised = Color.vDynamic(light: (0x1F2342, 1), dark: (0x1B1E3A, 1))
+    static let vNightCardRaised = Color.vDynamic(light: (0x1B1E3A, 1), dark: (0x1B1E3A, 1))
     /// Tracks and icon wells on the night palette.
     static let vNightFill = Color.vDynamic(light: (0x262A4D, 1), dark: (0x232644, 1))
+    /// Selected segment / chip on the night palette.
+    static let vNightSelected = Color.vDynamic(light: (0x2F3360, 1), dark: (0x2F3360, 1))
     /// Card outline on the night palette.
     static let vNightSeparator = Color.vDynamic(light: (0xFFFFFF, 0.06), dark: (0xFFFFFF, 0.06))
+    /// Dashed outlines (empty states) on the night palette.
+    static let vNightDashed = Color.vDynamic(light: (0x3A3F6B, 1), dark: (0x3A3F6B, 1))
     /// Primary text on the night palette.
     static let vNightInk = Color.vDynamic(light: (0xFFFFFF, 1), dark: (0xF4F2FA, 1))
+    /// Strong secondary text on the night palette.
+    static let vNightInkLabel = Color.vDynamic(light: (0xC9CDE3, 1), dark: (0xC9CDE3, 1))
     /// Secondary text on the night palette.
     static let vNightInkSecondary = Color.vDynamic(light: (0xA3A8C3, 1), dark: (0xA3A8C3, 1))
     /// Tertiary text on the night palette.
-    static let vNightInkTertiary = Color.vDynamic(light: (0x5C6286, 1), dark: (0x5C6286, 1))
+    static let vNightInkTertiary = Color.vDynamic(light: (0x8A90AE, 1), dark: (0x8A90AE, 1))
     /// Accent on the night palette.
     static let vNightAccent = Color.vDynamic(light: (0xB7B1FF, 1), dark: (0xB7B1FF, 1))
     /// Better-than-baseline on the night palette.
@@ -185,7 +228,7 @@ extension ShapeStyle where Self == Color {
 
     /// Screen background.
     static var vBackground: Color { VColorStorage.vBackground }
-    /// Card / grouped section background.
+    /// Card / grouped section background (elevated one step above the background in dark).
     static var vCard: Color { VColorStorage.vCard }
     /// Inset tile inside a card (stat tiles, info boxes).
     static var vCardRaised: Color { VColorStorage.vCardRaised }
@@ -201,6 +244,12 @@ extension ShapeStyle where Self == Color {
     static var vHairline: Color { VColorStorage.vHairline }
     /// Soft card shadow colour.
     static var vShadow: Color { VColorStorage.vShadow }
+    /// Segmented-control thumb shadow.
+    static var vShadowStrong: Color { VColorStorage.vShadowStrong }
+    /// Chart grid lines.
+    static var vChartGrid: Color { VColorStorage.vChartGrid }
+    /// Dashed baseline / reference line in charts.
+    static var vChartBaseline: Color { VColorStorage.vChartBaseline }
 
     // MARK: Ink (text & icons)
 
@@ -210,11 +259,11 @@ extension ShapeStyle where Self == Color {
     static var vInkLabel: Color { VColorStorage.vInkLabel }
     /// Secondary text: dates, captions, units.
     static var vInkSecondary: Color { VColorStorage.vInkSecondary }
-    /// Tertiary text, neutral sparklines, chevrons.
+    /// Tertiary text, neutral sparklines, chevrons (decorative / non-essential only in light).
     static var vInkTertiary: Color { VColorStorage.vInkTertiary }
     /// Disabled controls, inactive dots.
     static var vInkDisabled: Color { VColorStorage.vInkDisabled }
-    /// Inverted fill: selected day chip, primary button.
+    /// Inverted fill: selected day chip, dark button.
     static var vInverseFill: Color { VColorStorage.vInverseFill }
     /// Text/icons drawn on `vInverseFill`.
     static var vInkOnInverse: Color { VColorStorage.vInkOnInverse }
@@ -227,6 +276,16 @@ extension ShapeStyle where Self == Color {
     static var vAccent: Color { VColorStorage.vAccent }
     /// Selected tab pill background.
     static var vAccentTint: Color { VColorStorage.vAccentTint }
+    /// Solid brand button fill (onboarding CTA).
+    static var vPrimaryButton: Color { VColorStorage.vPrimaryButton }
+    /// Disabled primary button fill.
+    static var vButtonDisabled: Color { VColorStorage.vButtonDisabled }
+    /// Disabled primary button label.
+    static var vButtonDisabledInk: Color { VColorStorage.vButtonDisabledInk }
+    /// Floating tab bar material tint.
+    static var vTabBarBackground: Color { VColorStorage.vTabBarBackground }
+    /// Floating tab bar drop shadow.
+    static var vTabBarShadow: Color { VColorStorage.vTabBarShadow }
 
     // MARK: Scores
 
@@ -257,6 +316,8 @@ extension ShapeStyle where Self == Color {
     static var vRunSoft: Color { VColorStorage.vRunSoft }
     /// Running chip background.
     static var vRunTint: Color { VColorStorage.vRunTint }
+    /// Text on run tint.
+    static var vRunInk: Color { VColorStorage.vRunInk }
     /// Lifting: highlighted bars and chips.
     static var vLift: Color { VColorStorage.vLift }
     /// Lifting: non-highlighted bars.
@@ -276,8 +337,10 @@ extension ShapeStyle where Self == Color {
     static var vWarningInk: Color { VColorStorage.vWarningInk }
     /// Caution chip / banner background.
     static var vWarningTint: Color { VColorStorage.vWarningTint }
-    /// Red recovery band, errors, destructive.
+    /// Red recovery band, errors, destructive fills.
     static var vDanger: Color { VColorStorage.vDanger }
+    /// Text for errors and destructive labels.
+    static var vDangerInk: Color { VColorStorage.vDangerInk }
     /// Danger chip / banner background.
     static var vDangerTint: Color { VColorStorage.vDangerTint }
 
@@ -316,7 +379,22 @@ extension ShapeStyle where Self == Color {
     /// Zone 5 · Maximum.
     static var vZone5: Color { VColorStorage.vZone5 }
 
-    // MARK: Night palette (Sleep tab is dark in both appearances)
+    // MARK: Activity rings (Move / Exercise / Stand)
+
+    /// Move ring.
+    static var vMove: Color { VColorStorage.vMove }
+    /// Move ring track.
+    static var vMoveTint: Color { VColorStorage.vMoveTint }
+    /// Exercise ring.
+    static var vExercise: Color { VColorStorage.vExercise }
+    /// Exercise ring track.
+    static var vExerciseTint: Color { VColorStorage.vExerciseTint }
+    /// Stand ring.
+    static var vStand: Color { VColorStorage.vStand }
+    /// Stand ring track.
+    static var vStandTint: Color { VColorStorage.vStandTint }
+
+    // MARK: Night palette (Sleep tab; the tab also forces the dark colour scheme, so these hold in both appearances)
 
     /// Sleep tab background.
     static var vNightBackground: Color { VColorStorage.vNightBackground }
@@ -326,10 +404,16 @@ extension ShapeStyle where Self == Color {
     static var vNightCardRaised: Color { VColorStorage.vNightCardRaised }
     /// Tracks and icon wells on the night palette.
     static var vNightFill: Color { VColorStorage.vNightFill }
+    /// Selected segment / chip on the night palette.
+    static var vNightSelected: Color { VColorStorage.vNightSelected }
     /// Card outline on the night palette.
     static var vNightSeparator: Color { VColorStorage.vNightSeparator }
+    /// Dashed outlines (empty states) on the night palette.
+    static var vNightDashed: Color { VColorStorage.vNightDashed }
     /// Primary text on the night palette.
     static var vNightInk: Color { VColorStorage.vNightInk }
+    /// Strong secondary text on the night palette.
+    static var vNightInkLabel: Color { VColorStorage.vNightInkLabel }
     /// Secondary text on the night palette.
     static var vNightInkSecondary: Color { VColorStorage.vNightInkSecondary }
     /// Tertiary text on the night palette.

@@ -276,3 +276,29 @@ A screen is done when:
 - HealthKit cannot be exercised in the simulator without data: the simulator uses the mock unless
   `-VigilLiveData`. Real HealthKit testing requires a signed device build.
 - Free-team builds expire after 7 days and are limited to 3 apps per device.
+
+---
+
+## 12. Design system usage
+
+Fonts: `Font.custom` with the variable fonts' named instances (`VFontFamily.postScriptName`), so 600/700/800 really apply; all roles scale with Dynamic Type. Colours are dynamic (light/dark) tokens; the Sleep tab forces the dark scheme in `MainTabView`, so system chrome is dark there in both appearances. Pushed detail screens hide the floating tab bar. Browse everything in `Vigil/DesignSystem/DesignSystemGallery.swift` (DEBUG previews).
+
+**Tokens** (`Shared/DesignSystem`)
+- Colour: `.foregroundStyle(.vInk)`, `.background(Color.vCard)`; groups: surfaces, ink, brand (`vAccent vPrimaryButton vTabBar*`), scores, training (`vRun* vLift*`), status (`vPositive vWarning* vDanger*`), stages, zones `Color.vZone(3)`, activity (`vMove vExercise vStand`), chart (`vChartGrid vChartBaseline`), night (`vNight*`).
+- Type: `Text("Today").vTextStyle(.largeTitle)`; free sizes `Font.vCustom(.heading, size: 29, weight: .bold, relativeTo: .title)`.
+- Layout: `VSpacing.screenGutter`, `VRadius.card`, `VSize.minTapTarget`, `VSize.tabBarReservedHeight`.
+- Motion: `view.vRiseIn(delay: 0.07)`, `Button {}.buttonStyle(.vPress)`, `VMotion.ease(duration:)`; all honour Reduce Motion.
+- Rings (Shared, usable in widgets): `ScoreRing(kind: .sleep, progress: 0.84) { Text("84") }`, `ConcentricRings(recovery: 0.78, sleep: 0.84, strain: 0.62)`.
+
+**Components** (`Vigil/DesignSystem`)
+- `view.vCard()` / `VCard { }` / `view.vNightCard()`; `ScoreCard { ScoreTile(kind:progress:value:unit:caption:) x3 }`.
+- `SectionHeader("Vitals", trailing: "vs. 30-day baseline")`, `OverlineLabel("Apple Health")`.
+- `VitalTile(name:value:unit:delta:trend:trendColor:)`, `DeltaBadge("+12%", direction: .up, tone: .positive)`, `Sparkline(values:)`, `MetricRow` inside `MetricRowList`.
+- `StatTile("Distance", value: "18.4", unit: "/ 25 km")` in `StatGrid(columns: 3) { }`.
+- `ProgressBarGoal("Running", value:goal:valueText:goalText:color:)`, `SegmentedGoalBar`, `ZoneBar(zone: 3, fraction: 0.45, duration:percentText:)`.
+- `VSegmentedControl(selection: $x, options: [...]) { LocalizedStringKey($0.title) }` (optional `selectedFill:`).
+- `DayStrip(items: [DayStripItem], selection: $day) { delta in ... }` (swipe + VoiceOver adjustable).
+- `CircleIconButton(systemImage:label:) { }`, `PrimaryButton("Continue", kind: .inverse) { }`, `SecondaryButton("Edit", isDestructive:) { }`, `VTextButton`, `.buttonStyle(.vPill(.primary))`.
+- `VChip("via Hevy", tone: .run)`, `PRBadge(isNew:)`, `InsightRow(text, systemImage:)`, `EmptyStateView(systemImage:title:message:actionTitle:action:)`.
+- Charts: `Chart { ... }.vChartAxes()`, `.vLineStyle(.vRecovery)`, `.vAreaStyle(_)`, `.vBarStyle(_)`, `VBaselineBand(low:high:)`, `VReferenceLine`, `VPointMarker`.
+- Sleep tab screens: end the root view with `.vNightScreen()` (night background, night components via `\.vSurface`, dark nav bar). Other screens: `.vScreenBackground()`.

@@ -72,4 +72,19 @@ enum VSize {
     static let scoreRingStroke: CGFloat = 9
     /// Card hairline width.
     static let hairline: CGFloat = 1
+    /// Floating tab bar height (66).
+    static let tabBarHeight: CGFloat = 66
+    /// Gap between the tab bar and the bottom safe-area edge (design: 28 over the home indicator; 8 on top of the safe area).
+    static let tabBarBottomGap: CGFloat = 8
+    /// Space screens should reserve at the bottom of scroll content so nothing hides behind the tab bar.
+    /// (`MainTabView` already insets the safe area; use this only for custom overlays.)
+    static let tabBarReservedHeight: CGFloat = tabBarHeight + tabBarBottomGap + 8
+    /// Day-strip chip height (62).
+    static let dayChipHeight: CGFloat = 62
+    /// Segmented control segment height (40).
+    static let segmentHeight: CGFloat = 40
+    /// Goal / zone progress bar height (10).
+    static let progressBarHeight: CGFloat = 10
+    /// Heart-rate zone bar height (14).
+    static let zoneBarHeight: CGFloat = 14
 }
