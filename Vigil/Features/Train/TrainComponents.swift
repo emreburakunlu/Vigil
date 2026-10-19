@@ -71,7 +71,7 @@ struct TrainStrainCard: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Strain \(strain.value) · \(Text(levelName))")
                     .vTextStyle(.bodyStrong).foregroundStyle(Color.vInk)
-                Text("Training load \(Int(strain.trainingLoad.rounded()))\(note.map { Text(" · ") + Text($0) } ?? Text(""))")
+                Text("Training load \(Int(strain.trainingLoad.rounded()))\(note.map { " · \($0)" } ?? "")")
                     .vTextStyle(.footnote).foregroundStyle(Color.vInkSecondary)
             }
             Spacer(minLength: 0)

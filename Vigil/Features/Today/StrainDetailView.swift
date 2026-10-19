@@ -321,8 +321,7 @@ private struct StrainWorkoutRow: View {
                 .frame(width: 40, height: 40).background(iconBackground, in: .rect(cornerRadius: VRadius.chip, style: .continuous))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 5) {
-                (Text(title).font(.vCustom(.body, size: 15, weight: .bold, relativeTo: .callout)).foregroundStyle(.vInk)
-                 + Text(subtitle.map { " · \($0)" } ?? "").font(.vCustom(.body, size: 15, weight: .semibold, relativeTo: .callout)).foregroundStyle(.vInkSecondary))
+                Text("\(Text(title).font(.vCustom(.body, size: 15, weight: .bold, relativeTo: .callout)).foregroundStyle(.vInk))\(Text(subtitle.map { " · \($0)" } ?? "").font(.vCustom(.body, size: 15, weight: .semibold, relativeTo: .callout)).foregroundStyle(.vInkSecondary))")
                 GeometryReader { proxy in
                     ZStack(alignment: .leading) {
                         Capsule().fill(Color.vFill)
