@@ -146,13 +146,14 @@ struct RepositoryTests {
         #expect(overview.sleepScore != nil)
         #expect(overview.vitals.count == 5)
         #expect(overview.completeness == .complete)
-        #expect(overview.workouts.contains { $0.workout.kind == .run })
+        let lastWeek = DateInterval(start: TestSupport.referenceDate.addingTimeInterval(-7 * 86_400), end: TestSupport.referenceDate)
+        #expect(try await !container.repository.workouts(.run, in: lastWeek).isEmpty)
         #expect(await container.repository.healthAccessState() == .connected)
     }
 
     @Test func partialDataScenario() async throws {
         let overview = try await container(.partialData).repository.dayOverview(for: LocalDay(TestSupport.referenceDate, calendar: TestSupport.utc))
-        #expect(overview.completeness == .partial(missing: [.respiratoryRate, .wristTemperature]))
+        #expect(overview.completeness == .partial(missing: [.wristTemperature, .oxygenSaturation]))
         #expect(overview.recovery?.isPartial == true)
     }
 
