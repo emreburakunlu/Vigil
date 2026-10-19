@@ -11,11 +11,32 @@ import SwiftUI
 // Every role scales with Dynamic Type via `relativeTo:`.
 
 /// Font family names as registered by the font files.
-enum VFontFamily {
-    /// Display / headings.
-    static let heading = "Bricolage Grotesque"
-    /// Body / UI.
-    static let body = "Figtree"
+enum VFontFamily: Sendable {
+    /// Display / headings ("Bricolage Grotesque").
+    case heading
+    /// Body / UI ("Figtree").
+    case body
+
+    /// PostScript name of the named variable-font instance for a weight.
+    ///
+    /// Variable fonts loaded with `Font.custom(family, …).weight(…)` frequently ignore the weight, so
+    /// we address the font's *named instances* (500/600/700/800) directly. Both families register
+    /// them from the `*-Variable.ttf` files (`UIAppFonts`).
+    func postScriptName(for weight: Font.Weight) -> String {
+        let suffix: String
+        switch weight {
+        case .black, .heavy: suffix = "ExtraBold"
+        case .bold: suffix = "Bold"
+        case .semibold: suffix = "SemiBold"
+        case .medium: suffix = "Medium"
+        case .regular, .light, .thin, .ultraLight: suffix = "Regular"
+        default: suffix = "Bold"
+        }
+        switch self {
+        case .heading: return "BricolageGrotesque-96ptExtraBold_\(suffix)"
+        case .body: return "Figtree-\(suffix)"
+        }
+    }
 }
 
 /// Semantic text styles.
@@ -80,7 +101,7 @@ enum VTextStyle: CaseIterable, Sendable {
         }
     }
 
-    var family: String {
+    var family: VFontFamily {
         switch self {
         case .largeTitle, .title, .title2, .headline, .display, .score: VFontFamily.heading
         default: VFontFamily.body
@@ -117,11 +138,17 @@ enum VTextStyle: CaseIterable, Sendable {
     var isUppercased: Bool { self == .overline }
 
     var font: Font {
-        Font.custom(family, size: size, relativeTo: relativeTo).weight(weight).monospacedDigit()
+        Font.vCustom(family, size: size, weight: weight, relativeTo: relativeTo)
     }
 }
 
 extension Font {
+    /// Free-form brand font for sizes the roles don't cover (e.g. a 29 pt ring number).
+    /// Scales with Dynamic Type relative to `textStyle`; digits are tabular.
+    static func vCustom(_ family: VFontFamily, size: CGFloat, weight: Font.Weight, relativeTo textStyle: Font.TextStyle = .body) -> Font {
+        Font.custom(family.postScriptName(for: weight), size: size, relativeTo: textStyle).monospacedDigit()
+    }
+
     static var vLargeTitle: Font { VTextStyle.largeTitle.font }
     static var vTitle: Font { VTextStyle.title.font }
     static var vTitle2: Font { VTextStyle.title2.font }
