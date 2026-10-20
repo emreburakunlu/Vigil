@@ -36,6 +36,16 @@ final class VigilRepository {
 
     var today: LocalDay { LocalDay(now(), calendar: calendar) }
 
+    // CONTRACT (Phase 4): implemented by the core-pipeline fixer; called by the app layer.
+    /// New Health data arrived (or the app returned to the foreground): drop short-lived caches
+    /// so the next reads rebuild today/recent summaries.
+    func invalidateRecent() {}
+
+    /// "Delete local data": drop every in-memory cache (personal bests, recent summaries, access state).
+    func resetCaches() {
+        bestEffortsByRun = [:]
+    }
+
     /// Best efforts found inside each run, keyed by workout id. Runs never change once recorded,
     /// so each run's distance timeline is read and scanned only once per launch.
     private var bestEffortsByRun: [UUID: [PersonalBest]] = [:]

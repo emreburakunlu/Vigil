@@ -25,10 +25,14 @@ enum HealthDataError: Error, Equatable, Sendable {
 }
 
 /// A "new data available" signal from HealthKit observer queries / background delivery.
-struct HealthDataUpdate: Hashable, Sendable {
+struct HealthDataUpdate: Sendable {
     /// Categories that changed.
     var categories: Set<HealthDataCategory>
     var receivedAt: Date
+    /// Call once the update has been processed (summaries rebuilt). The live source forwards this
+    /// to HealthKit's observer completion handler, so iOS keeps a background launch alive until the
+    /// refresh finishes. Implementations must tolerate it never being called (time out on their own).
+    var acknowledge: @Sendable () -> Void = {}
 }
 
 /// Read-only access to everything Vigil needs from Apple Health.
@@ -76,6 +80,13 @@ protocol HealthDataSource: Sendable {
     func runDetails(for workoutID: UUID) async throws -> RunDetails
     /// Heart-rate samples (bpm) inside `interval` — used for lift HR charts, zones and strain.
     func heartRateSamples(in interval: DateInterval) async throws -> [MetricSample]
+    /// Only the GPS route of a run (cheap; for list thumbnails). Empty when the run has no route.
+    func route(for workoutID: UUID) async throws -> [RouteLocation]
+    /// Only the cumulative-distance timeline of a run (cheap; for personal-best detection).
+    func cumulativeDistance(for workoutID: UUID) async throws -> [MetricSample]
+    /// Same as `dailyVitals(in:)` but reuses already-fetched `nights` for the sleep windows,
+    /// instead of fetching sleep again.
+    func dailyVitals(in interval: DateInterval, nights: [SleepNight]) async throws -> [DailyVitals]
 
     // MARK: Updates
 
@@ -86,6 +97,21 @@ protocol HealthDataSource: Sendable {
 }
 
 extension HealthDataSource {
+    /// Default: derived from `runDetails`. The live source overrides this with a route-only query.
+    func route(for workoutID: UUID) async throws -> [RouteLocation] {
+        try await runDetails(for: workoutID).route
+    }
+
+    /// Default: derived from `runDetails`. The live source overrides this with a distance-only query.
+    func cumulativeDistance(for workoutID: UUID) async throws -> [MetricSample] {
+        try await runDetails(for: workoutID).cumulativeDistance
+    }
+
+    /// Default: ignores `nights`. The live source overrides this to avoid a second sleep query.
+    func dailyVitals(in interval: DateInterval, nights: [SleepNight]) async throws -> [DailyVitals] {
+        try await dailyVitals(in: interval)
+    }
+
     /// Convenience: VO₂ max samples (mL/kg/min).
     func vo2MaxSamples(in interval: DateInterval) async throws -> [MetricSample] {
         try await samples(of: .vo2Max, in: interval)
