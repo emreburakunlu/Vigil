@@ -21,9 +21,15 @@ final class StrainDetailModel {
 
     var isStale: Bool { overview?.day != day }
 
+    /// Follows `AppContainer.currentDay`: a screen showing the old today moves to the new one.
+    func rollOver(to newToday: LocalDay) {
+        guard newToday != today else { return }
+        if day == today { day = newToday }
+        today = newToday
+    }
+
     func load(_ repository: VigilRepository) async {
         let target = day
-        today = repository.today
         if overview == nil { phase = .loading }
         do {
             let overview = try await repository.dayOverview(for: target)
@@ -55,16 +61,16 @@ struct StrainDetailView: View {
 
     private var formatter: VigilFormatter { settingsStore.formatter }
 
+    private struct LoadKey: Hashable { var day: LocalDay; var version: Int; var current: LocalDay }
+
     var body: some View {
         ScrollView {
             VStack(spacing: VSpacing.cardGap) {
                 switch model.phase {
                 case .failed:
-                    EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load Strain",
-                                   message: "Something went wrong reading your data.", actionTitle: "Try again") {
+                    VErrorCard(title: "Couldn't load Strain", message: "Something went wrong reading your data.") {
                         Task { await model.load(container.repository) }
                     }
-                    .vCard()
                 case .loading, .loaded:
                     let overview = model.overview ?? TodayPlaceholder.overview(day: model.day)
                     let isPlaceholder = model.overview == nil || model.isStale
@@ -83,11 +89,13 @@ struct StrainDetailView: View {
                 TodayDetailTitle(title: String(localized: "Strain"), subtitle: TodayPresentation.shortDate(model.day))
             }
             ToolbarItem(placement: .primaryAction) {
-                Button { isPickingDate = true } label: { Image(systemName: "calendar") }
-                    .accessibilityLabel("Choose a date")
+                CircleIconButton(systemImage: "calendar", label: "Choose a date") { isPickingDate = true }
             }
         }
-        .task(id: model.day) { await model.load(container.repository) }
+        .task(id: LoadKey(day: model.day, version: container.dataVersion, current: container.currentDay)) {
+            model.rollOver(to: container.currentDay)
+            await model.load(container.repository)
+        }
         .sheet(isPresented: $isPickingDate) {
             TodayDatePickerSheet(selection: model.day, today: model.today) { model.day = min($0, model.today) }
         }
@@ -347,6 +355,7 @@ private struct StrainWorkoutRow: View {
 private struct StrainLoadCard: View {
     let load: TrainingLoad
     let formatter: VigilFormatter
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var riskColor: Color {
         switch load.risk {
@@ -361,13 +370,16 @@ private struct StrainLoadCard: View {
         let history = load.history
         let top = history.flatMap { [$0.acute, $0.chronic * 1.3] }
         VStack(alignment: .leading, spacing: VSpacing.l) {
-            HStack(alignment: .top, spacing: VSpacing.m) {
+            let headerLayout = typeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: VSpacing.m))
+                : AnyLayout(HStackLayout(alignment: .top, spacing: VSpacing.m))
+            headerLayout {
                 VStack(alignment: .leading, spacing: 3) {
-                    SectionHeader("Training load", style: .card)
+                    SectionHeader("Training load", style: .card).lineLimit(1).minimumScaleFactor(0.7)
                     Text("7-day vs. 28-day, last 8 weeks").vTextStyle(.footnote).foregroundStyle(.vInkSecondary)
                 }
-                Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: 2) {
+                if !typeSize.isAccessibilitySize { Spacer(minLength: 0) }
+                VStack(alignment: typeSize.isAccessibilitySize ? .leading : .trailing, spacing: 2) {
                     Text(load.ratio.map { formatter.number($0, fractionDigits: 2) } ?? "–")
                         .font(.vCustom(.heading, size: 24, weight: .bold, relativeTo: .title2)).foregroundStyle(.vInk)
                     Text(StrainPresentation.riskName(load.risk))
@@ -381,14 +393,14 @@ private struct StrainLoadCard: View {
                                  yEnd: .value("High", point.chronic * 1.3), series: .value("Series", "band"))
                             .foregroundStyle(Color.vRecovery.opacity(0.16))
                         LineMark(x: .value("Day", point.day.startDate()), y: .value("Load", point.chronic), series: .value("Series", "chronic"))
-                            .interpolationMethod(.monotone)
+                            .interpolationMethod(.linear)
                             .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round, dash: [5, 4]))
                             .foregroundStyle(Color.vInkTertiary)
                         LineMark(x: .value("Day", point.day.startDate()), y: .value("Load", point.acute), series: .value("Series", "acute"))
                             .vLineStyle(.vStrain, width: 2.8)
                     }
                     if let last = history.last {
-                        VPointMarker(x: .value("Day", last.day.startDate()), y: .value("Load", last.acute), color: .vStrain)
+                        VEndDot(x: .value("Day", last.day.startDate()), y: .value("Load", last.acute), color: .vStrain)
                     }
                 }
                 .vChartAxes(yCount: 3, xValues: .automatic(desiredCount: 4), xFormat: .dateTime.month(.abbreviated).day())

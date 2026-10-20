@@ -12,11 +12,20 @@ final class MetricDetailModel {
 
     var metric: HealthMetric
     var range: MetricRange = .month
-    let day: LocalDay
+    private(set) var day: LocalDay
+    private var today: LocalDay
 
-    init(metric: HealthMetric, day: LocalDay) {
+    init(metric: HealthMetric, day: LocalDay, today: LocalDay = .today()) {
         self.metric = metric
         self.day = day
+        self.today = today
+    }
+
+    /// Follows `AppContainer.currentDay`: a screen showing the old today moves to the new one.
+    func rollOver(to newToday: LocalDay) {
+        guard newToday != today else { return }
+        if day == today { day = newToday }
+        today = newToday
     }
 
     var isStale: Bool { series.map { $0.metric != metric || $0.range != range } ?? true }
@@ -25,17 +34,17 @@ final class MetricDetailModel {
     var key: Key { Key(metric: metric, range: range) }
 
     func load(_ repository: VigilRepository) async {
-        let (metric, range) = (metric, range)
+        let (metric, range, day) = (metric, range, day)
         if series == nil { phase = .loading }
         do {
             let result = try await repository.metricSeries(metric, range: range, endingOn: day)
-            guard !Task.isCancelled, metric == self.metric, range == self.range else { return }
+            guard !Task.isCancelled, metric == self.metric, range == self.range, day == self.day else { return }
             series = result
             phase = .loaded
         } catch is CancellationError {
             return
         } catch {
-            guard !Task.isCancelled, metric == self.metric, range == self.range else { return }
+            guard !Task.isCancelled, metric == self.metric, range == self.range, day == self.day else { return }
             phase = .failed
         }
     }
@@ -54,17 +63,17 @@ struct MetricDetailView: View {
 
     private var formatter: VigilFormatter { settingsStore.formatter }
 
+    private struct LoadKey: Hashable { var key: MetricDetailModel.Key; var day: LocalDay; var version: Int; var current: LocalDay }
+
     var body: some View {
         ScrollView {
             VStack(spacing: VSpacing.cardGap) {
                 if HealthMetric.vitals.contains(model.metric) { metricChips }
                 switch model.phase {
                 case .failed:
-                    EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load data",
-                                   message: "Something went wrong reading your data.", actionTitle: "Try again") {
+                    VErrorCard(title: "Couldn't load data", message: "Something went wrong reading your data.") {
                         Task { await model.load(container.repository) }
                     }
-                    .vCard()
                 case .loading, .loaded:
                     if let series = model.series {
                         MetricDetailContent(series: series, metric: model.metric, range: $model.range, selection: $selection,
@@ -93,8 +102,9 @@ struct MetricDetailView: View {
                 TodayDetailTitle(title: model.metric.displayName, subtitle: MetricPresentation.subtitle(model.metric))
             }
         }
-        .task(id: model.key) {
+        .task(id: LoadKey(key: model.key, day: model.day, version: container.dataVersion, current: container.currentDay)) {
             selection = nil
+            model.rollOver(to: container.currentDay)
             await model.load(container.repository)
         }
     }
@@ -174,6 +184,8 @@ private struct MetricDetailContent: View {
             display.points.min { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }
         }
         let average = display.average
+        let axis = TodayChartScale.niceAxis(values: display.points.map(\.value), band: display.band)
+        let averageDelta = MetricPresentation.averageReading(series).flatMap { TodayPresentation.deltaDisplay($0, formatter: formatter) }
         return VStack(alignment: .leading, spacing: VSpacing.xl) {
             if let selected {
                 TodayBigValue(label: LocalizedStringKey(selected.date.formatted(.dateTime.month(.abbreviated).day().hour())),
@@ -182,18 +194,18 @@ private struct MetricDetailContent: View {
                               caption: MetricPresentation.rangeLabel(series.interval, range: range))
             } else {
                 TodayBigValue(label: "Average", value: average?.value ?? "–", unit: average?.unit,
-                              caption: MetricPresentation.rangeLabel(series.interval, range: range))
+                              caption: MetricPresentation.rangeLabel(series.interval, range: range),
+                              delta: averageDelta.map { DeltaBadge($0.text, direction: $0.direction, tone: $0.tone) })
             }
-            TodayLineChart(points: display.points, band: display.band, bandColor: .vRecovery, color: .vRecovery, yDomain: display.yDomain,
+            TodayLineChart(points: display.points, band: display.band, bandColor: .vRecovery, color: .vRecovery, yDomain: axis?.domain ?? display.yDomain,
                            xDomain: series.interval.start...series.interval.end, xFormat: MetricPresentation.xFormat(range), height: 190,
-                           showsArea: false, selection: $selection)
+                           showsArea: false, yTicks: axis?.ticks, selection: $selection)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("\(metric.displayName), \(MetricPresentation.rangeLabel(series.interval, range: range))"))
                 .accessibilityValue(Text("Average \(average?.value ?? "none") \(average?.unit ?? ""), minimum \(display.minimum?.value ?? "none"), maximum \(display.maximum?.value ?? "none"), \(display.points.count) points"))
             if let text = display.baselineText {
                 HStack(spacing: VSpacing.s) {
                     RoundedRectangle(cornerRadius: 4).fill(Color.vRecovery.opacity(0.14))
-                        .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.vChartBaseline, lineWidth: 1))
                         .frame(width: 14, height: 14)
                     Text(text).font(.vCustom(.body, size: 13, weight: .semibold, relativeTo: .footnote)).foregroundStyle(.vInkLabel)
                 }

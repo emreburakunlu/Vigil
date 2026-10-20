@@ -51,9 +51,17 @@ final class TodayModel {
 
     // MARK: Loading
 
+    /// Follows `AppContainer.currentDay`. A selection on the old today moves to the new today and the strip slides with it.
+    func rollOver(to newToday: LocalDay) {
+        guard newToday != today else { return }
+        let old = today
+        today = newToday
+        selection = selection == old ? newToday : min(selection, newToday)
+        window = TodayDayWindow.containing(selection, today: newToday, calendar: calendar)
+    }
+
     func load(_ repository: VigilRepository) async {
         let day = selection
-        today = repository.today
         if overview == nil { phase = .loading }
         do {
             let result = try await repository.dayOverview(for: day)
@@ -69,17 +77,13 @@ final class TodayModel {
         }
     }
 
-    /// Fills the strip dots from cached summaries first, then computes the missing days.
+    /// Fills the strip dots with one ranged read of the strip window (missing days are built in one batch).
     func loadDots(_ repository: VigilRepository) async {
         let days = window.days
-        for day in days {
-            if let cached = repository.summaries.summary(for: day)?.recovery { recoveryByDay[day] = cached.value }
-        }
-        for day in days where recoveryByDay[day] == nil && day != repository.today {
-            if Task.isCancelled { return }
-            if let summary = try? await repository.summary(for: day), let recovery = summary.recovery {
-                recoveryByDay[day] = recovery.value
-            }
+        guard let first = days.first, let last = days.last else { return }
+        guard let summaries = try? await repository.ensuredSummaries(from: first, through: last), !Task.isCancelled else { return }
+        for summary in summaries where days.contains(summary.day) {
+            if let recovery = summary.recovery { recoveryByDay[summary.day] = recovery.value }
         }
     }
 

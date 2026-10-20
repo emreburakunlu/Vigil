@@ -28,12 +28,19 @@ struct TodayView: View {
         .vScreenBackground()
         .toolbar(.hidden, for: .navigationBar)
         .refreshable { await model.load(container.repository) }
-        .task(id: model.selection) { await model.load(container.repository) }
-        .task(id: model.window.end) { await model.loadDots(container.repository) }
+        .task(id: LoadKey(day: model.selection, version: container.dataVersion, current: container.currentDay)) {
+            model.rollOver(to: container.currentDay)
+            await model.load(container.repository)
+        }
+        .task(id: LoadKey(day: model.window.end, version: container.dataVersion, current: container.currentDay)) {
+            await model.loadDots(container.repository)
+        }
         .sheet(isPresented: $isPickingDate) {
             TodayDatePickerSheet(selection: model.selection, today: model.today) { model.select($0) }
         }
     }
+
+    private struct LoadKey: Hashable { var day: LocalDay; var version: Int; var current: LocalDay }
 
     private var swipe: some Gesture {
         DragGesture(minimumDistance: 24)
@@ -47,11 +54,9 @@ struct TodayView: View {
     private var content: some View {
         switch model.phase {
         case .failed:
-            EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load Today",
-                           message: "Something went wrong reading your data.", actionTitle: "Try again") {
+            VErrorCard(title: "Couldn't load Today", message: "Something went wrong reading your data.") {
                 Task { await model.load(container.repository) }
             }
-            .vCard()
         case .loading, .loaded:
             let overview = model.overview ?? TodayPlaceholder.overview(day: model.selection)
             let isPlaceholder = model.overview == nil || model.isStale
@@ -79,7 +84,7 @@ struct TodayContent: View {
                 }
             }
             if !overview.workouts.isEmpty {
-                TodayWorkoutsSection(workouts: overview.workouts, formatter: formatter)
+                TodayWorkoutsSection(workouts: overview.workouts, formatter: formatter, isToday: overview.day == today)
             }
             if let activity = overview.activity {
                 TodayActivityCard(activity: activity, formatter: formatter)

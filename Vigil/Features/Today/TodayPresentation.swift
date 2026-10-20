@@ -129,14 +129,20 @@ enum TodayPresentation {
 
     static func deltaDisplay(_ reading: VitalReading, formatter: VigilFormatter) -> DeltaDisplay? {
         guard reading.value != nil, reading.status != .noBaseline, reading.status != .missing, let delta = reading.delta else { return nil }
-        if reading.status == .within {
+        if delta == 0 {
             return DeltaDisplay(text: String(localized: "Steady"), direction: .flat, tone: .neutral)
         }
-        let isAbove = reading.status == .above
-        let tone: VDeltaTone = switch reading.metric.higherIsBetter {
-        case .some(true): isAbove ? .positive : .caution
-        case .some(false): isAbove ? .caution : .positive
-        case .none: .caution
+        let isAbove = delta > 0
+        let favourable: Bool? = reading.metric.higherIsBetter.map { $0 == isAbove }
+        let tone: VDeltaTone
+        if reading.status == .within {
+            // Inside the normal range a favourable move is still good news; an unfavourable one is not worth a warning.
+            tone = favourable == true ? .positive : .neutral
+        } else {
+            tone = switch favourable {
+            case .some(true): .positive
+            case .some(false), .none: .caution
+            }
         }
         let text: String
         switch reading.metric {
@@ -167,7 +173,6 @@ enum TodayPresentation {
         let workout = item.workout
         var parts = [formatter.timeOfDay(workout.start, calendar: calendar)]
         parts.append(workout.kind == .run ? formatter.duration(workout.duration, style: .clock) : formatter.duration(workout.duration, style: .minutes))
-        if let strain = item.strain { parts.append(String(localized: "Strain \(strain.value)")) }
         if let via = thirdPartySource(workout) { parts.append(String(localized: "via \(via)")) }
 
         var primary: String?

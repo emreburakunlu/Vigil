@@ -5,10 +5,11 @@ import SwiftUI
 struct TodayWorkoutsSection: View {
     let workouts: [WorkoutSummary]
     let formatter: VigilFormatter
+    var isToday = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: VSpacing.m) {
-            SectionHeader("Today's workouts", trailing: "From Apple Health")
+            SectionHeader(isToday ? "Today's workouts" : "Workouts", trailing: "From Apple Health")
             ForEach(workouts) { item in
                 let display = TodayPresentation.workout(item, formatter: formatter)
                 switch item.workout.kind {
@@ -143,8 +144,8 @@ struct TodayVitalsSection: View {
 
     private var displays: [TodayPresentation.VitalDisplay] {
         vitals.map { TodayPresentation.vital($0, formatter: formatter) }
-            // Blood oxygen is optional hardware: only listed when recorded.
-            .filter { $0.isRecorded || $0.metric != .oxygenSaturation }
+            // The grid is HRV, resting HR, respiratory rate and wrist temperature; blood oxygen stays in Metric detail.
+            .filter { $0.metric != .oxygenSaturation }
     }
 
     var body: some View {
