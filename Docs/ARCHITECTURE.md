@@ -302,3 +302,11 @@ Fonts: `Font.custom` with the variable fonts' named instances (`VFontFamily.post
 - `VChip("via Hevy", tone: .run)`, `PRBadge(isNew:)`, `InsightRow(text, systemImage:)`, `EmptyStateView(systemImage:title:message:actionTitle:action:)`.
 - Charts: `Chart { ... }.vChartAxes()`, `.vLineStyle(.vRecovery)`, `.vAreaStyle(_)`, `.vBarStyle(_)`, `VBaselineBand(low:high:)`, `VReferenceLine`, `VPointMarker`.
 - Sleep tab screens: end the root view with `.vNightScreen()` (night background, night components via `\.vSurface`, dark nav bar). Other screens: `.vScreenBackground()`.
+
+**Phase 4 design-system additions**
+- Tab-bar clearance: `MainTabView` applies `contentMargins(.bottom, barHeight + gap + 28, for: .scrollContent)` to each tab root (only while the bar is visible), so every `ScrollView` on a tab root scrolls clear of the floating bar with no per-screen code. Pushed screens do not inherit it. The bar is an overlay, not a safe-area inset (avoids double padding).
+- `VTabBar` stays 66 pt; Dynamic Type is capped at `.xxxLarge`; labels hide at accessibility sizes (icons only, VoiceOver labels kept, large content viewer on long press).
+- `CircleIconButton` is neutral (card circle, ink glyph, hairline); `usesAccent: true` is opt-in. Header buttons must use it rather than a bare `Button` (StrainDetailView calendar, RecoveryDetailView help).
+- Charts: `vLineStyle`/`vAreaStyle` use `.linear`; do not apply `.monotone`/`.catmullRom` in feature charts. `VBaselineBand` is a solid tint. `VEndDot(x:y:color:)` draws the white-filled end dot (r 5, 3 pt stroke).
+- `vNightScreen()` also fades the night surface under the status bar.
+- `VSkeletonStack(heights: [210, 300, 240], label:)` replaces ad-hoc skeletons (surface from `\.vSurface`); `VErrorCard(title:message:retry:)` replaces ad-hoc failure cards.

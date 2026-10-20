@@ -95,8 +95,10 @@ struct VTabBar: View {
             }
         }
         .padding(6)
-        .frame(height: typeSize.isAccessibilitySize ? nil : VSize.tabBarHeight)
-        .frame(minHeight: VSize.tabBarHeight)
+        .frame(height: VSize.tabBarHeight)
+        // The bar keeps its 66 pt design height; text is capped and, at accessibility sizes, hidden
+        // (the large content viewer shows the label on long press).
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .background {
             ZStack {
                 Capsule().fill(.ultraThinMaterial)
@@ -123,10 +125,12 @@ struct VTabBar: View {
         } label: {
             VStack(spacing: 2) {
                 VTabGlyph(tab: tab)
-                Text(tab.title)
-                    .font(.vCustom(.body, size: 11, weight: isSelected ? .bold : .semibold, relativeTo: .caption2))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                if !typeSize.isAccessibilitySize {
+                    Text(tab.title)
+                        .font(.vCustom(.body, size: 11, weight: isSelected ? .bold : .semibold, relativeTo: .caption2))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
             .foregroundStyle(isSelected ? selectedInk : idleInk)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -139,6 +143,9 @@ struct VTabBar: View {
         }
         .buttonStyle(.vPress)
         .accessibilityLabel(tab.title)
+        .accessibilityShowsLargeContentViewer {
+            Label { Text(tab.title) } icon: { VTabGlyph(tab: tab) }
+        }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

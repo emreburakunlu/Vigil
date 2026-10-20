@@ -14,6 +14,8 @@ struct CircleIconButton: View {
     /// VoiceOver label (required: the button has no text).
     let label: LocalizedStringKey
     var isDisabled = false
+    /// Opt-in accent icon colour; the default is the neutral ink glyph on a white (card) circle.
+    var usesAccent = false
     let action: () -> Void
 
     @Environment(\.vSurface) private var surface
@@ -22,7 +24,7 @@ struct CircleIconButton: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(surface.ink)
+                .foregroundStyle(usesAccent ? surface.accent : surface.ink)
                 .frame(width: VSize.minTapTarget, height: VSize.minTapTarget)
                 .background(surface == .night ? Color.vNightCardRaised : Color.vCard, in: .circle)
                 .overlay(Circle().strokeBorder(surface == .night ? Color.vNightSeparator : Color.vHairline, lineWidth: VSize.hairline))
