@@ -24,6 +24,8 @@ struct LiveHealthDataSource: HealthDataSource {
     let store: HKHealthStore
     /// Calendar used for day bucketing (`LocalDay`) — the user's current calendar and time zone.
     let calendar: Calendar
+    /// Route / heart-rate lookups per workout (workouts are immutable, so entries never expire).
+    let derivedCache = WorkoutDerivedCache()
 
     /// Sleep samples are fetched with this much context before / after the requested interval so sessions that
     /// straddle the interval edges are reconstructed completely before filtering by wake time.
@@ -34,6 +36,8 @@ struct LiveHealthDataSource: HealthDataSource {
     static let rawHeartRateMaximumSpan: TimeInterval = 2 * 86_400
     /// Bucket size for the cumulative-distance series of a run (deduplicated by HealthKit statistics).
     static let distanceBucketSeconds = 5
+    /// A workout younger than this may still receive its route / heart rate, so incomplete lookups aren't cached.
+    static let derivedSettleInterval: TimeInterval = 24 * 3600
 
     init(store: HKHealthStore = HKHealthStore(), calendar: Calendar = .autoupdatingCurrent) {
         self.store = store
@@ -138,10 +142,14 @@ struct LiveHealthDataSource: HealthDataSource {
     }
 
     func dailyVitals(in interval: DateInterval) async throws -> [DailyVitals] {
+        let nights = try await sleepNights(in: interval)
+        return try await dailyVitals(in: interval, nights: nights)
+    }
+
+    func dailyVitals(in interval: DateInterval, nights: [SleepNight]) async throws -> [DailyVitals] {
         try await guarded(empty: []) {
             // Overnight samples for the first day start the evening before.
             let overnight = DateInterval(start: interval.start.addingTimeInterval(-Self.sleepLookback), end: interval.end)
-            async let nights = sleepNights(in: interval)
             async let hrv = samples(of: .heartRateVariability, in: overnight)
             async let respiratory = samples(of: .respiratoryRate, in: overnight)
             async let oxygen = samples(of: .oxygenSaturation, in: overnight)
@@ -259,8 +267,11 @@ struct LiveHealthDataSource: HealthDataSource {
     }
 
     /// Maps workouts concurrently (each may need a route-existence or HR-statistics query), preserving order.
-    private func makeWorkouts(_ workouts: [HKWorkout]) async throws -> [Workout] {
-        try await withThrowingTaskGroup(of: (Int, Workout).self) { group in
+    private func makeWorkouts(_ input: [HKWorkout]) async throws -> [Workout] {
+        // Never return the same HKWorkout twice.
+        var seen = Set<UUID>()
+        let workouts = input.filter { seen.insert($0.uuid).inserted }
+        return try await withThrowingTaskGroup(of: (Int, Workout).self) { group in
             for (index, workout) in workouts.enumerated() {
                 group.addTask { (index, try await makeWorkout(workout)) }
             }
@@ -290,16 +301,34 @@ struct LiveHealthDataSource: HealthDataSource {
         var heartRateSource: DataSourceInfo?
 
         // Third-party workouts (Hevy, Strong…) usually carry no HR statistics; compute them from the HR the
-        // watch recorded during the workout interval.
-        let needsHeartRateFallback = averageHeartRate == nil
+        // watch recorded during the workout interval. Both lookups are cached per workout.
         let checksRoute = kind == .run && !isIndoor
-        async let fallback: HKStatistics? = needsHeartRateFallback ? heartRateStatistics(in: interval) : nil
-        async let hasRoute = checksRoute ? routeExists(for: workout) : false
-        if let statistics = try await fallback {
-            averageHeartRate = statistics.averageQuantity()?.doubleValue(for: RunningFormUnits.bpm)
-            maxHeartRate = statistics.maximumQuantity()?.doubleValue(for: RunningFormUnits.bpm)
-            if let hrSource = statistics.sources?.first(where: { $0.bundleIdentifier != source.bundleIdentifier }) {
-                heartRateSource = DataSourceInfo(name: hrSource.name, bundleIdentifier: hrSource.bundleIdentifier)
+        var hasRoute = false
+        if let cached = await derivedCache.value(for: workout.uuid) {
+            hasRoute = cached.hasRoute
+            averageHeartRate = cached.averageHeartRate
+            maxHeartRate = cached.maxHeartRate
+            heartRateSource = cached.heartRateSource
+        } else {
+            let needsHeartRateFallback = averageHeartRate == nil
+            async let fallback: HKStatistics? = needsHeartRateFallback ? heartRateStatistics(in: interval) : nil
+            async let routeFlag = checksRoute ? routeExists(for: workout) : false
+            if let statistics = try await fallback {
+                averageHeartRate = statistics.averageQuantity()?.doubleValue(for: RunningFormUnits.bpm)
+                maxHeartRate = statistics.maximumQuantity()?.doubleValue(for: RunningFormUnits.bpm)
+                if let hrSource = statistics.sources?.first(where: { $0.bundleIdentifier != source.bundleIdentifier }) {
+                    heartRateSource = DataSourceInfo(name: hrSource.name, bundleIdentifier: hrSource.bundleIdentifier)
+                }
+            }
+            hasRoute = try await routeFlag
+            // A just-finished workout may still be waiting for its route / watch heart rate to sync: don't pin
+            // an incomplete answer.
+            let settled = workout.endDate.addingTimeInterval(Self.derivedSettleInterval) < .now
+                || ((!checksRoute || hasRoute) && averageHeartRate != nil)
+            if settled {
+                await derivedCache.store(WorkoutDerived(hasRoute: hasRoute, averageHeartRate: averageHeartRate,
+                                                        maxHeartRate: maxHeartRate, heartRateSource: heartRateSource),
+                                         for: workout.uuid)
             }
         }
 
@@ -318,7 +347,7 @@ struct LiveHealthDataSource: HealthDataSource {
                        elevationGainMeters: elevation(HKMetadataKeyElevationAscended),
                        elevationLossMeters: elevation(HKMetadataKeyElevationDescended),
                        source: source, heartRateSource: heartRateSource,
-                       isIndoor: isIndoor, hasRoute: try await hasRoute)
+                       isIndoor: isIndoor, hasRoute: hasRoute)
     }
 
     private func heartRateStatistics(in interval: DateInterval) async throws -> HKStatistics? {
@@ -339,6 +368,26 @@ struct LiveHealthDataSource: HealthDataSource {
     }
 
     // MARK: - Run details
+
+    func route(for workoutID: UUID) async throws -> [RouteLocation] {
+        guard isHealthDataAvailable else { throw HealthDataError.notFound }
+        guard let workout = try await guarded(empty: nil, { try await hkWorkout(id: workoutID) }) else {
+            throw HealthDataError.notFound
+        }
+        return try await routeLocations(for: workout)
+    }
+
+    func cumulativeDistance(for workoutID: UUID) async throws -> [MetricSample] {
+        guard isHealthDataAvailable else { throw HealthDataError.notFound }
+        let found = try await guarded(empty: nil) { try await hkWorkout(id: workoutID) }
+        guard let workout = found, WorkoutKind(activityType: workout.workoutActivityType) == .run else {
+            throw HealthDataError.notFound
+        }
+        let interval = DateInterval(start: workout.startDate, end: max(workout.startDate, workout.endDate))
+        let buckets = try await bucketTotals(HealthKitTypes.distanceWalkingRunning, unit: .meter(), in: interval,
+                                             every: DateComponents(second: Self.distanceBucketSeconds))
+        return RunSeriesMath.cumulativeDistance(fromBuckets: buckets)
+    }
 
     func runDetails(for workoutID: UUID) async throws -> RunDetails {
         guard isHealthDataAvailable else { throw HealthDataError.notFound }
@@ -521,15 +570,26 @@ struct LiveHealthDataSource: HealthDataSource {
         for entry in HealthKitTypes.observed {
             let category = entry.category
             let query = HKObserverQuery(sampleType: entry.type, predicate: nil) { _, completionHandler, error in
-                // Always tell HealthKit we're done, or background delivery backs off.
-                defer { completionHandler() }
-                if let error {
+                // HealthKit is told we're done once the consumer has refreshed (or after a timeout), so iOS keeps a
+                // background launch alive for the work but never waits forever.
+                let handler = ObserverCompletionHandler(completionHandler)
+                let gate = ObserverCompletionGate(completion: { handler() })
+                switch ObserverOutcome.classify(error) {
+                case .signal:
+                    let update = HealthDataUpdate(categories: [category], receivedAt: .now, acknowledge: { gate.acknowledge() })
+                    switch continuation.yield(update) {
+                    case .enqueued: break
+                    case .dropped(let replaced): replaced.acknowledge() // superseded by a newer update
+                    case .terminated: gate.acknowledge()
+                    @unknown default: gate.acknowledge()
+                    }
+                case .deferUntilUnlock:
                     // Locked device: remember and re-signal once protected data is available again.
-                    if HealthDataError.mapping(error) == .protectedDataUnavailable { tracker.markPending(category) }
-                    return
+                    tracker.markPending(category)
+                    gate.acknowledge()
+                case .ignore:
+                    gate.acknowledge()
                 }
-                tracker.markPending(category)
-                continuation.yield(HealthDataUpdate(categories: [category], receivedAt: .now))
             }
             store.execute(query)
             queries.append(query)
@@ -553,8 +613,12 @@ struct LiveHealthDataSource: HealthDataSource {
         Task {
             for entry in HealthKitTypes.observed {
                 // Fails without the background-delivery entitlement (e.g. unsigned builds); observers still work
-                // while the app runs.
-                try? await store.enableBackgroundDelivery(for: entry.type, frequency: entry.frequency)
+                // while the app runs. Only sleep, workouts and HRV wake the app in the background.
+                if let frequency = entry.backgroundFrequency {
+                    try? await store.enableBackgroundDelivery(for: entry.type, frequency: frequency)
+                } else {
+                    try? await store.disableBackgroundDelivery(for: entry.type)
+                }
             }
         }
         return stream
