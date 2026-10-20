@@ -14,12 +14,17 @@ struct MainTabView: View {
 
     var body: some View {
         @Bindable var router = router
-        ZStack {
+        ZStack(alignment: .bottom) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 if visited.contains(tab) || router.selectedTab == tab {
                     let isSelected = router.selectedTab == tab
                     NavigationStack(path: router.path(for: tab)) {
-                        root(for: tab).withAppRoutes()
+                        // Scroll views inside the root inherit this margin, so the last section can
+                        // scroll clear of the floating bar. Pushed screens (bar hidden) don't get it.
+                        root(for: tab)
+                            .contentMargins(.bottom, showsTabBar ? Self.barClearance : 0, for: .scrollContent)
+                            .contentMargins(.bottom, showsTabBar ? Self.barClearance : 0, for: .scrollIndicators)
+                            .withAppRoutes()
                     }
                     .opacity(isSelected ? 1 : 0)
                     .allowsHitTesting(isSelected)
@@ -29,7 +34,7 @@ struct MainTabView: View {
             }
         }
         .onChange(of: router.selectedTab, initial: true) { _, tab in visited.insert(tab) }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        .overlay(alignment: .bottom) {
             if showsTabBar {
                 VTabBar(selection: $router.selectedTab)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -39,6 +44,9 @@ struct MainTabView: View {
         .preferredColorScheme(router.selectedTab == .sleep ? .dark : nil)
         .tint(.vAccent)
     }
+
+    /// Bar height + gap + 28 pt of breathing room.
+    private static let barClearance = VSize.tabBarHeight + VSize.tabBarBottomGap + 28
 
     /// Tab roots show the bar; pushed detail screens don't.
     private var showsTabBar: Bool {

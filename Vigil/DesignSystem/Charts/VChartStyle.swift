@@ -49,10 +49,10 @@ private struct VChartAxesModifier: ViewModifier {
 }
 
 extension ChartContent {
-    /// Standard line series: 2.5 pt round-joined line in `color`, monotone interpolation.
+    /// Standard line series: 2.5 pt round-joined line in `color`, straight `.linear` interpolation (never smoothed: curves overshoot the data).
     func vLineStyle(_ color: Color, width: CGFloat = 2.5) -> some ChartContent {
         self
-            .interpolationMethod(.monotone)
+            .interpolationMethod(.linear)
             .lineStyle(StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round))
             .foregroundStyle(color)
     }
@@ -60,7 +60,7 @@ extension ChartContent {
     /// Standard area under a line: vertical gradient from 22% to 0% of `color`.
     func vAreaStyle(_ color: Color) -> some ChartContent {
         self
-            .interpolationMethod(.monotone)
+            .interpolationMethod(.linear)
             .foregroundStyle(LinearGradient(colors: [color.opacity(0.22), color.opacity(0.0)], startPoint: .top, endPoint: .bottom))
     }
 
@@ -72,7 +72,7 @@ extension ChartContent {
     }
 }
 
-/// Baseline band (e.g. the 30-day normal range for HRV): a faint horizontal band with dashed edges.
+/// Baseline band (e.g. the 30-day normal range for HRV): a solid tint fill, no edge lines.
 ///
 /// ```swift
 /// Chart { VBaselineBand(low: 55, high: 70) ; LineMark(…) }
@@ -84,13 +84,26 @@ struct VBaselineBand: ChartContent {
 
     var body: some ChartContent {
         RectangleMark(yStart: .value("Baseline low", low), yEnd: .value("Baseline high", high))
-            .foregroundStyle(color.opacity(0.12))
-        RuleMark(y: .value("Baseline low", low))
-            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
-            .foregroundStyle(Color.vChartBaseline)
-        RuleMark(y: .value("Baseline high", high))
-            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
-            .foregroundStyle(Color.vChartBaseline)
+            .foregroundStyle(color.opacity(0.14))
+    }
+}
+
+/// End-of-series dot: white fill, r = 5, 3 pt stroke in the series colour.
+///
+/// ```swift
+/// VEndDot(x: .value("Day", last.date), y: .value("HRV", last.value), color: .vRecovery)
+/// ```
+struct VEndDot: ChartContent {
+    let x: PlottableValue<Date>
+    let y: PlottableValue<Double>
+    var color: Color = .vAccent
+
+    var body: some ChartContent {
+        PointMark(x: x, y: y)
+            .symbol {
+                Circle().fill(Color.white).frame(width: 10, height: 10)
+                    .overlay(Circle().strokeBorder(color, lineWidth: 3))
+            }
     }
 }
 

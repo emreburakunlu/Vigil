@@ -41,10 +41,29 @@ extension View {
             .environment(\.vSurface, .night)
             .background(Color.vNightBackground.ignoresSafeArea())
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .overlay(alignment: .top) { VNightTopEdge() }
     }
 
     /// Standard screen background (`vBackground`, extends under the safe area).
     func vScreenBackground() -> some View {
         background(Color.vBackground.ignoresSafeArea())
+    }
+}
+
+/// Night surface fading in under the status bar so scrolling content doesn't collide with it.
+private struct VNightTopEdge: View {
+    var body: some View {
+        GeometryReader { proxy in
+            let top = proxy.safeAreaInsets.top
+            LinearGradient(
+                stops: [.init(color: .vNightBackground, location: 0),
+                        .init(color: .vNightBackground.opacity(0.9), location: 0.55),
+                        .init(color: .vNightBackground.opacity(0), location: 1)],
+                startPoint: .top, endPoint: .bottom)
+                .frame(height: top + 8)
+                .offset(y: -top)
+                .allowsHitTesting(false)
+        }
+        .accessibilityHidden(true)
     }
 }
