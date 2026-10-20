@@ -105,14 +105,13 @@ extension ScoreRing {
     }
 }
 
-/// Three concentric rings (Recovery outermost, Sleep, Strain) around a dark "eye" — the onboarding hero
-/// and the Today summary mark. Values are 0...1.
+/// Three concentric rings (Recovery outermost, Sleep, Strain) — the onboarding hero. Values are 0...1.
+/// Echoes the Vigil logo (see `VigilLogoMark`).
 struct ConcentricRings: View {
     var recovery: Double
     var sleep: Double
     var strain: Double
     var diameter: CGFloat = 320
-    var showsEye = true
     var animated = true
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -126,12 +125,6 @@ struct ConcentricRings: View {
             ring(.recovery, value: recovery, radius: 140 * unit, stroke: stroke, delay: 0)
             ring(.sleep, value: sleep, radius: 106 * unit, stroke: stroke, delay: 0.12)
             ring(.strain, value: strain, radius: 72 * unit, stroke: stroke, delay: 0.24)
-            if showsEye {
-                Circle().fill(Color.vInverseFill).frame(width: 68 * unit, height: 68 * unit)
-                Capsule().stroke(Color.vInkOnInverse, lineWidth: max(1.5, 2.4 * unit))
-                    .frame(width: 40 * unit, height: 16 * unit)
-                Circle().fill(Color.vInkOnInverse).frame(width: 9 * unit, height: 9 * unit)
-            }
         }
         .frame(width: diameter, height: diameter)
         .onAppear {

@@ -37,7 +37,7 @@ struct RecoveryWidgetView: View {
             HStack {
                 Text("Recovery").vTextStyle(.footnote).fontWeight(.bold).foregroundStyle(Color.vInk)
                 Spacer(minLength: 0)
-                VigilMark(size: 16, pupil: band.ringColor)
+                VigilMark(size: 16)
             }
             Spacer(minLength: 0)
             WidgetRing(progress: Double(percent ?? 0) / 100, color: band.ringColor, track: band.trackColor, diameter: 86) {

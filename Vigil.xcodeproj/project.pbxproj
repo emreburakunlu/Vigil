@@ -179,8 +179,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				7A0000000000000000000022 /* VigilWidgets */,
 				7A0000000000000000000021 /* Shared */,
+				7A0000000000000000000022 /* VigilWidgets */,
 			);
 			name = VigilWidgets;
 			packageProductDependencies = (
@@ -450,7 +450,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/Vigil.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39P69G98FL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Vigil-Info.plist";
@@ -484,7 +484,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/Vigil.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39P69G98FL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Vigil-Info.plist";
@@ -518,7 +518,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/VigilWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39P69G98FL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/VigilWidgets-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Vigil;
@@ -548,7 +548,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/VigilWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39P69G98FL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/VigilWidgets-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Vigil;

@@ -86,12 +86,7 @@ struct ProfileView: View {
 
     private var summary: some View {
         HStack(spacing: VSpacing.xl) {
-            Image(systemName: "eye")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(Color.vInk)
-                .frame(width: 52, height: 52)
-                .background(Color.vInkOnAccent, in: .rect(cornerRadius: 16, style: .continuous))
-                .accessibilityHidden(true)
+            VigilLogoTile(size: 52)
             VStack(alignment: .leading, spacing: 3) {
                 Text("Your Vigil").vTextStyle(.statValueSmall)
                 Text("\(model.cachedDays) days of history · stored on this iPhone").vTextStyle(.footnote).opacity(0.85)

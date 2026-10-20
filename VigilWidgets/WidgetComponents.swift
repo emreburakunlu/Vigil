@@ -3,35 +3,12 @@ import WidgetKit
 
 // MARK: - Shared widget building blocks
 
-/// The Vigil eye mark (Design/Widgets.dc.html header icon): dark rounded square, white eye, coloured pupil.
+/// The Vigil logo tile in widget headers and placeholders.
 struct VigilMark: View {
     var size: CGFloat = 16
-    var pupil: Color = .vRecovery
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size * 0.28, style: .continuous).fill(Color.vInverseFill)
-            EyeShape()
-                .stroke(Color.vInkOnInverse, lineWidth: size * 0.075)
-                .frame(width: size * 0.66, height: size * 0.66)
-            Circle().fill(pupil).frame(width: size * 0.106 * 2, height: size * 0.106 * 2)
-        }
-        .frame(width: size, height: size)
-        .accessibilityHidden(true)
-    }
-
-    private struct EyeShape: Shape {
-        func path(in rect: CGRect) -> Path {
-            // "M5.5 16c4.5-6.5 16.5-6.5 21 0-4.5 6.5-16.5 6.5-21 0z" in a 32 pt box.
-            let sx = rect.width / 21, sy = rect.height / 21
-            func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * sx, y: rect.midY + y * sy) }
-            var path = Path()
-            path.move(to: p(0, 0))
-            path.addCurve(to: p(21, 0), control1: p(4.5, -6.5), control2: p(16.5, -6.5))
-            path.addCurve(to: p(0, 0), control1: p(16.5, 6.5), control2: p(4.5, 6.5))
-            path.closeSubpath()
-            return path
-        }
+        VigilLogoTile(size: size)
     }
 }
 
@@ -129,7 +106,7 @@ struct WidgetNeedsUpdateView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         default:
             VStack(spacing: VSpacing.s) {
-                VigilMark(size: 30, pupil: .vInkTertiary)
+                VigilMark(size: 30)
                 Text("Open Vigil to update")
                     .vTextStyle(.callout)
                     .foregroundStyle(Color.vInkSecondary)

@@ -40,7 +40,7 @@ struct WelcomeView: View {
         HStack {
             if pageNumber == 1 {
                 HStack(spacing: VSpacing.m) {
-                    OnboardingLogoMark()
+                    VigilLogoTile(size: 32)
                     Text("Vigil")
                         .font(.vCustom(.heading, size: 22, weight: .bold, relativeTo: .title2))
                         .tracking(-0.44)
@@ -144,18 +144,6 @@ enum OnboardingIllustration {
 
 // MARK: - Logo
 
-/// The Vigil mark: dark rounded square, eye outline, green pupil.
-private struct OnboardingLogoMark: View {
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.vInverseFill)
-            Capsule().stroke(Color.vInkOnInverse, lineWidth: 2).frame(width: 21, height: 12)
-            Circle().fill(Color.vPositive).frame(width: 7, height: 7)
-        }
-        .frame(width: 32, height: 32)
-        .accessibilityHidden(true)
-    }
-}
 
 // MARK: - Onb2 · score cards
 
