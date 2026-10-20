@@ -58,14 +58,14 @@ struct ProfileExporterTests {
         #expect(lines[1].contains("68.4,52"))
     }
 
-    @Test func jsonRoundTripsAndFilesAreWritten() throws {
+    @Test func jsonRoundTripsAndFilesAreWritten() async throws {
         let data = ProfileExportData(exportedAt: TestSupport.referenceDate, appVersion: "1.0", units: "metric",
                                      dailySummaries: [DailySummary(day: LocalDay(year: 2026, month: 10, day: 19))], workouts: [])
         let json = try ProfileExporter.json(data)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         #expect(try decoder.decode(ProfileExportData.self, from: json).dailySummaries.count == 1)
-        let files = try ProfileExporter.writeFiles(data)
+        let files = try await ProfileExporter.writeFiles(data)
         #expect(FileManager.default.fileExists(atPath: files.dailyCSV.path()))
         #expect(FileManager.default.fileExists(atPath: files.workoutsCSV.path()))
         #expect(FileManager.default.fileExists(atPath: files.json.path()))
