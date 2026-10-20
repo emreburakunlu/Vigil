@@ -27,8 +27,16 @@ struct RunDetailView: View {
         }
         .background(Color.vBackground)
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: workoutID) { await model.load(id: workoutID, repository: container.repository) }
+        .task(id: RunDetailLoadKey(workoutID: workoutID, units: settingsStore.settings.units)) {
+            await model.load(id: workoutID, repository: container.repository)
+        }
     }
+}
+
+/// Reload key: splits depend on the unit system, so a units change recomputes them.
+private struct RunDetailLoadKey: Hashable {
+    let workoutID: UUID
+    let units: UnitSystem
 }
 
 private struct RunDetailContent: View {
@@ -92,7 +100,7 @@ private struct RunDetailContent: View {
             Text(dateLine).vTextStyle(.subheadline).foregroundStyle(Color.vInkSecondary)
             Text(workout.displayName).vTextStyle(.largeTitle).foregroundStyle(Color.vInk)
                 .accessibilityAddTraits(.isHeader)
-            let pills = detail.personalBests
+            let pills = Array(detail.personalBests.prefix(1))
             if !pills.isEmpty || !showsMap {
                 VStack(alignment: .leading, spacing: VSpacing.s) {
                     ForEach(pills) { best in TrainPersonalBestPill(best: best, formatter: formatter) }
@@ -232,7 +240,7 @@ private struct RunDetailContent: View {
             let ticks = TrainSeries.distanceTicks(maxMeters: presentation.xMax, formatter: formatter)
             return ticks.enumerated().map { index, meters in
                 let number = formatter.number(formatter.displayDistance(meters: meters), fractionDigits: 0)
-                return (meters, index == ticks.count - 1 ? "\(number) \(formatter.distanceUnit)" : number)
+                return (meters, index == 0 || index == ticks.count - 1 ? "\(number) \(formatter.distanceUnit)" : number)
             }
         }
         let minutes = max(presentation.xMax / 60, 1)
@@ -351,7 +359,6 @@ private struct RunMapInsetModifier: ViewModifier {
         if extendsUnderBar {
             content
                 .ignoresSafeArea(.container, edges: .top)
-                .toolbarBackground(.hidden, for: .navigationBar)
         } else {
             content
         }
