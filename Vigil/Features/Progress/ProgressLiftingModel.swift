@@ -39,11 +39,14 @@ final class ProgressLiftingModel {
     func load(repository: VigilRepository, range: ProgressRange) async {
         if content == nil { phase = .loading }
         do {
-            content = try await Self.buildContent(repository: repository, range: range)
+            let built = try await Self.buildContent(repository: repository, range: range)
+            guard !Task.isCancelled else { return }
+            content = built
             phase = .loaded
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }
             if content == nil { phase = .failed }
         }
     }
@@ -59,8 +62,7 @@ final class ProgressLiftingModel {
         // One fetch for runs and lifts (heatmap needs both). Strain comes from cached summaries: no per-workout HR reads.
         let workouts = try await repository.dataSource.workouts(in: interval, kinds: [.run, .strength])
         let lifts = workouts.filter { $0.kind == .strength }
-        try await repository.ensureSummaries(from: first, through: today)
-        let cached = repository.summaries.summaries(from: first, through: today)
+        let cached = try await repository.ensuredSummaries(from: first, through: today)
         var strainByWorkout: [UUID: Double] = [:]
         for summary in cached {
             for workout in summary.strain?.workouts ?? [] { strainByWorkout[workout.workoutID] = Double(workout.value) }

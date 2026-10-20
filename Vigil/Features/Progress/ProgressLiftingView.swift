@@ -3,7 +3,7 @@ import SwiftUI
 
 /// Progress · Lifting: sessions, time, calories, intensity, consistency.
 struct ProgressLiftingView: View {
-    var range: ProgressRange = .threeMonths
+    var key: ProgressLoadKey
 
     @Environment(AppContainer.self) private var container
     @Environment(SettingsStore.self) private var settingsStore
@@ -11,8 +11,7 @@ struct ProgressLiftingView: View {
 
     var body: some View {
         let formatter = settingsStore.formatter
-        let key = ProgressLoadKey(range: range, units: settingsStore.settings.units)
-        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload(key) } }) {
+        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload() } }) {
             if let content = model.content {
                 if content.totalSessions == 0 {
                     EmptyStateView(systemImage: "dumbbell", title: "No lifting yet",
@@ -26,10 +25,10 @@ struct ProgressLiftingView: View {
                 ConsistencyCard(heatmap: content.heatmap)
             }
         }
-        .task(id: key) { await reload(key) }
+        .task(id: key) { await reload() }
     }
 
-    private func reload(_ key: ProgressLoadKey) async {
+    private func reload() async {
         await model.load(repository: container.repository, range: key.range)
     }
 }
@@ -220,5 +219,5 @@ private struct ConsistencyCard: View {
     }
 }
 
-#Preview("Lifting") { ProgressLiftingView().vigilPreview() }
-#Preview("Lifting dark") { ProgressLiftingView().vigilPreview().preferredColorScheme(.dark) }
+#Preview("Lifting") { ProgressLiftingView(key: .preview).vigilPreview() }
+#Preview("Lifting dark") { ProgressLiftingView(key: .preview).vigilPreview().preferredColorScheme(.dark) }

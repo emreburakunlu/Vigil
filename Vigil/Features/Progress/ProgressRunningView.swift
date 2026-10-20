@@ -3,7 +3,7 @@ import SwiftUI
 
 /// Progress · Running: distance, pace at similar heart rate, VO₂ max, personal bests, training load.
 struct ProgressRunningView: View {
-    var range: ProgressRange = .threeMonths
+    var key: ProgressLoadKey
 
     @Environment(AppContainer.self) private var container
     @Environment(SettingsStore.self) private var settingsStore
@@ -11,24 +11,25 @@ struct ProgressRunningView: View {
 
     var body: some View {
         let formatter = settingsStore.formatter
-        let key = ProgressLoadKey(range: range, units: settingsStore.settings.units)
-        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload(key) } }) {
+        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload() } }) {
             if let content = model.content {
                 DistanceCard(content: content, period: $model.period, formatter: formatter)
                 if let pace = content.pace { PaceCard(pace: pace, formatter: formatter) }
-                if let vo2 = content.vo2 { VO2Card(vo2: vo2) }
-                PersonalBestsCard(rows: model.personalBests)
+                if let vo2 = content.vo2 { VO2Card(vo2: vo2, formatter: formatter) }
+                PersonalBestsCard(rows: model.personalBests.map {
+                    ProgressRunningModel.personalBestRows($0, formatter: formatter, today: container.repository.today,
+                                                          calendar: container.repository.calendar)
+                })
                 if let load = content.load, !load.ratios.isEmpty { LoadCard(load: load, ticks: content.tickDates) }
             }
         }
-        .task(id: key) { await reload(key) }
-        .task(id: key.units) {
-            await model.loadPersonalBests(repository: container.repository, formatter: formatter)
-        }
+        // Range, new data and a new day reload; the unit system only re-formats.
+        .task(id: key) { await reload() }
+        .task(id: key.dataVersion) { await model.loadPersonalBests(repository: container.repository) }
     }
 
-    private func reload(_ key: ProgressLoadKey) async {
-        await model.load(repository: container.repository, range: key.range, formatter: settingsStore.formatter)
+    private func reload() async {
+        await model.load(repository: container.repository, range: key.range)
     }
 }
 
@@ -41,16 +42,18 @@ private struct DistanceCard: View {
 
     var body: some View {
         let monthly = period == .monthly
-        let bars = monthly ? content.monthlyBars : content.weeklyBars
-        let goal = monthly ? content.monthlyGoal : content.weeklyGoal
+        let bars = (monthly ? content.monthlyBars : content.weeklyBars).map {
+            ProgressBar(id: $0.id, start: $0.start, value: formatter.displayDistance(meters: $0.value))
+        }
+        let goal = formatter.displayDistance(meters: monthly ? content.monthlyGoalMeters : content.weeklyGoalMeters)
         let top = max(bars.map(\.value).max() ?? 0, goal) * 1.15
         ProgressCard(title: "Distance") {
-            VSegmentedControl(selection: $period, options: ProgressPeriod.allCases) { $0 == .weekly ? "Weekly" : "4-week" }
+            VSegmentedControl(selection: $period, options: ProgressPeriod.allCases) { $0 == .weekly ? "Weekly" : "Monthly" }
             ProgressBigValue(
-                value: content.total.text,
+                value: formatter.distance(meters: content.totalMeters, fractionDigits: 0).text,
                 caption: monthly
-                    ? String(localized: "4-week totals · goal \(formatter.number(goal, fractionDigits: 0)) \(formatter.distanceUnit)")
-                    : String(localized: "avg \(content.averagePerWeek.text) / week"))
+                    ? String(localized: "monthly totals · goal \(formatter.number(goal, fractionDigits: 0)) \(formatter.distanceUnit)")
+                    : String(localized: "avg \(formatter.distance(meters: content.averageMetersPerWeek, fractionDigits: 1).text) / week"))
             if content.runCount == 0 {
                 ProgressMessage(systemImage: "figure.run", text: "No runs in this range.")
             } else {
@@ -71,11 +74,11 @@ private struct DistanceCard: View {
                 .chartXAxis(.hidden)
                 .chartYScale(domain: 0...top)
                 .frame(height: 150)
-                .accessibilityLabel(monthly ? "Distance per 4 weeks" : "Distance per week")
+                .accessibilityLabel(monthly ? "Distance per month" : "Distance per week")
                 .accessibilityValue(progressSummary(bars.map { ProgressPoint(date: $0.start, value: $0.value) }) {
                     formatter.number($0, fractionDigits: 1) + " " + formatter.distanceUnit
                 })
-                ProgressTicks(dates: content.tickDates)
+                ProgressTicks(dates: monthly ? content.monthTickDates : content.tickDates, format: monthly ? .dateTime.month(.abbreviated) : .dateTime.month(.abbreviated).day())
             }
         }
     }
@@ -91,16 +94,19 @@ private struct PaceCard: View {
     let formatter: VigilFormatter
 
     var body: some View {
-        ProgressCard(title: "Average pace", trailing: pace.changeText.map { "\($0)" },
-                     trailingColor: pace.isFaster == true ? .vPositive : .vInkSecondary) {
-            ProgressBigValue(value: pace.latest.value,
-                             caption: String(localized: "\(pace.latest.unit) this week · at ~\(pace.referenceHeartRate) bpm"))
+        let latest = formatter.pace(secondsPerKilometer: pace.latestSecondsPerKilometer)
+        let change = ProgressRunningModel.paceChangeText(pace.changeSecondsPerKilometer, formatter: formatter)
+        let points = pace.points.map { ProgressPoint(date: $0.date, value: formatter.displayPace(secondsPerKilometer: $0.value)) }
+        ProgressCard(title: "Average pace", trailing: change?.text,
+                     trailingColor: change?.isFaster == true ? .vPositive : .vInkSecondary) {
+            ProgressBigValue(value: latest.value,
+                             caption: String(localized: "\(latest.unit) this week · at ~\(pace.referenceHeartRate) bpm"))
             Chart {
-                ForEach(pace.points) { point in
+                ForEach(points) { point in
                     LineMark(x: .value("Week", point.date), y: .value("Pace", point.value)).vLineStyle(.vRun)
                 }
-                if let last = pace.points.last {
-                    VPointMarker(x: .value("Week", last.date), y: .value("Pace", last.value), color: .vRun)
+                if let last = points.last {
+                    VEndDot(x: .value("Week", last.date), y: .value("Pace", last.value), color: .vRun)
                 }
             }
             .vChartAxes()
@@ -108,7 +114,7 @@ private struct PaceCard: View {
             .chartYScale(domain: .automatic(includesZero: false, reversed: true))
             .frame(height: 100)
             .accessibilityLabel("Pace at similar heart rate")
-            .accessibilityValue(progressSummary(pace.points) { formatter.pace(secondsPerKilometer: $0 * (formatter.units == .metric ? 1 : 1_000 / UnitConversion.metersPerMile)).text })
+            .accessibilityValue(progressSummary(pace.points) { formatter.pace(secondsPerKilometer: $0).text })
             HStack {
                 Text("slower ↓ · faster ↑")
                 Spacer()
@@ -121,13 +127,15 @@ private struct PaceCard: View {
 
 private struct VO2Card: View {
     let vo2: ProgressVO2Content
+    let formatter: VigilFormatter
 
     var body: some View {
         let change = vo2.change
         ProgressCard(title: "VO₂ max",
                      trailing: change.map { String(localized: "\(signed($0)) since \(vo2.since.formatted(.dateTime.month(.abbreviated)))") },
                      trailingColor: (change ?? 0) >= 0 ? .vPositive : .vInkSecondary) {
-            ProgressBigValue(value: vo2.latest.value, caption: vo2.latest.unit)
+            let latest = formatter.vo2Max(vo2.latest)
+            ProgressBigValue(value: latest.value, caption: latest.unit)
             if vo2.points.count >= 2 {
                 let values = vo2.points.map(\.value)
                 let low = (values.min() ?? 0) - 1
@@ -148,7 +156,7 @@ private struct VO2Card: View {
         }
     }
 
-    private func signed(_ value: Double) -> String { VigilFormatter().signed(value, fractionDigits: 1) }
+    private func signed(_ value: Double) -> String { formatter.signed(value, fractionDigits: 1) }
 }
 
 private struct PersonalBestsCard: View {
@@ -259,6 +267,9 @@ private struct LoadCard: View {
                 ForEach(load.ratios) { point in
                     LineMark(x: .value("Day", point.date), y: .value("Ratio", min(max(point.value, 0.4), 1.8))).vLineStyle(.vInk)
                 }
+                if let last = load.ratios.last {
+                    VEndDot(x: .value("Day", last.date), y: .value("Ratio", min(max(last.value, 0.4), 1.8)), color: .vInk)
+                }
             }
             .vChartAxes()
             .chartXAxis(.hidden)
@@ -273,6 +284,6 @@ private struct LoadCard: View {
     }
 }
 
-#Preview("Running") { ProgressRunningView().vigilPreview() }
-#Preview("Running dark") { ProgressRunningView().vigilPreview().preferredColorScheme(.dark) }
-#Preview("No runs") { ProgressRunningView().vigilPreview(.noRunsThisWeek) }
+#Preview("Running") { ProgressRunningView(key: .preview).vigilPreview() }
+#Preview("Running dark") { ProgressRunningView(key: .preview).vigilPreview().preferredColorScheme(.dark) }
+#Preview("No runs") { ProgressRunningView(key: .preview).vigilPreview(.noRunsThisWeek) }

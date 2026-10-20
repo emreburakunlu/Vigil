@@ -1,6 +1,6 @@
 import Foundation
 
-/// One bar of a Progress chart (a week, or a 4-week block). `value` is in display units.
+/// One bar of a Progress chart (a week, or a calendar month). `value` is in display units.
 struct ProgressBar: Hashable, Sendable, Identifiable {
     var id: Int
     var start: Date
@@ -72,21 +72,25 @@ enum ProgressAggregation {
         return zip(sums, counts).map { $1 > 0 ? $0 / Double($1) : nil }
     }
 
-    /// Groups weekly values into blocks of `size`, aligned to the newest week. A leading partial
-    /// block is dropped unless it is the only one. Returns the sum of each block with the index of its first week.
-    static func blocks(of weekly: [Double], size: Int = 4) -> [(firstWeek: Int, sum: Double)] {
-        guard size > 0, !weekly.isEmpty else { return [] }
-        var result: [(firstWeek: Int, sum: Double)] = []
-        var end = weekly.count
-        while end > 0 {
-            let start = max(0, end - size)
-            result.insert((start, weekly[start..<end].reduce(0, +)), at: 0)
-            end = start
+    /// First day of every calendar month from the month containing `first` through the month containing `today`, oldest first.
+    static func monthStarts(from first: LocalDay, through today: LocalDay) -> [LocalDay] {
+        let count = (today.year - first.year) * 12 + today.month - first.month + 1
+        guard count > 0 else { return [] }
+        return (0..<count).map { offset in
+            let index = first.month - 1 + offset
+            return LocalDay(year: first.year + index / 12, month: index % 12 + 1, day: 1)
         }
-        if result.count > 1, weekly.count % size != 0 {
-            result.removeFirst()
+    }
+
+    /// Sums `items` into the calendar months starting at `months` (as returned by `monthStarts`); items outside are ignored.
+    static func monthlySums(_ items: [(day: LocalDay, value: Double)], months: [LocalDay]) -> [Double] {
+        guard let first = months.first else { return [] }
+        var sums = Array(repeating: 0.0, count: months.count)
+        for item in items {
+            let index = (item.day.year - first.year) * 12 + item.day.month - first.month
+            if sums.indices.contains(index) { sums[index] += item.value }
         }
-        return result
+        return sums
     }
 
     /// Averages consecutive chunks so that at most `maxCount` points remain.

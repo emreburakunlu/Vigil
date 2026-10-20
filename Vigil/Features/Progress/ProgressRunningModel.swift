@@ -8,21 +8,20 @@ enum ProgressPhase: Equatable, Sendable {
     case failed
 }
 
-/// Pace-at-similar-heart-rate card.
+/// Pace-at-similar-heart-rate card. Values are canonical (seconds per km); views format them.
 struct ProgressPaceContent: Hashable, Sendable {
-    /// Weekly normalised pace in display units (seconds per km or mile), oldest first.
+    /// Weekly normalised pace in seconds per km, oldest first.
     var points: [ProgressPoint]
-    var latest: FormattedValue
-    /// "12 s/km faster", nil without enough runs.
-    var changeText: String?
-    var isFaster: Bool?
+    var latestSecondsPerKilometer: Double
+    /// Change in seconds per km (negative = faster); nil without enough runs.
+    var changeSecondsPerKilometer: Double?
     var referenceHeartRate: Int
 }
 
-/// VO₂ max card.
+/// VO₂ max card (ml/kg/min, the same in every unit system).
 struct ProgressVO2Content: Hashable, Sendable {
     var points: [ProgressPoint]
-    var latest: FormattedValue
+    var latest: Double
     /// Change since the first sample in the range.
     var change: Double?
     var since: Date
@@ -47,20 +46,25 @@ struct ProgressPersonalBestRow: Hashable, Sendable, Identifiable {
     var id: PersonalBestCategory { category }
 }
 
-/// Everything on Progress → Running that depends on the selected range.
+/// Everything on Progress → Running that depends on the selected range. Distances are in metres and
+/// paces in seconds per km: changing the unit system only re-formats, it never reloads.
 struct ProgressRunningContent: Hashable, Sendable {
+    /// Metres per week.
     var weeklyBars: [ProgressBar]
+    /// Metres per calendar month (whole months overlapping the range).
     var monthlyBars: [ProgressBar]
-    /// Goals in display units (km / mi).
-    var weeklyGoal: Double
-    var monthlyGoal: Double
-    var total: FormattedValue
-    var averagePerWeek: FormattedValue
+    var weeklyGoalMeters: Double
+    var monthlyGoalMeters: Double
+    var totalMeters: Double
+    var weekCount: Int
     var runCount: Int
     var tickDates: [Date]
+    var monthTickDates: [Date]
     var pace: ProgressPaceContent?
     var vo2: ProgressVO2Content?
     var load: ProgressLoadContent?
+
+    var averageMetersPerWeek: Double { totalMeters / Double(max(weekCount, 1)) }
 }
 
 /// Screen model for Progress → Running.
@@ -69,98 +73,106 @@ struct ProgressRunningContent: Hashable, Sendable {
 final class ProgressRunningModel {
     private(set) var phase: ProgressPhase = .loading
     private(set) var content: ProgressRunningContent?
-    private(set) var personalBests: [ProgressPersonalBestRow]?
+    /// Canonical personal bests; nil until loaded (empty when unavailable).
+    private(set) var personalBests: [PersonalBest]?
     var period: ProgressPeriod = .weekly
 
-    func load(repository: VigilRepository, range: ProgressRange, formatter: VigilFormatter) async {
+    func load(repository: VigilRepository, range: ProgressRange) async {
         if content == nil { phase = .loading }
         do {
-            content = try await Self.buildContent(repository: repository, range: range, formatter: formatter)
+            let built = try await Self.buildContent(repository: repository, range: range)
+            guard !Task.isCancelled else { return }
+            content = built
             phase = .loaded
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }
             if content == nil { phase = .failed }
         }
     }
 
-    /// Personal bests cover a fixed year, so they load once per screen model (and when units change).
-    func loadPersonalBests(repository: VigilRepository, formatter: VigilFormatter) async {
-        guard let bests = try? await repository.personalBests() else {
-            if personalBests == nil { personalBests = Self.personalBestRows([], formatter: formatter, today: repository.today, calendar: repository.calendar) }
-            return
-        }
-        personalBests = Self.personalBestRows(bests, formatter: formatter, today: repository.today, calendar: repository.calendar)
+    /// Personal bests cover a fixed year, so they depend on new data only (not on the range or the units).
+    func loadPersonalBests(repository: VigilRepository) async {
+        let bests = try? await repository.personalBests()
+        guard !Task.isCancelled else { return }
+        if let bests { personalBests = bests } else if personalBests == nil { personalBests = [] }
     }
 
     // MARK: Building
 
-    static func buildContent(repository: VigilRepository, range: ProgressRange, formatter: VigilFormatter) async throws -> ProgressRunningContent {
+    static func buildContent(repository: VigilRepository, range: ProgressRange) async throws -> ProgressRunningContent {
         let calendar = repository.calendar
         let today = repository.today
         let weeks = range.weeks
         let interval = range.interval(endingOn: today, calendar: calendar)
         let starts = ProgressAggregation.weekStarts(weeks: weeks, endingOn: today, calendar: calendar)
         let first = starts[0]
+        let months = ProgressAggregation.monthStarts(from: first, through: today)
+        // Whole calendar months for the Monthly toggle, so fetch from the start of the first one (a single query).
+        let fetchInterval = LocalDay.interval(from: months.first ?? first, through: today, calendar: calendar)
+        let source = repository.dataSource
 
-        let runs = try await repository.dataSource.workouts(in: interval, kinds: [.run])
-        let weeklyMeters = ProgressAggregation.weeklySums(
-            runs.map { (LocalDay($0.start, calendar: calendar), $0.distanceMeters ?? 0) }, first: first, count: weeks, calendar: calendar)
+        async let fetchedRuns = source.workouts(in: fetchInterval, kinds: [.run])
+        async let vo2Samples = try? source.samples(of: .vo2Max, in: interval)
+        async let loadHistory = try? repository.trainingLoad(endingOn: today, historyDays: weeks * 7)
+        let runs = try await fetchedRuns
+
+        let items = runs.map { (LocalDay($0.start, calendar: calendar), $0.distanceMeters ?? 0) }
+        let weeklyMeters = ProgressAggregation.weeklySums(items, first: first, count: weeks, calendar: calendar)
+        let monthlyMeters = ProgressAggregation.monthlySums(items, months: months)
         let weeklyBars = weeklyMeters.enumerated().map { index, meters in
-            ProgressBar(id: index, start: starts[index].startDate(in: calendar), value: formatter.displayDistance(meters: meters))
+            ProgressBar(id: index, start: starts[index].startDate(in: calendar), value: meters)
         }
-        let monthlyBars = ProgressAggregation.blocks(of: weeklyMeters).enumerated().map { index, block in
-            ProgressBar(id: index, start: starts[block.firstWeek].startDate(in: calendar), value: formatter.displayDistance(meters: block.sum))
+        let monthlyBars = monthlyMeters.enumerated().map { index, meters in
+            ProgressBar(id: index, start: months[index].startDate(in: calendar), value: meters)
         }
-        let totalMeters = weeklyMeters.reduce(0, +)
         let goalMeters = repository.settings.settings.goals.weeklyRunDistanceMeters
 
-        let pace = try await paceContent(repository: repository, weeks: weeks, today: today, formatter: formatter)
-        let vo2 = await vo2Content(repository: repository, interval: interval, formatter: formatter)
-        let load = try? await loadContent(repository: repository, weeks: weeks, today: today)
+        let pace = paceContent(repository: repository, runs: runs, weeks: weeks, today: today)
+        let vo2 = vo2Content(samples: await vo2Samples, calendar: calendar)
+        let load = await loadHistory.map { loadContent($0, calendar: calendar) }
 
         return ProgressRunningContent(
             weeklyBars: weeklyBars, monthlyBars: monthlyBars,
-            weeklyGoal: formatter.displayDistance(meters: goalMeters), monthlyGoal: formatter.displayDistance(meters: goalMeters * 4),
-            total: formatter.distance(meters: totalMeters, fractionDigits: 0),
-            averagePerWeek: formatter.distance(meters: totalMeters / Double(weeks), fractionDigits: 1),
-            runCount: runs.count,
+            weeklyGoalMeters: goalMeters, monthlyGoalMeters: goalMeters * 52 / 12,
+            totalMeters: weeklyMeters.reduce(0, +), weekCount: weeks,
+            runCount: runs.filter { interval.contains($0.start) }.count,
             tickDates: ProgressAggregation.tickDates(weeklyBars.map(\.start)),
+            monthTickDates: ProgressAggregation.tickDates(monthlyBars.map(\.start)),
             pace: pace, vo2: vo2, load: load)
     }
 
-    private static func paceContent(repository: VigilRepository, weeks: Int, today: LocalDay, formatter: VigilFormatter) async throws -> ProgressPaceContent? {
-        guard let trend = try await repository.aerobicEfficiency(endingOn: today, weeks: weeks), trend.points.count >= 2,
+    private static func paceContent(repository: VigilRepository, runs: [Workout], weeks: Int, today: LocalDay) -> ProgressPaceContent? {
+        guard let trend = repository.aerobicEfficiency(runs: runs, endingOn: today, weeks: weeks), trend.points.count >= 2,
               let last = trend.points.last else { return nil }
         let calendar = repository.calendar
         let points = trend.points.map {
-            ProgressPoint(date: $0.weekStart.startDate(in: calendar), value: formatter.displayPace(secondsPerKilometer: $0.paceSecondsPerKilometer))
+            ProgressPoint(date: $0.weekStart.startDate(in: calendar), value: $0.paceSecondsPerKilometer)
         }
-        var changeText: String?
-        var isFaster: Bool?
-        if let change = trend.paceChangeSecondsPerKilometer, abs(change) >= 1 {
-            let amount = formatter.paceDifference(secondsPerKilometer: change).text
-            isFaster = change < 0
-            changeText = change < 0 ? String(localized: "\(amount) faster") : String(localized: "\(amount) slower")
-        }
-        return ProgressPaceContent(points: points, latest: formatter.pace(secondsPerKilometer: last.paceSecondsPerKilometer),
-                                   changeText: changeText, isFaster: isFaster, referenceHeartRate: Int(trend.referenceHeartRate.rounded()))
+        return ProgressPaceContent(points: points, latestSecondsPerKilometer: last.paceSecondsPerKilometer,
+                                   changeSecondsPerKilometer: trend.paceChangeSecondsPerKilometer,
+                                   referenceHeartRate: Int(trend.referenceHeartRate.rounded()))
     }
 
-    private static func vo2Content(repository: VigilRepository, interval: DateInterval, formatter: VigilFormatter) async -> ProgressVO2Content? {
-        guard let samples = try? await repository.dataSource.samples(of: .vo2Max, in: interval), !samples.isEmpty else { return nil }
-        let calendar = repository.calendar
+    private static func vo2Content(samples: [MetricSample]?, calendar: Calendar) -> ProgressVO2Content? {
+        guard let samples, !samples.isEmpty else { return nil }
         let daily = ProgressAggregation.dailyMeans(samples, calendar: calendar)
         guard let latest = daily.last, let firstPoint = daily.first else { return nil }
-        let points = ProgressAggregation.downsample(daily)
-        return ProgressVO2Content(points: points, latest: formatter.vo2Max(latest.value),
+        return ProgressVO2Content(points: ProgressAggregation.downsample(daily), latest: latest.value,
                                   change: ProgressAggregation.change(daily), since: firstPoint.date)
     }
 
-    private static func loadContent(repository: VigilRepository, weeks: Int, today: LocalDay) async throws -> ProgressLoadContent {
-        let load = try await repository.trainingLoad(endingOn: today, historyDays: weeks * 7)
-        let ratios = ProgressAggregation.downsample(ProgressAggregation.loadRatios(load.history, calendar: repository.calendar))
+    private static func loadContent(_ load: TrainingLoad, calendar: Calendar) -> ProgressLoadContent {
+        let ratios = ProgressAggregation.downsample(ProgressAggregation.loadRatios(load.history, calendar: calendar))
         return ProgressLoadContent(ratios: ratios, current: load.ratio, risk: load.risk)
+    }
+
+    /// "12 s/km faster" / "12 s/km slower"; nil when the change is under a second.
+    static func paceChangeText(_ change: Double?, formatter: VigilFormatter) -> (text: String, isFaster: Bool)? {
+        guard let change, abs(change) >= 1 else { return nil }
+        let amount = formatter.paceDifference(secondsPerKilometer: change).text
+        return (change < 0 ? String(localized: "\(amount) faster") : String(localized: "\(amount) slower"), change < 0)
     }
 
     static func personalBestRows(_ bests: [PersonalBest], formatter: VigilFormatter, today: LocalDay, calendar: Calendar) -> [ProgressPersonalBestRow] {
