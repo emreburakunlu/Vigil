@@ -80,7 +80,7 @@ final class TrainModel {
             history.items += page.filter { !known.contains($0.id) }
             history.groups = TrainFormatting.monthGroups(history.items, calendar: calendar)
             history.oldestFetched = start
-            history.hasMore = weeksBack < Self.maxHistoryWeeks
+            history.hasMore = !page.isEmpty && weeksBack < Self.maxHistoryWeeks
         } catch {
             history = kind == .run ? runs : lifts
             history.hasMore = false

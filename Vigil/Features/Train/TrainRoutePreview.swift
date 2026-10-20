@@ -7,16 +7,12 @@ struct TrainRoutePreview: Hashable, Sendable {
 
     static let none = TrainRoutePreview(points: [])
 
-    /// Projects the route, drops inaccurate fixes, simplifies (Douglas-Peucker) to at most `maxPoints`
+    /// Projects the route, simplifies (Douglas-Peucker) to at most `maxPoints`
     /// and fits it into the unit square with padding. Nonisolated: safe to call off the main actor.
     static func make(from route: [RouteLocation], maxPoints: Int = 64) -> TrainRoutePreview {
-        let usable = route.filter { ($0.horizontalAccuracy ?? 0) <= 50 }
-        let fixes = usable.count >= 2 ? usable : route
-        guard fixes.count >= 2 else { return .none }
-        let meanLatitude = fixes.reduce(0) { $0 + $1.latitude } / Double(fixes.count)
-        let scale = cos(meanLatitude * .pi / 180)
-        let xs = fixes.map { $0.longitude * scale }
-        let ys = fixes.map { $0.latitude }
+        guard route.count >= 2 else { return .none }
+        let projection = RouteProjection(route)
+        let xs = projection.xs, ys = projection.ys
         let kept = TrainSeries.simplify(x: xs, y: ys, maxPoints: maxPoints)
         guard kept.count >= 2,
               let minX = kept.map({ xs[$0] }).min(), let maxX = kept.map({ xs[$0] }).max(),

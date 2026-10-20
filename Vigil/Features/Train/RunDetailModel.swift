@@ -60,14 +60,11 @@ struct RunDetailPresentation: Sendable {
         result.bestPace = paceValues.isEmpty ? nil : TrainSeries.percentile(paceValues, 0.03)
 
         guard !detail.workout.isIndoor else { return result }
-        let accurate = details.route.filter { ($0.horizontalAccuracy ?? 0) <= 50 }
-        let fixes = accurate.count >= 2 ? accurate : details.route
+        let fixes = details.route
         guard fixes.count >= 2 else { return result }
 
-        let meanLatitude = fixes.reduce(0) { $0 + $1.latitude } / Double(fixes.count)
-        let scale = cos(meanLatitude * .pi / 180)
-        let xs = fixes.map { $0.longitude * scale }
-        let ys = fixes.map(\.latitude)
+        let projection = RouteProjection(fixes)
+        let xs = projection.xs, ys = projection.ys
         let kept = TrainSeries.simplify(x: xs, y: ys, maxPoints: maxRoutePoints)
         guard kept.count >= 2 else { return result }
 
@@ -85,8 +82,9 @@ struct RunDetailPresentation: Sendable {
             return seconds > 0 && meters > 0.5 ? seconds / meters * 1_000 : nil
         }
         let hrAtFix: [Double?] = fixes.map { TrainSeries.nearestValue(in: details.heartRate, at: $0.timestamp) }
-        let paceSegmentValues = segmentValues(paceAtFix, kept: kept)
-        let hrSegmentValues = segmentValues(hrAtFix, kept: kept)
+        let times = fixes.map(\.timestamp)
+        let paceSegmentValues = segmentValues(smoothed(paceAtFix, times: times), kept: kept)
+        let hrSegmentValues = segmentValues(smoothed(hrAtFix, times: times), kept: kept)
 
         let coordinates = fixes.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
         let paceBuckets = quintileBuckets(paceSegmentValues, fasterIsHigher: true)
@@ -105,6 +103,32 @@ struct RunDetailPresentation: Sendable {
     }
 
     // MARK: Helpers
+
+    /// Rolling mean over a centred time window (default 30 s) after forward/back-filling gaps, so colours
+    /// don't flicker with every GPS fix.
+    static func smoothed(_ values: [Double?], times: [Date], window: TimeInterval = 30) -> [Double?] {
+        guard values.count == times.count, values.contains(where: { $0 != nil }) else { return values }
+        var filled: [Double] = []
+        filled.reserveCapacity(values.count)
+        var last: Double?
+        for value in values {
+            if let value { last = value }
+            filled.append(value ?? last ?? .nan)
+        }
+        let firstValid = filled.first { !$0.isNaN } ?? 0
+        for index in filled.indices where filled[index].isNaN { filled[index] = firstValid }
+        var prefix: [Double] = [0]
+        prefix.reserveCapacity(filled.count + 1)
+        for value in filled { prefix.append(prefix[prefix.count - 1] + value) }
+        var lower = 0, upper = 0
+        let half = window / 2
+        return filled.indices.map { index in
+            while times[index].timeIntervalSince(times[lower]) > half { lower += 1 }
+            if upper < index { upper = index }
+            while upper + 1 < times.count, times[upper + 1].timeIntervalSince(times[index]) <= half { upper += 1 }
+            return (prefix[upper + 1] - prefix[lower]) / Double(upper - lower + 1)
+        }
+    }
 
     /// Average value across each simplified segment (nil when the stretch has no data).
     static func segmentValues(_ values: [Double?], kept: [Int]) -> [Double?] {
@@ -193,7 +217,8 @@ final class RunDetailModel {
     var colorMode: TrainRouteColorMode = .pace
 
     func load(id: UUID, repository: VigilRepository) async {
-        state = .loading
+        // Keep the content on screen while reloading (e.g. after a units change).
+        if case .loaded = state {} else { state = .loading }
         do {
             let detail = try await repository.runDetail(id: id)
             let built = await RunDetailPresentation.build(from: detail)

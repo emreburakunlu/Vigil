@@ -19,25 +19,17 @@ struct TrainLiftView: View {
         }
     }
 
-    private var list: some View {
-        VStack(alignment: .leading, spacing: VSpacing.m) {
+    @ViewBuilder private var list: some View {
+        Group {
             SectionHeader("Strength workouts").padding(.top, VSpacing.l)
-            ForEach(model.lifts.groups) { group in
-                Text(TrainFormatting.monthTitle(group.start, now: model.now, calendar: model.calendar))
-                    .vTextStyle(.overline)
-                    .foregroundStyle(Color.vInkSecondary)
-                    .padding(.horizontal, VSpacing.xxs)
-                    .padding(.top, VSpacing.xs)
-                    .accessibilityAddTraits(.isHeader)
-                ForEach(group.items) { lift in
-                    NavigationLink(value: AppRoute.liftDetail(lift.id)) {
-                        TrainLiftRow(lift: lift, model: model)
-                    }
-                    .buttonStyle(.vPress)
-                    .onAppear {
-                        if lift.id == model.lifts.items.last?.id {
-                            Task { await model.loadMore(.strength, repository: container.repository) }
-                        }
+            ForEach(model.lifts.items) { lift in
+                NavigationLink(value: AppRoute.liftDetail(lift.id)) {
+                    TrainLiftRow(lift: lift, model: model)
+                }
+                .buttonStyle(.vPress)
+                .onAppear {
+                    if lift.id == model.lifts.items.last?.id {
+                        Task { await model.loadMore(.strength, repository: container.repository) }
                     }
                 }
             }

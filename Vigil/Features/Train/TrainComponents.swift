@@ -52,7 +52,7 @@ struct TrainValueCell: View {
 /// Strain ring + "Strain 41 · Moderate" + training load line.
 struct TrainStrainCard: View {
     let strain: WorkoutStrain
-    let note: LocalizedStringKey?
+    let note: String?
 
     private var levelName: LocalizedStringKey {
         switch strain.level {
@@ -86,6 +86,7 @@ struct TrainStrainCard: View {
 struct TrainZonesCard: View {
     let durations: ZoneDurations
     let style: DurationStyle
+    var showsPercent = true
     @Environment(SettingsStore.self) private var settingsStore
 
     var body: some View {
@@ -94,7 +95,7 @@ struct TrainZonesCard: View {
             ForEach(1...5, id: \.self) { zone in
                 ZoneBar(zone: zone, fraction: fractions[zone - 1],
                         duration: VigilFormatter.duration(durations[zone], style: style),
-                        percentText: settingsStore.formatter.percent(Int((fractions[zone - 1] * 100).rounded())).text)
+                        percentText: showsPercent ? settingsStore.formatter.percent(Int((fractions[zone - 1] * 100).rounded())).text : "")
             }
         }
     }

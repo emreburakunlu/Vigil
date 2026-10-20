@@ -86,7 +86,7 @@ private struct LiftDetailContent: View {
             summary.padding(.horizontal, VSpacing.headerGutter - VSpacing.screenGutter)
             totals
             if presentation.points.count > 1 { heartRateCard }
-            if detail.zoneDurations.total > 0 { TrainZonesCard(durations: detail.zoneDurations, style: .hoursMinutes) }
+            if detail.zoneDurations.total > 0 { TrainZonesCard(durations: detail.zoneDurations, style: .hoursMinutes, showsPercent: false) }
             TrainStrainCard(strain: detail.strain, note: "based on heart rate, not weight lifted")
             sourceCard
         }
@@ -145,7 +145,7 @@ private struct LiftDetailContent: View {
 
     private var heartRateCard: some View {
         TrainCard(title: "Heart rate", spacing: VSpacing.l) {
-            LiftHeartRateChart(points: presentation.points, domain: presentation.domain, zones: detail.zones, start: workout.start)
+            LiftHeartRateChart(points: presentation.points, domain: presentation.domain, zones: detail.zones, start: workout.start, end: workout.end)
                 .frame(height: 150)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Heart rate during session")
@@ -206,6 +206,7 @@ private struct LiftHeartRateChart: View {
     let domain: ClosedRange<Double>
     let zones: HeartRateZones
     let start: Date
+    let end: Date
 
     private var bands: [(zone: Int, low: Double, high: Double)] {
         zones.zones.enumerated().compactMap { index, zone in
@@ -233,7 +234,7 @@ private struct LiftHeartRateChart: View {
             }
         }
         .chartYScale(domain: domain)
-        .chartXScale(domain: 0...max(points.last?.x ?? 1, 1))
+        .chartXScale(domain: 0...max(end.timeIntervalSince(start), points.last?.x ?? 1, 1))
         .chartYAxis {
             AxisMarks(position: .trailing, values: bands.map { ($0.low + $0.high) / 2 }) { value in
                 AxisValueLabel {
