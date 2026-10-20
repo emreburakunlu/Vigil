@@ -23,11 +23,26 @@ extension WidgetSnapshot {
     /// The moment this snapshot turns stale; used to schedule a timeline entry that flips the widget.
     var staleDate: Date { generatedAt.addingTimeInterval(Self.staleAfter) }
 
+    /// Whether the snapshot's scores belong to the calendar day containing `date`.
+    func isForDay(of date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
+        calendar.isDate(day, inSameDayAs: date)
+    }
+
     /// Resolves what to show. `groupAvailable == false` (no App Group entitlement) always needs an update,
-    /// because the app's data cannot be shared with the widget.
-    static func displayState(snapshot: WidgetSnapshot?, at date: Date, groupAvailable: Bool = true) -> WidgetDisplayState {
-        guard groupAvailable, let snapshot, !snapshot.isStale(at: date) else { return .needsUpdate }
+    /// because the app's data cannot be shared with the widget. Yesterday's scores are never shown as
+    /// today's: after midnight the widget asks the user to open Vigil until the app writes a new snapshot.
+    static func displayState(snapshot: WidgetSnapshot?, at date: Date, groupAvailable: Bool = true,
+                             calendar: Calendar = .autoupdatingCurrent) -> WidgetDisplayState {
+        guard groupAvailable, let snapshot, !snapshot.isStale(at: date), snapshot.isForDay(of: date, calendar: calendar) else {
+            return .needsUpdate
+        }
         return .ready(snapshot)
+    }
+
+    /// Start of the day after `date`; the timeline flips there.
+    static func nextDayStart(after date: Date, calendar: Calendar = .autoupdatingCurrent) -> Date {
+        let start = calendar.startOfDay(for: date)
+        return calendar.date(byAdding: .day, value: 1, to: start) ?? start.addingTimeInterval(86_400)
     }
 
     /// Short readiness label under the Recovery ring ("Push day").

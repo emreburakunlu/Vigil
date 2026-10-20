@@ -46,10 +46,16 @@ struct SnapshotTimelineProvider: TimelineProvider {
         groupAvailable ? WidgetSnapshotStore().load() : nil
     }
 
-    static func timeline(now: Date, snapshot: WidgetSnapshot?, groupAvailable: Bool) -> Timeline<SnapshotEntry> {
+    /// Entries: now, the next midnight (yesterday's scores flip to "Open Vigil to update") and the 36 h
+    /// staleness flip, whichever lie in the future, ascending.
+    static func timeline(now: Date, snapshot: WidgetSnapshot?, groupAvailable: Bool,
+                         calendar: Calendar = .autoupdatingCurrent) -> Timeline<SnapshotEntry> {
         var entries = [SnapshotEntry(date: now, snapshot: snapshot, groupAvailable: groupAvailable)]
-        if groupAvailable, let snapshot, snapshot.staleDate > now {
-            entries.append(SnapshotEntry(date: snapshot.staleDate, snapshot: snapshot))
+        if groupAvailable, let snapshot {
+            let flips = Set([WidgetSnapshot.nextDayStart(after: now, calendar: calendar), snapshot.staleDate])
+                .filter { $0 > now }
+                .sorted()
+            entries += flips.map { SnapshotEntry(date: $0, snapshot: snapshot) }
         }
         return Timeline(entries: entries, policy: .after(now.addingTimeInterval(refreshInterval)))
     }
