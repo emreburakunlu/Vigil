@@ -127,8 +127,12 @@ final class OnboardingModel {
     func startImport(in container: AppContainer) {
         guard importTask == nil, !isImportFinished else { return }
         if container.settings.settings.onboarding.historyImportedAt != nil {
-            // Resumed after a kill: the import already finished.
-            importProgress = ImportProgress(phase: .finished, fraction: 1, nightsImported: 0, workoutsImported: 0, workoutsTotal: 0)
+            // Resumed after a kill: the import already finished. Count the imported nights from the cache.
+            let repository = container.repository
+            let today = repository.today
+            let first = today.adding(days: -(HistoryImportService.defaultHistoryDays - 1), calendar: repository.calendar)
+            let nights = repository.summaries.summaries(from: first, through: today).filter { $0.sleepNightID != nil }.count
+            importProgress = ImportProgress(phase: .finished, fraction: 1, nightsImported: nights, workoutsImported: 0, workoutsTotal: 0)
             return
         }
         importFailed = false
@@ -150,9 +154,11 @@ final class OnboardingModel {
         startImport(in: container)
     }
 
-    /// Marks onboarding complete; `RootView` then shows the main tabs.
+    /// Marks onboarding complete; `RootView` then shows the main tabs. When a notification is switched on
+    /// (the morning summary is by default), asks for notification permission and schedules.
     func complete(in container: AppContainer) {
         container.settings.update { $0.onboarding.completed = true }
+        Task { await container.requestNotificationPermissionIfEnabled() }
     }
 }
 

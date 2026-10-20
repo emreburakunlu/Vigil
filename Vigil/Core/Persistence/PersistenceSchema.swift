@@ -3,7 +3,7 @@ import SwiftData
 
 // SwiftData schema. Records are persistence details: feature code never touches them and works
 // with the value types (`VigilSettings`, `DailySummary`) exposed by `SettingsStore` /
-// `DailySummaryStore`. To change the schema add `VigilSchemaV2` + a migration stage; never edit
+// `DailySummaryStore`. To change the schema add a new `VigilSchemaVn` + a migration stage; never edit
 // V1 models in place once shipped.
 
 enum VigilSchemaV1: VersionedSchema {
@@ -143,11 +143,54 @@ enum VigilSchemaV1: VersionedSchema {
     }
 }
 
-typealias SettingsRecord = VigilSchemaV1.SettingsRecord
-typealias DailySummaryRecord = VigilSchemaV1.DailySummaryRecord
+// MARK: - V2
 
-/// Migration plan (V1 only for now).
+/// V2 adds `DailySummaryRecord.settingsFingerprint` so the cache can be checked for staleness without
+/// decoding payloads. `SettingsRecord` is unchanged and shared with V1.
+enum VigilSchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    static var models: [any PersistentModel.Type] {
+        [VigilSchemaV1.SettingsRecord.self, DailySummaryRecord.self]
+    }
+
+    /// Cached `DailySummary` for one day. The full summary is JSON in `payload`; a few fields are
+    /// denormalized for cheap queries (calendar, widgets, cache freshness checks).
+    @Model
+    final class DailySummaryRecord {
+        /// `LocalDay.key` (yyyymmdd).
+        @Attribute(.unique) var dayKey: Int
+        var computedAt: Date
+        var engineVersion: Int
+        /// `DailySummary.settingsFingerprint`; nil for rows migrated from V1 (treated as stale).
+        var settingsFingerprint: String?
+        var recoveryPercent: Int?
+        var sleepScore: Int?
+        var strain: Int?
+        /// JSON-encoded `DailySummary`.
+        var payload: Data
+
+        init(dayKey: Int, computedAt: Date, engineVersion: Int, settingsFingerprint: String? = nil,
+             recoveryPercent: Int?, sleepScore: Int?, strain: Int?, payload: Data) {
+            self.dayKey = dayKey
+            self.computedAt = computedAt
+            self.engineVersion = engineVersion
+            self.settingsFingerprint = settingsFingerprint
+            self.recoveryPercent = recoveryPercent
+            self.sleepScore = sleepScore
+            self.strain = strain
+            self.payload = payload
+        }
+    }
+}
+
+typealias SettingsRecord = VigilSchemaV1.SettingsRecord
+typealias DailySummaryRecord = VigilSchemaV2.DailySummaryRecord
+
+/// Migration plan. V1 → V2 is lightweight (one new optional attribute).
 enum VigilMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [VigilSchemaV1.self] }
-    static var stages: [MigrationStage] { [] }
+    static var schemas: [any VersionedSchema.Type] { [VigilSchemaV1.self, VigilSchemaV2.self] }
+    static var stages: [MigrationStage] {
+        [.lightweight(fromVersion: VigilSchemaV1.self, toVersion: VigilSchemaV2.self)]
+    }
 }

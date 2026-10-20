@@ -176,6 +176,25 @@ The mock is deterministic (seeded per day) and anchored to "now", so the simulat
 For pure subviews, prefer passing values (`DayOverview`, `VitalReading`) built in the preview over
 loading through the repository.
 
+**Reacting to new data and the date changing** — `AppContainer` exposes two observable signals:
+
+| Property | Changes when | Use |
+|---|---|---|
+| `dataVersion: Int` | after `refreshRecent` (launch, foreground, HealthKit updates), the history import, `settingsDidChange()` (units, goals, profile, zones, notifications) and "Delete local data" | put it in the screen's `.task(id:)` so it reloads |
+| `currentDay: LocalDay` | scene becomes active, midnight (`NSCalendarDayChanged`), `significantTimeChangeNotification`, time-zone change | when the selected day was the old today, move the selection to the new day |
+
+```swift
+@Environment(AppContainer.self) private var container
+@State private var selection: LocalDay?          // nil until first load
+.task(id: [AnyHashable(selection), AnyHashable(container.dataVersion)]) { await model.load(container.repository, day: selection ?? container.currentDay) }
+.onChange(of: container.currentDay) { old, new in if selection == old { selection = new } }
+```
+
+Repository calls are cheap to repeat: today's summary is reused for 10 min unless new data arrived, settled days
+come from the cache, and every cached summary is invalidated automatically when settings that change scores do
+(settings fingerprint). Use `container.currentDay` rather than computing `LocalDay()` with your own calendar —
+the app calendar is `.autoupdatingCurrent`.
+
 Tests construct containers explicitly with a fixed clock:
 `AppContainer(configuration: …, calendar: utc, now: { fixedDate })` (see `VigilTests/CoreTests.swift`).
 
@@ -218,12 +237,25 @@ Tests construct containers explicitly with a fixed clock:
 
 ## 8. Persistence, import & widgets
 
-- SwiftData schema `VigilSchemaV1` (`SettingsRecord` singleton, `DailySummaryRecord` per day with a JSON
-  `DailySummary` payload). Changes need a new `VersionedSchema` + migration stage.
-- Store lives in the app sandbox (`groupContainer: .none`, `cloudKitDatabase: .none`).
+- SwiftData schema `VigilSchemaV2` (`SettingsRecord` singleton, `DailySummaryRecord` per day with a JSON
+  `DailySummary` payload plus denormalized `computedAt`, `engineVersion`, `settingsFingerprint`). V1 → V2 is a
+  lightweight migration. Changes need a new `VersionedSchema` + migration stage.
+- Store lives in the app sandbox (`groupContainer: .none`, `cloudKitDatabase: .none`). Personal bests found per run
+  are persisted separately in `Application Support/PersonalBests.json` (`PersonalBestCache`).
+- **Summary cache rules** (`VigilRepository`): a cached day is used when engine version and settings fingerprint
+  match and it is *settled* (computed ≥ 6 h after its day ended) — otherwise (today, yesterday early morning) only
+  while it was built in this process since the last `invalidateRecent()` and is < 10 min old. Every build goes
+  through `VigilRepository.buildSummaries(from:through:data:)`, seeded with the cached strains of the 86 days
+  before, so single-day reads, refreshes and the import give identical results. Building runs off the main actor.
+  Strength workouts saved twice (Hevy + Apple Watch, > 50 % overlap) count once (`WorkoutDeduplication`).
 - `HistoryImportService.importHistory()` (onboarding) fetches 90 + 30 days, builds summaries, caches them,
-  refreshes the widget snapshot and sets `onboarding.historyImportedAt`. `refreshRecent()` recomputes the last
-  2 days on launch and on every `HealthDataSource.updates()` event.
+  refreshes the widget snapshot and sets `onboarding.historyImportedAt`. `refreshRecent()` recomputes every day
+  since the last settled one (2–14 days) on launch/foreground and after HealthKit updates. Updates are observed for
+  the whole process (started from the app delegate, so background deliveries work), coalesced (20 s foreground,
+  3 s background), and acknowledged after the refresh.
+- No refresh, widget snapshot or notification sync runs before onboarding completes (the onboarding import
+  itself still fills the cache); "Delete local data"
+  (`AppContainer.deleteAllLocalData()`) stops in-flight builds from writing.
 - Widgets read only `WidgetSnapshot` from the App Group (`group.com.emreburakunlu.vigil`) via
   `WidgetSnapshotStore`; the app writes it in `WidgetSnapshotService.refresh()` and reloads timelines.
   When the App Group is unavailable (unsigned builds) both sides fall back to a private directory — the widget

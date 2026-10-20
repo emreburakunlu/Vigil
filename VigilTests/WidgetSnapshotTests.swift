@@ -7,12 +7,12 @@ struct WidgetSnapshotTests {
     let now = Date(timeIntervalSince1970: 1_800_000_000)
 
     private func snapshot(age: TimeInterval) -> WidgetSnapshot {
-        .placeholder(now: now.addingTimeInterval(-age))
+        .placeholder(now: now.addingTimeInterval(-age), calendar: TestSupport.utc)
     }
 
     @Test func freshSnapshotIsReady() {
         let s = snapshot(age: 3600)
-        #expect(WidgetSnapshot.displayState(snapshot: s, at: now) == .ready(s))
+        #expect(WidgetSnapshot.displayState(snapshot: s, at: now, calendar: TestSupport.utc) == .ready(s))
     }
 
     @Test func staleBoundaryIs36Hours() {

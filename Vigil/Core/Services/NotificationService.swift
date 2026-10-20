@@ -68,7 +68,7 @@ enum NotificationPlanner {
     }
 
     static func plan(preferences: NotificationPreferences, sleepTarget: TimeInterval, morning: MorningSummaryContent?,
-                     now: Date, calendar: Calendar = .current, horizonDays: Int = horizonDays) -> [PlannedNotification] {
+                     now: Date, calendar: Calendar = .autoupdatingCurrent, horizonDays: Int = horizonDays) -> [PlannedNotification] {
         var planned: [PlannedNotification] = []
         if preferences.morningSummaryEnabled {
             let startOfToday = calendar.startOfDay(for: now)
@@ -101,28 +101,94 @@ enum NotificationPlanner {
     }
 }
 
+// MARK: - Scheduling backend
+
+/// The parts of `UNUserNotificationCenter` the service uses. Injected so tests and previews never touch
+/// the real notification center (which can block the test host).
+@MainActor
+protocol NotificationScheduling: AnyObject {
+    func authorizationStatus() async -> UNAuthorizationStatus
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
+    func pendingRequestIdentifiers() async -> [String]
+    func removePendingRequests(withIdentifiers identifiers: [String])
+    func add(_ request: UNNotificationRequest) async throws
+}
+
+/// The real notification center.
+@MainActor
+final class SystemNotificationScheduler: NotificationScheduling {
+    private let center: UNUserNotificationCenter
+
+    init(center: UNUserNotificationCenter = .current()) { self.center = center }
+
+    func authorizationStatus() async -> UNAuthorizationStatus { await center.notificationSettings().authorizationStatus }
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool { try await center.requestAuthorization(options: options) }
+    func pendingRequestIdentifiers() async -> [String] { await center.pendingNotificationRequests().map(\.identifier) }
+    func removePendingRequests(withIdentifiers identifiers: [String]) { center.removePendingNotificationRequests(withIdentifiers: identifiers) }
+    func add(_ request: UNNotificationRequest) async throws { try await center.add(request) }
+}
+
+/// In-memory scheduler for previews and tests: records requests, never prompts.
+@MainActor
+final class InMemoryNotificationScheduler: NotificationScheduling {
+    var status: UNAuthorizationStatus
+    /// What `requestAuthorization` grants when the status is `.notDetermined`.
+    var grantsOnRequest: Bool
+    private(set) var requests: [String: UNNotificationRequest] = [:]
+    private(set) var authorizationRequests = 0
+    private(set) var addCount = 0
+
+    init(status: UNAuthorizationStatus = .notDetermined, grantsOnRequest: Bool = false) {
+        self.status = status
+        self.grantsOnRequest = grantsOnRequest
+    }
+
+    func authorizationStatus() async -> UNAuthorizationStatus { status }
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
+        authorizationRequests += 1
+        if status == .notDetermined { status = grantsOnRequest ? .authorized : .denied }
+        return status == .authorized
+    }
+    func pendingRequestIdentifiers() async -> [String] { Array(requests.keys) }
+    func removePendingRequests(withIdentifiers identifiers: [String]) { identifiers.forEach { requests[$0] = nil } }
+    func add(_ request: UNNotificationRequest) async throws {
+        addCount += 1
+        requests[request.identifier] = request
+    }
+}
+
 // MARK: - Service
 
 /// Schedules Vigil's local notifications (no push: a free Apple ID has no APNs).
 ///
 /// - Permission is requested only through `requestAuthorizationIfNeeded()`, which the UI calls when the
-///   user switches a notification on. `sync` never prompts; without permission it clears pending requests.
-/// - `sync` is idempotent and cheap: call it on launch, on every settings change and after each data refresh.
+///   user switches a notification on and onboarding calls on completion. `sync` never prompts; without
+///   permission it clears pending requests.
+/// - `sync` is idempotent and cheap: it remembers the last plan it scheduled and does nothing when the new
+///   plan is identical. Call it on launch, on every settings change and after each data refresh.
 @MainActor
 final class NotificationService {
-    private let center: UNUserNotificationCenter
+    private let scheduler: any NotificationScheduling
     private let now: @Sendable () -> Date
     private let calendar: Calendar
+    /// The plan currently scheduled (nil = unknown, e.g. after launch or removal).
+    private var lastPlan: [PlannedNotification]?
 
-    init(center: UNUserNotificationCenter = .current(), calendar: Calendar = .current, now: @escaping @Sendable () -> Date = { .now }) {
-        self.center = center
+    init(scheduler: any NotificationScheduling, calendar: Calendar = .autoupdatingCurrent,
+         now: @escaping @Sendable () -> Date = { .now }) {
+        self.scheduler = scheduler
         self.calendar = calendar
         self.now = now
     }
 
+    convenience init(center: UNUserNotificationCenter = .current(), calendar: Calendar = .autoupdatingCurrent,
+                     now: @escaping @Sendable () -> Date = { .now }) {
+        self.init(scheduler: SystemNotificationScheduler(center: center), calendar: calendar, now: now)
+    }
+
     /// Current OS authorization state.
     func authorizationStatus() async -> UNAuthorizationStatus {
-        await center.notificationSettings().authorizationStatus
+        await scheduler.authorizationStatus()
     }
 
     /// Asks for alert/sound permission if it hasn't been decided yet. Call when the user enables a notification.
@@ -131,36 +197,42 @@ final class NotificationService {
         switch await authorizationStatus() {
         case .authorized, .provisional, .ephemeral: return true
         case .denied: return false
-        case .notDetermined: return (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
+        case .notDetermined: return (try? await scheduler.requestAuthorization(options: [.alert, .sound])) ?? false
         @unknown default: return false
         }
     }
 
     /// Rebuilds all schedules from preferences. `morning` carries today's real values when known.
     func sync(preferences: NotificationPreferences, sleepTarget: TimeInterval, morning: MorningSummaryContent? = nil) async {
-        await removeVigilRequests()
         switch await authorizationStatus() {
         case .authorized, .provisional, .ephemeral: break
-        default: return
+        default:
+            await removeVigilRequests()
+            return
         }
         let plan = NotificationPlanner.plan(preferences: preferences, sleepTarget: sleepTarget, morning: morning,
                                             now: now(), calendar: calendar)
+        guard plan != lastPlan else { return }
+        await removeVigilRequests()
         for item in plan { await add(item) }
+        lastPlan = plan
     }
 
-    /// Convenience for the data-refresh path: re-plan using the freshly written snapshot.
+    /// Convenience for the data-refresh path: re-plan using the freshly written snapshot. The snapshot's
+    /// values are used only when it has last night's sleep (otherwise the generic text is scheduled).
     func sync(settings: VigilSettings, snapshot: WidgetSnapshot?) async {
-        await sync(preferences: settings.notifications, sleepTarget: settings.goals.sleepTarget,
-                   morning: snapshot.map(MorningSummaryContent.init(snapshot:)))
+        let morning = snapshot.flatMap { s in s.sleepDuration == nil ? nil : MorningSummaryContent(snapshot: s) }
+        await sync(preferences: settings.notifications, sleepTarget: settings.goals.sleepTarget, morning: morning)
     }
 
     /// Removes everything Vigil scheduled (Delete local data).
     func removeAll() async { await removeVigilRequests() }
 
     private func removeVigilRequests() async {
-        let pending = await center.pendingNotificationRequests()
-        let ids = pending.map(\.identifier).filter { $0.hasPrefix(NotificationPlanner.morningPrefix) || $0 == NotificationPlanner.bedtimeIdentifier }
-        center.removePendingNotificationRequests(withIdentifiers: ids)
+        lastPlan = nil
+        let ids = await scheduler.pendingRequestIdentifiers()
+            .filter { $0.hasPrefix(NotificationPlanner.morningPrefix) || $0 == NotificationPlanner.bedtimeIdentifier }
+        scheduler.removePendingRequests(withIdentifiers: ids)
     }
 
     private func add(_ item: PlannedNotification) async {
@@ -171,7 +243,7 @@ final class NotificationService {
         content.userInfo = [NotificationDelegate.deepLinkKey: DeepLink.today.url.absoluteString]
         let trigger = UNCalendarNotificationTrigger(dateMatching: item.components, repeats: item.repeats)
         do {
-            try await center.add(UNNotificationRequest(identifier: item.identifier, content: content, trigger: trigger))
+            try await scheduler.add(UNNotificationRequest(identifier: item.identifier, content: content, trigger: trigger))
         } catch {
             print("Vigil: failed to schedule \(item.identifier): \(error)")
         }
