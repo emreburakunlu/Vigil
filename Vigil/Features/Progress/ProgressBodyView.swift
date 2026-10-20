@@ -3,19 +3,19 @@ import SwiftUI
 
 /// Progress · Body: body weight, resting HR, HRV, recovery vs. load.
 struct ProgressBodyView: View {
-    var range: ProgressRange = .threeMonths
+    var key: ProgressLoadKey
 
     @Environment(AppContainer.self) private var container
     @Environment(SettingsStore.self) private var settingsStore
     @State private var model = ProgressBodyModel()
 
     var body: some View {
-        let key = ProgressLoadKey(range: range, units: settingsStore.settings.units)
-        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload(key) } }) {
+        let formatter = settingsStore.formatter
+        ProgressSegmentScaffold(phase: model.phase, retry: { Task { await reload() } }) {
             if let content = model.content {
                 ForEach(ProgressBodyModel.metrics) { metric in
                     if let card = content.cards.first(where: { $0.metric == metric }) {
-                        BodyMetricCardView(card: card, ticks: content.tickDates, today: container.repository.today)
+                        BodyMetricCardView(card: card, ticks: content.tickDates, today: container.repository.today, formatter: formatter)
                     } else {
                         ProgressCard(title: LocalizedStringKey(metric.displayName)) {
                             ProgressMessage(systemImage: "chart.line.downtrend.xyaxis", text: "Not available in this range.")
@@ -25,11 +25,11 @@ struct ProgressBodyView: View {
                 RecoveryLoadCard(days: content.recoveryLoad, ticks: content.recoveryLoadTicks)
             }
         }
-        .task(id: key) { await reload(key) }
+        .task(id: key) { await reload() }
     }
 
-    private func reload(_ key: ProgressLoadKey) async {
-        await model.load(repository: container.repository, range: key.range, formatter: settingsStore.formatter)
+    private func reload() async {
+        await model.load(repository: container.repository, range: key.range)
     }
 }
 
@@ -37,37 +37,43 @@ private struct BodyMetricCardView: View {
     let card: ProgressBodyCard
     let ticks: [Date]
     let today: LocalDay
+    let formatter: VigilFormatter
 
     var body: some View {
         let color = Self.color(card.metric)
+        let latest = formatter.format(card.metric, card.latest)
+        let points = card.points.map { ProgressPoint(date: $0.date, value: toDisplay($0.value)) }
+        let band = card.band.map { toDisplay($0.lowerBound)...toDisplay($0.upperBound) }
+        let pill = Self.pillColors(card.changeIsGood)
         NavigationLink(value: AppRoute.metric(card.metric, today)) {
             VStack(alignment: .leading, spacing: VSpacing.l) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(LocalizedStringKey(card.metric.displayName)).vTextStyle(.bodyStrong).foregroundStyle(Color.vInkLabel)
                         HStack(alignment: .firstTextBaseline, spacing: VSpacing.xs) {
-                            Text(card.latest.value).vTextStyle(.title).foregroundStyle(Color.vInk)
-                            Text(card.latest.unit).vTextStyle(.footnote).foregroundStyle(Color.vInkSecondary)
+                            Text(latest.value).vTextStyle(.title).foregroundStyle(Color.vInk)
+                            Text(latest.unit).vTextStyle(.footnote).foregroundStyle(Color.vInkSecondary)
                         }
                     }
                     Spacer(minLength: VSpacing.s)
-                    if let change = card.changeText {
-                        Text(change).font(.vCustom(.body, size: 13, weight: .bold, relativeTo: .footnote))
-                            .foregroundStyle(card.changeIsGood == true ? Color.vPositive : Color.vInkLabel)
+                    if let change = card.change {
+                        Text(ProgressBodyModel.changeText(card.metric, change, formatter))
+                            .font(.vCustom(.body, size: 13, weight: .bold, relativeTo: .footnote))
+                            .foregroundStyle(pill.ink)
                             .padding(.horizontal, VSpacing.m).padding(.vertical, VSpacing.xxs + 1)
-                            .background(card.changeIsGood == true ? Color.vPositiveTint : Color.vFill, in: .capsule)
+                            .background(pill.fill, in: .capsule)
                     }
                 }
                 Chart {
-                    if let band = card.band {
+                    if let band {
                         RectangleMark(yStart: .value("Low", band.lowerBound), yEnd: .value("High", band.upperBound))
                             .foregroundStyle(color.opacity(0.14))
                     }
-                    ForEach(card.points) { point in
+                    ForEach(points) { point in
                         LineMark(x: .value("Date", point.date), y: .value(card.metric.shortName, point.value)).vLineStyle(color, width: 2.6)
                     }
-                    if let last = card.points.last {
-                        VPointMarker(x: .value("Date", last.date), y: .value(card.metric.shortName, last.value), color: color)
+                    if let last = points.last {
+                        VEndDot(x: .value("Date", last.date), y: .value(card.metric.shortName, last.value), color: color)
                     }
                 }
                 .vChartAxes()
@@ -75,7 +81,7 @@ private struct BodyMetricCardView: View {
                 .chartYScale(domain: .automatic(includesZero: false))
                 .frame(height: 84)
                 .accessibilityLabel("\(card.metric.displayName) trend")
-                .accessibilityValue(progressSummary(card.points) { String(format: "%.1f", $0) })
+                .accessibilityValue(progressSummary(points) { String(format: "%.1f", $0) })
                 ProgressTicks(dates: ticks)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -84,6 +90,19 @@ private struct BodyMetricCardView: View {
         }
         .buttonStyle(.plain)
         .accessibilityHint("Opens the metric detail")
+    }
+
+    private func toDisplay(_ value: Double) -> Double {
+        card.metric == .bodyMass ? formatter.displayWeight(kilograms: value) : value
+    }
+
+    /// Delta pill colours, like the vitals: good = green, worse = amber, neutral = grey.
+    static func pillColors(_ isGood: Bool?) -> (ink: Color, fill: Color) {
+        switch isGood {
+        case true: (.vPositive, .vPositiveTint)
+        case false: (.vWarningInk, .vWarningTint)
+        case nil: (.vInkLabel, .vFill)
+        }
     }
 
     static func color(_ metric: HealthMetric) -> Color {
@@ -112,6 +131,9 @@ private struct RecoveryLoadCard: View {
                     }
                     ForEach(days.filter { $0.recovery != nil }) { day in
                         LineMark(x: .value("Day", day.date, unit: .day), y: .value("Recovery", day.recovery ?? 0)).vLineStyle(.vRecovery, width: 2.6)
+                    }
+                    if let last = days.last(where: { $0.recovery != nil }), let value = last.recovery {
+                        VEndDot(x: .value("Day", last.date), y: .value("Recovery", value), color: .vRecovery)
                     }
                 }
                 .vChartAxes()
@@ -145,5 +167,5 @@ private struct RecoveryLoadCard: View {
     }
 }
 
-#Preview("Body") { ProgressBodyView().vigilPreview() }
-#Preview("Body dark") { ProgressBodyView().vigilPreview().preferredColorScheme(.dark) }
+#Preview("Body") { ProgressBodyView(key: .preview).vigilPreview() }
+#Preview("Body dark") { ProgressBodyView(key: .preview).vigilPreview().preferredColorScheme(.dark) }

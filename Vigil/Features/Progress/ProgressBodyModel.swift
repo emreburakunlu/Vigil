@@ -4,13 +4,14 @@ import Observation
 /// One trend card on Progress → Body.
 struct ProgressBodyCard: Hashable, Sendable, Identifiable {
     var metric: HealthMetric
-    /// Daily means in display units, at most ~300 points.
+    /// Daily means in canonical units (kg, bpm, ms), at most ~300 points. Views convert for display.
     var points: [ProgressPoint]
-    var latest: FormattedValue
-    var changeText: String?
+    var latest: Double
+    /// Change from the first to the last day, canonical units.
+    var change: Double?
     /// Whether the change is good (true), bad (false) or neutral/unknown (nil).
     var changeIsGood: Bool?
-    /// 30-day baseline band in display units.
+    /// 30-day baseline band in canonical units.
     var band: ClosedRange<Double>?
     var id: HealthMetric { metric }
 }
@@ -40,21 +41,24 @@ final class ProgressBodyModel {
     private(set) var phase: ProgressPhase = .loading
     private(set) var content: ProgressBodyContent?
 
-    func load(repository: VigilRepository, range: ProgressRange, formatter: VigilFormatter) async {
+    func load(repository: VigilRepository, range: ProgressRange) async {
         if content == nil { phase = .loading }
         do {
-            content = try await Self.buildContent(repository: repository, range: range, formatter: formatter)
+            let built = try await Self.buildContent(repository: repository, range: range)
+            guard !Task.isCancelled else { return }
+            content = built
             phase = .loaded
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }
             if content == nil { phase = .failed }
         }
     }
 
     static let metrics: [HealthMetric] = [.bodyMass, .restingHeartRate, .heartRateVariability]
 
-    static func buildContent(repository: VigilRepository, range: ProgressRange, formatter: VigilFormatter) async throws -> ProgressBodyContent {
+    static func buildContent(repository: VigilRepository, range: ProgressRange) async throws -> ProgressBodyContent {
         let calendar = repository.calendar
         let today = repository.today
         let interval = range.interval(endingOn: today, calendar: calendar)
@@ -65,22 +69,18 @@ final class ProgressBodyModel {
             let samples = try await repository.dataSource.samples(of: metric, in: interval)
             let daily = ProgressAggregation.dailyMeans(samples, calendar: calendar)
             guard let last = daily.last else { continue }
-            let canonicalChange = ProgressAggregation.change(daily)
-            let toDisplay: (Double) -> Double = { metric == .bodyMass ? formatter.displayWeight(kilograms: $0) : $0 }
-            let points = ProgressAggregation.downsample(daily.map { ProgressPoint(date: $0.date, value: toDisplay($0.value)) })
-            let band = baselines?[metric].flatMap { $0.isEstablished ? toDisplay($0.normalRange.lowerBound)...toDisplay($0.normalRange.upperBound) : nil }
+            let change = ProgressAggregation.change(daily)
+            let band = baselines?[metric].flatMap { $0.isEstablished ? $0.normalRange.lowerBound...$0.normalRange.upperBound : nil }
             var isGood: Bool?
-            if let change = canonicalChange, let better = metric.higherIsBetter, abs(change) > 0 { isGood = (change > 0) == better }
-            cards.append(ProgressBodyCard(metric: metric, points: points, latest: formatter.format(metric, last.value),
-                                          changeText: canonicalChange.map { changeText(metric, $0, formatter) },
-                                          changeIsGood: isGood, band: band))
+            if let change, let better = metric.higherIsBetter, abs(change) > 0 { isGood = (change > 0) == better }
+            cards.append(ProgressBodyCard(metric: metric, points: ProgressAggregation.downsample(daily), latest: last.value,
+                                          change: change, changeIsGood: isGood, band: band))
         }
 
         // Recovery vs. load: cached summaries only (≈ 90 days), capped to the range.
         let days = min(range.weeks * 7, 90)
         let start = today.adding(days: -(days - 1), calendar: calendar)
-        try? await repository.ensureSummaries(from: start, through: today)
-        let summaries = repository.summaries.summaries(from: start, through: today)
+        let summaries = (try? await repository.ensuredSummaries(from: start, through: today)) ?? []
         let maxLoad = max(summaries.compactMap { $0.strain?.trainingLoad }.max() ?? 0, 1)
         // Days with neither a recovery score nor training are empty placeholders, not data.
         let recoveryLoad = summaries.filter { $0.recovery != nil || ($0.strain?.trainingLoad ?? 0) > 0 }.map {

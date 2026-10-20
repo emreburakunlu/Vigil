@@ -30,13 +30,21 @@ struct ProgressAggregationTests {
         #expect(means[1] == 5)
     }
 
-    @Test func fourWeekBlocksAlignToNewestAndDropLeadingPartial() {
-        let weekly = Array(repeating: 10.0, count: 13)
-        let blocks = ProgressAggregation.blocks(of: weekly)
-        #expect(blocks.count == 3)
-        #expect(blocks.allSatisfy { $0.sum == 40 })
-        #expect(ProgressAggregation.blocks(of: [1, 2, 3]).map(\.sum) == [6])
-        #expect(ProgressAggregation.blocks(of: Array(repeating: 1, count: 52)).count == 13)
+    @Test func monthStartsCoverCalendarMonthsAcrossYearEnd() {
+        let months = ProgressAggregation.monthStarts(from: LocalDay(year: 2025, month: 11, day: 17), through: LocalDay(year: 2026, month: 2, day: 3))
+        #expect(months == [LocalDay(year: 2025, month: 11, day: 1), LocalDay(year: 2025, month: 12, day: 1),
+                           LocalDay(year: 2026, month: 1, day: 1), LocalDay(year: 2026, month: 2, day: 1)])
+        #expect(ProgressAggregation.monthStarts(from: today, through: today) == [LocalDay(year: 2026, month: 10, day: 1)])
+    }
+
+    @Test func monthlySumsBucketByCalendarMonth() {
+        let months = ProgressAggregation.monthStarts(from: LocalDay(year: 2026, month: 8, day: 20), through: today)
+        let items: [(day: LocalDay, value: Double)] = [
+            (LocalDay(year: 2026, month: 8, day: 31), 5), (LocalDay(year: 2026, month: 9, day: 1), 7),
+            (LocalDay(year: 2026, month: 9, day: 30), 1), (today, 10),
+            (LocalDay(year: 2026, month: 7, day: 31), 99), // before the first month
+        ]
+        #expect(ProgressAggregation.monthlySums(items, months: months) == [5, 8, 10])
     }
 
     @Test func downsampleCapsPointCountAndKeepsMean() {
@@ -98,17 +106,29 @@ struct ProgressModelTests {
                      calendar: TestSupport.utc, now: { TestSupport.referenceDate })
     }
 
-    @Test func runningContentRespectsRangeAndUnits() async throws {
+    @Test func runningContentIsCanonicalAndFormatsPerUnit() async throws {
         let c = container()
-        let metric = try await ProgressRunningModel.buildContent(repository: c.repository, range: .threeMonths, formatter: VigilFormatter(units: .metric, locale: TestSupport.enUS))
-        let imperial = try await ProgressRunningModel.buildContent(repository: c.repository, range: .threeMonths, formatter: VigilFormatter(units: .imperial, locale: TestSupport.enUS))
-        #expect(metric.weeklyBars.count == 13)
-        #expect(metric.total.unit == "km")
-        #expect(imperial.total.unit == "mi")
-        let km = metric.weeklyBars.reduce(0) { $0 + $1.value }
-        let mi = imperial.weeklyBars.reduce(0) { $0 + $1.value }
-        #expect(abs(km / 1.609344 - mi) < 0.001)
-        #expect(metric.weeklyGoal == 25)
+        let content = try await ProgressRunningModel.buildContent(repository: c.repository, range: .threeMonths)
+        let metric = VigilFormatter(units: .metric, locale: TestSupport.enUS)
+        let imperial = VigilFormatter(units: .imperial, locale: TestSupport.enUS)
+        #expect(content.weeklyBars.count == 13)
+        #expect(metric.distance(meters: content.totalMeters, fractionDigits: 0).unit == "km")
+        #expect(imperial.distance(meters: content.totalMeters, fractionDigits: 0).unit == "mi")
+        #expect(abs(content.totalMeters - content.weeklyBars.reduce(0) { $0 + $1.value }) < 0.001)
+        #expect(metric.displayDistance(meters: content.weeklyGoalMeters) == 25)
+    }
+
+    @Test func monthlyBarsAreWholeCalendarMonths() async throws {
+        let c = container()
+        let content = try await ProgressRunningModel.buildContent(repository: c.repository, range: .sixMonths)
+        let calendar = c.repository.calendar
+        #expect(content.monthlyBars.count >= 6)
+        for bar in content.monthlyBars {
+            #expect(calendar.component(.day, from: bar.start) == 1)
+        }
+        let months = zip(content.monthlyBars, content.monthlyBars.dropFirst())
+        #expect(months.allSatisfy { calendar.dateComponents([.month], from: $0.start, to: $1.start).month == 1 })
+        #expect(content.monthlyBars.reduce(0) { $0 + $1.value } >= content.totalMeters - 0.001)
     }
 
     @Test func oneYearLoadsQuicklyAndIsDownsampled() async throws {
@@ -116,7 +136,7 @@ struct ProgressModelTests {
         let clock = ContinuousClock()
         var content: ProgressRunningContent?
         let elapsed = try await clock.measure {
-            content = try await ProgressRunningModel.buildContent(repository: c.repository, range: .oneYear, formatter: VigilFormatter(locale: TestSupport.enUS))
+            content = try await ProgressRunningModel.buildContent(repository: c.repository, range: .oneYear)
         }
         #expect(content?.weeklyBars.count == 52)
         #expect((content?.load?.ratios.count ?? 0) <= 300)
@@ -143,18 +163,17 @@ struct ProgressModelTests {
         #expect(content.heatmap.columns.count == 13)
     }
 
-    @Test func bodyContentConvertsWeightToDisplayUnits() async throws {
+    @Test func bodyContentKeepsCanonicalWeight() async throws {
         let c = container()
-        let metric = try await ProgressBodyModel.buildContent(repository: c.repository, range: .threeMonths, formatter: VigilFormatter(units: .metric, locale: TestSupport.enUS))
-        let imperial = try await ProgressBodyModel.buildContent(repository: c.repository, range: .threeMonths, formatter: VigilFormatter(units: .imperial, locale: TestSupport.enUS))
-        let kg = try #require(metric.cards.first { $0.metric == .bodyMass }?.points.last?.value)
-        let lb = try #require(imperial.cards.first { $0.metric == .bodyMass }?.points.last?.value)
-        #expect(abs(kg / 0.45359237 - lb) < 0.01)
+        let content = try await ProgressBodyModel.buildContent(repository: c.repository, range: .threeMonths)
+        let card = try #require(content.cards.first { $0.metric == .bodyMass })
+        let imperial = VigilFormatter(units: .imperial, locale: TestSupport.enUS)
+        #expect(abs(imperial.displayWeight(kilograms: card.latest) * 0.45359237 - card.latest) < 0.01)
     }
 
     @Test func emptyScenarioProducesNoCards() async throws {
         let c = container(.empty)
-        let content = try await ProgressBodyModel.buildContent(repository: c.repository, range: .fourWeeks, formatter: VigilFormatter(locale: TestSupport.enUS))
+        let content = try await ProgressBodyModel.buildContent(repository: c.repository, range: .fourWeeks)
         #expect(content.cards.isEmpty)
         #expect(content.recoveryLoad.isEmpty)
     }

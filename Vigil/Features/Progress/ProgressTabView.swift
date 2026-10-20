@@ -4,11 +4,14 @@ import SwiftUI
 /// Named `ProgressTabView` to avoid clashing with SwiftUI's `ProgressView`. Owner: Progress agent.
 struct ProgressTabView: View {
     @Environment(AppRouter.self) private var router
+    @Environment(AppContainer.self) private var container
     @State private var range: ProgressRange = .threeMonths
 
     var body: some View {
         @Bindable var router = router
-        VStack(spacing: 0) {
+        let key = ProgressLoadKey(range: range, dataVersion: container.dataVersion, day: container.currentDay)
+        // The title, segmented control and range chips scroll with the content (nothing floats over it).
+        ScrollView {
             VStack(alignment: .leading, spacing: VSpacing.l) {
                 Text("Progress").vTextStyle(.largeTitle).foregroundStyle(Color.vInk)
                     .padding(.horizontal, VSpacing.headerGutter - VSpacing.screenGutter)
@@ -21,15 +24,17 @@ struct ProgressTabView: View {
                     }
                 }
                 ProgressRangePicker(selection: $range)
+                switch router.progressSegment {
+                case .running: ProgressRunningView(key: key)
+                case .lifting: ProgressLiftingView(key: key)
+                case .body: ProgressBodyView(key: key)
+                }
             }
             .padding(.horizontal, VSpacing.screenGutter)
             .padding(.top, VSpacing.s)
-            switch router.progressSegment {
-            case .running: ProgressRunningView(range: range)
-            case .lifting: ProgressLiftingView(range: range)
-            case .body: ProgressBodyView(range: range)
-            }
+            .padding(.bottom, VSpacing.xxxl)
         }
+        .scrollIndicators(.hidden)
         .background(Color.vBackground)
         .toolbar(.hidden, for: .navigationBar)
     }

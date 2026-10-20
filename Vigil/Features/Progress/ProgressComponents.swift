@@ -1,9 +1,15 @@
 import SwiftUI
 
-/// Reload key for Progress segments: data reloads when the range or the unit system changes.
+/// Reload key for Progress segments: data reloads when the range changes, new data arrives
+/// (`AppContainer.dataVersion`) or the day rolls over. Units are deliberately not part of it:
+/// models keep canonical values and the views format them.
 struct ProgressLoadKey: Hashable {
     var range: ProgressRange
-    var units: UnitSystem
+    var dataVersion: Int
+    var day: LocalDay
+
+    /// Key for previews.
+    static var preview: ProgressLoadKey { ProgressLoadKey(range: .threeMonths, dataVersion: 0, day: LocalDay(.now)) }
 }
 
 /// Card with a title row (title left, optional trailing note) and content.
@@ -104,28 +110,7 @@ struct ProgressRangePicker: View {
     }
 }
 
-/// Placeholder card shown while a segment loads (no spinner).
-struct ProgressSkeleton: View {
-    var cards = 3
-
-    var body: some View {
-        VStack(spacing: VSpacing.xl) {
-            ForEach(0..<cards, id: \.self) { _ in
-                VStack(alignment: .leading, spacing: VSpacing.l) {
-                    RoundedRectangle(cornerRadius: VRadius.bar).fill(Color.vFill).frame(width: 120, height: 20)
-                    RoundedRectangle(cornerRadius: VRadius.bar).fill(Color.vFill).frame(width: 170, height: 30)
-                    RoundedRectangle(cornerRadius: VRadius.chip).fill(Color.vFill).frame(height: 120)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .vCard()
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Loading")
-    }
-}
-
-/// Empty / error message inside a card.
+/// Inline empty-state message inside a card.
 struct ProgressMessage: View {
     let systemImage: String
     let text: LocalizedStringKey
@@ -139,31 +124,24 @@ struct ProgressMessage: View {
     }
 }
 
-/// Shared scaffold for a segment: skeleton while loading, error state, otherwise the content.
+/// Shared scaffold for a segment: skeleton while loading, error card, otherwise the content.
+/// Not a scroll view itself: `ProgressTabView` scrolls the header and the segment together.
 struct ProgressSegmentScaffold<Content: View>: View {
     let phase: ProgressPhase
     let retry: () -> Void
     @ViewBuilder var content: Content
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: VSpacing.xl) {
-                switch phase {
-                case .loading:
-                    ProgressSkeleton()
-                case .failed:
-                    EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load progress",
-                                   message: "Something went wrong reading your data.", actionTitle: "Try again", action: retry)
-                        .vCard()
-                case .loaded:
-                    content
-                }
+        VStack(spacing: VSpacing.xl) {
+            switch phase {
+            case .loading:
+                VSkeletonStack(heights: [210, 300, 240])
+            case .failed:
+                VErrorCard(title: "Couldn't load progress", message: "Something went wrong reading your data.", retry: retry)
+            case .loaded:
+                content
             }
-            .padding(.horizontal, VSpacing.screenGutter)
-            .padding(.top, VSpacing.l)
-            .padding(.bottom, VSpacing.xxxl)
         }
-        .scrollIndicators(.hidden)
     }
 }
 
