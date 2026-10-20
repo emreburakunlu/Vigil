@@ -11,6 +11,7 @@ struct SleepNightView: View {
 
     private var repository: VigilRepository { container.repository }
     private var current: LocalDay { shownDay ?? day }
+    private var today: LocalDay { container.currentDay }
 
     var body: some View {
         ScrollView {
@@ -25,8 +26,11 @@ struct SleepNightView: View {
         .navigationTitle(SleepFormat.nightRange(for: current, calendar: repository.calendar))
         .navigationSubtitle("Primary sleep")
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: current) {
+        .task(id: [AnyHashable(current), AnyHashable(container.dataVersion)]) {
             await model.load(repository: repository, formatter: settingsStore.formatter, day: current)
+        }
+        .onChange(of: container.currentDay) { old, new in
+            if current == old { shownDay = new }
         }
     }
 
@@ -40,8 +44,8 @@ struct SleepNightView: View {
                 Label("Next night", systemImage: "chevron.right").labelStyle(TrailingIconLabelStyle())
             }
             .buttonStyle(NightPillStyle())
-            .disabled(current >= repository.today)
-            .opacity(current >= repository.today ? 0.35 : 1)
+            .disabled(current >= today)
+            .opacity(current >= today ? 0.35 : 1)
         }
         .padding(.top, VSpacing.xs)
     }
@@ -50,16 +54,16 @@ struct SleepNightView: View {
     private var content: some View {
         switch model.phase {
         case .loading:
-            SleepSkeleton()
+            VSkeletonStack(heights: [210, 300, 240], label: "Loading sleep")
         case .failed:
-            SleepFailedView {
+            VErrorCard(title: "Couldn't load sleep", message: "Something went wrong reading your sleep data.") {
                 Task { await model.load(repository: repository, formatter: settingsStore.formatter, day: current) }
             }
         case .empty:
-            SleepNoSleepCard(isLastNight: current == repository.today)
+            SleepNoSleepCard(isLastNight: current == today)
         case .loaded(let night):
             SleepScoreCard(night: night)
-            SleepStagesCard(night: night)
+            SleepStagesCard(night: night, showsEdgeTicks: true)
             if night.hasVitals { SleepVitalsCard(night: night) }
         }
     }

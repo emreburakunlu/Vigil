@@ -10,6 +10,17 @@ enum SleepFormat {
         return style
     }
 
+    /// Clock time with a leading zero in 24-hour locales (`"07:04"`); the locale's own 12-hour format otherwise.
+    static func time(_ date: Date, formatter: VigilFormatter, calendar: Calendar) -> String {
+        let template = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: formatter.locale) ?? ""
+        if template.contains("a") { return formatter.timeOfDay(date, calendar: calendar) }
+        var style = Date.FormatStyle().hour(.twoDigits(amPM: .omitted)).minute(.twoDigits)
+        style.locale = formatter.locale
+        style.calendar = calendar
+        style.timeZone = calendar.timeZone
+        return date.formatted(style)
+    }
+
     /// `"Sun 18 → Mon 19 Oct"` for the night that ended on `day`.
     static func nightRange(for day: LocalDay, calendar: Calendar) -> String {
         let first = style(Date.FormatStyle().weekday(.abbreviated).day(), calendar: calendar)

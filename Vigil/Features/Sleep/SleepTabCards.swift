@@ -9,6 +9,8 @@ struct SleepDebtCard: View {
     let calendar: Calendar
 
     @ScaledMetric(relativeTo: .body) private var plotHeight: CGFloat = 110
+    /// Strip above the plot that holds the target label, so it never sits on a bar.
+    private let labelBand: CGFloat = 16
 
     private var floorSeconds: TimeInterval { max(0, debt.target - 3 * 3600) }
 
@@ -32,23 +34,23 @@ struct SleepDebtCard: View {
                     .foregroundStyle(Color.vNightNegative)
             }
             ZStack(alignment: .topLeading) {
-                Rectangle()
-                    .stroke(Color.vNightInkLabel.opacity(0.45), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-                    .frame(height: 0)
-                    .padding(.top, 1)
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: labelBand))
+                    path.addLine(to: CGPoint(x: 4000, y: labelBand))
+                }
+                .stroke(Color.vNightInkLabel.opacity(0.55), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+                .clipped()
                 Text(SleepFormat.targetText(debt.target, formatter: formatter))
                     .vTextStyle(.caption2).fontWeight(.bold)
                     .foregroundStyle(Color.vNightInkSecondary)
-                    .padding(.leading, VSpacing.xxs)
-                    .background(Color.vNightCard)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .offset(y: -8)
+                    .frame(maxWidth: .infinity, minHeight: labelBand - 2, alignment: .trailing)
+                    .accessibilityHidden(true)
                 HStack(alignment: .bottom, spacing: VSpacing.m) {
                     ForEach(debt.nights) { night in column(night) }
                 }
-                .padding(.top, 2)
+                .padding(.top, labelBand)
             }
-            .frame(height: plotHeight)
+            .frame(height: plotHeight + labelBand)
             HStack(spacing: VSpacing.m) {
                 ForEach(debt.nights) { night in
                     Text(weekdayLetter(night.day))

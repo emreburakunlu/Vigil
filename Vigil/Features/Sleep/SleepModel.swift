@@ -58,10 +58,14 @@ final class SleepModel {
         calendar = repository.calendar
         phase = .loading
         do {
+            async let debtResult = try? await repository.sleepDebt(endingOn: day)
+            async let insightsResult = try? await repository.insights(for: day)
             let detail = try await repository.sleepNightDetail(endingOn: day)
-            debt = try? await repository.sleepDebt(endingOn: day)
-            insights = SleepInsightItem.make(from: (try? await repository.insights(for: day)) ?? [])
+            let loadedDebt = await debtResult
+            let loadedInsights = await insightsResult ?? []
             if Task.isCancelled { return }
+            debt = loadedDebt
+            insights = SleepInsightItem.make(from: loadedInsights)
             if let detail {
                 phase = .loaded(SleepNightPresentation(detail: detail, formatter: formatter, calendar: repository.calendar))
             } else {
@@ -70,6 +74,7 @@ final class SleepModel {
         } catch is CancellationError {
             return
         } catch {
+            if Task.isCancelled { return }
             phase = .failed
         }
     }
@@ -81,11 +86,10 @@ final class SleepModel {
         target = repository.settings.settings.goals.sleepTarget
         let today = repository.today
         let start = today.adding(days: -(SleepTrendRange.ninetyDays.days - 1), calendar: repository.calendar)
-        guard let summaries = try? await repository.sleepHistory(from: start, through: today) else { return }
-        let nights = (try? await repository.primarySleepNights(from: start, through: today)) ?? []
+        guard let trend = try? await repository.sleepTrend(from: start, through: today) else { return }
         if Task.isCancelled { return }
-        history = summaries
-        points = SleepTrendChart.points(history: summaries, nights: nights, calendar: repository.calendar)
+        history = trend.summaries
+        points = SleepTrendChart.points(history: trend.summaries, nights: trend.nights, calendar: repository.calendar)
         rebuildChart()
     }
 
@@ -109,8 +113,9 @@ final class SleepNightScreenModel {
     func load(repository: VigilRepository, formatter: VigilFormatter, day: LocalDay) async {
         phase = .loading
         do {
-            if let detail = try await repository.sleepNightDetail(endingOn: day) {
-                if Task.isCancelled { return }
+            let detail = try await repository.sleepNightDetail(endingOn: day)
+            if Task.isCancelled { return }
+            if let detail {
                 phase = .loaded(SleepNightPresentation(detail: detail, formatter: formatter, calendar: repository.calendar))
             } else {
                 phase = .empty
@@ -118,6 +123,7 @@ final class SleepNightScreenModel {
         } catch is CancellationError {
             return
         } catch {
+            if Task.isCancelled { return }
             phase = .failed
         }
     }

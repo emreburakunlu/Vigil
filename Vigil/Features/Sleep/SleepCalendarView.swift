@@ -24,7 +24,7 @@ struct SleepCalendarView: View {
                     gridCard(data)
                     summary(data.summary)
                 } else if model.failed {
-                    SleepFailedView { Task { await reload() } }
+                    VErrorCard(title: "Couldn't load sleep", message: "Something went wrong reading your sleep data.") { Task { await reload() } }
                 } else {
                     RoundedRectangle(cornerRadius: VRadius.cardLarge, style: .continuous)
                         .fill(Color.vNightCard).frame(height: 420)
@@ -37,7 +37,7 @@ struct SleepCalendarView: View {
         .vNightScreen()
         .navigationTitle("Sleep calendar")
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: shownFirst) { await reload() }
+        .task(id: [AnyHashable(shownFirst), AnyHashable(container.dataVersion)]) { await reload() }
     }
 
     private func reload() async {
@@ -46,9 +46,9 @@ struct SleepCalendarView: View {
 
     private var monthSwitcher: some View {
         HStack {
-            CircleIconButton(systemImage: "chevron.left",
-                             label: LocalizedStringKey(SleepFormat.monthTitle(SleepCalendarMonth.month(shownFirst, offset: -1, calendar: calendar), calendar: calendar)),
-                             isDisabled: shownFirst <= earliestFirst) {
+            monthButton(systemImage: "chevron.left",
+                        label: SleepFormat.monthTitle(SleepCalendarMonth.month(shownFirst, offset: -1, calendar: calendar), calendar: calendar),
+                        isDisabled: shownFirst <= earliestFirst) {
                 first = SleepCalendarMonth.month(shownFirst, offset: -1, calendar: calendar)
             }
             Spacer()
@@ -56,13 +56,28 @@ struct SleepCalendarView: View {
                 .vTextStyle(.title).foregroundStyle(Color.vNightInk)
                 .accessibilityAddTraits(.isHeader)
             Spacer()
-            CircleIconButton(systemImage: "chevron.right",
-                             label: LocalizedStringKey(SleepFormat.monthTitle(SleepCalendarMonth.month(shownFirst, offset: 1, calendar: calendar), calendar: calendar)),
-                             isDisabled: shownFirst >= currentFirst) {
+            monthButton(systemImage: "chevron.right",
+                        label: SleepFormat.monthTitle(SleepCalendarMonth.month(shownFirst, offset: 1, calendar: calendar), calendar: calendar),
+                        isDisabled: shownFirst >= currentFirst) {
                 first = SleepCalendarMonth.month(shownFirst, offset: 1, calendar: calendar)
             }
         }
         .padding(.top, VSpacing.s)
+    }
+
+    /// Transparent 44 pt chevron (design: no fill, no border).
+    private func monthButton(systemImage: String, label: String, isDisabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(Color.vNightInkSecondary)
+                .frame(width: VSize.minTapTarget, height: VSize.minTapTarget)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.vPress)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.35 : 1)
+        .accessibilityLabel(label)
     }
 
     private func gridCard(_ data: SleepCalendarMonth) -> some View {
@@ -92,7 +107,7 @@ struct SleepCalendarView: View {
             ForEach(bands, id: \.self) { band in
                 HStack(spacing: VSpacing.xs) {
                     Circle().fill(Color.vSleepScoreBand(band)).frame(width: 10, height: 10)
-                    Text(band.legend).vTextStyle(.caption).foregroundStyle(Color.vNightInkLabel)
+                    Text(band.legend).font(.vCustom(.body, size: 12.5, weight: .semibold, relativeTo: .caption)).foregroundStyle(Color.vNightInkLabel)
                 }
             }
         }
