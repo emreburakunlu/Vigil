@@ -37,7 +37,7 @@ struct SleepScoreCard: View {
     }
 
     private var ring: some View {
-        ScoreRing(progress: Double(night.scoreValue) / 100, color: .vSleepScoreBand(night.band), track: .vNightFill, diameter: ringSize) {
+        ScoreRing(progress: Double(night.scoreValue) / 100, color: .vSleepScoreBand(night.band), track: .vNightFill, diameter: ringSize, animated: false) {
             VStack(spacing: 0) {
                 Text("\(night.scoreValue)")
                     .font(.vCustom(.heading, size: 38, weight: .bold, relativeTo: .largeTitle))
@@ -90,12 +90,14 @@ struct SleepScoreCard: View {
 
 struct SleepStagesCard: View {
     let night: SleepNightPresentation
+    /// Night detail labels the start, the end and the hours between; the tab shows whole hours only.
+    var showsEdgeTicks = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: VSpacing.xl) {
             SectionHeader("Sleep stages", style: .card)
             if let layout = night.hypnogram {
-                SleepHypnogramView(layout: layout, ticks: night.hypnogramTicks, accessibilityText: night.hypnogramAccessibility)
+                SleepHypnogramView(layout: layout, ticks: showsEdgeTicks ? night.hypnogramEdgeTicks : night.hypnogramTicks, accessibilityText: night.hypnogramAccessibility)
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: VSpacing.m), GridItem(.flexible())], spacing: VSpacing.m) {
                     ForEach(night.stages) { SleepStageTile(tile: $0) }
                 }
@@ -208,37 +210,7 @@ struct SleepVitalRowView: View {
     }
 }
 
-// MARK: - Skeleton, failure, no data
-
-struct SleepSkeleton: View {
-    var body: some View {
-        VStack(spacing: VSpacing.xl) {
-            ForEach([210.0, 300.0, 240.0], id: \.self) { height in
-                RoundedRectangle(cornerRadius: VRadius.cardLarge, style: .continuous)
-                    .fill(Color.vNightCard)
-                    .frame(height: height)
-                    .overlay(alignment: .topLeading) {
-                        VStack(alignment: .leading, spacing: VSpacing.l) {
-                            Capsule().fill(Color.vNightFill).frame(width: 140, height: 20)
-                            Capsule().fill(Color.vNightFill).frame(width: 220, height: 14)
-                        }
-                        .padding(VSpacing.xxxl)
-                    }
-            }
-        }
-        .accessibilityElement()
-        .accessibilityLabel("Loading sleep")
-    }
-}
-
-struct SleepFailedView: View {
-    let retry: () -> Void
-
-    var body: some View {
-        EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load sleep",
-                       message: "Something went wrong reading your sleep data.", actionTitle: "Try again", action: retry)
-    }
-}
+// MARK: - No data
 
 /// "No sleep recorded" card (State · No sleep). `nightBefore` adds the "See the night before" button.
 struct SleepNoSleepCard: View {

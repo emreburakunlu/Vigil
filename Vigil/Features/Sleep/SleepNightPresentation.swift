@@ -53,6 +53,8 @@ struct SleepNightPresentation: Equatable, Sendable {
     var scoreAccessibility: String
     var hypnogram: SleepHypnogramLayout?
     var hypnogramTicks: [TickLabel]
+    /// Start, intermediate hours and end (Night detail axis).
+    var hypnogramEdgeTicks: [TickLabel]
     var hypnogramAccessibility: String
     var stages: [StageTile]
     var vitals: [VitalRow]
@@ -70,8 +72,8 @@ struct SleepNightPresentation: Equatable, Sendable {
         let target = night.asleepDuration - detail.score.targetDifference
         targetProgress = target > 0 ? min(1, max(0, night.asleepDuration / target)) : 0
         targetCaption = SleepFormat.targetCaption(difference: detail.score.targetDifference, target: target, formatter: formatter)
-        bedtime = formatter.timeOfDay(night.sleepStart, calendar: calendar)
-        wakeTime = formatter.timeOfDay(night.sleepEnd, calendar: calendar)
+        bedtime = SleepFormat.time(night.sleepStart, formatter: formatter, calendar: calendar)
+        wakeTime = SleepFormat.time(night.sleepEnd, formatter: formatter, calendar: calendar)
         inBed = formatter.duration(night.inBedDuration)
         efficiency = formatter.percent(Int((night.efficiency * 100).rounded())).text
         interruptions = "\(night.interruptions)"
@@ -80,16 +82,27 @@ struct SleepNightPresentation: Equatable, Sendable {
         if night.hasStages {
             let layout = SleepHypnogramLayout(segments: night.segments)
             hypnogram = layout
-            hypnogramTicks = layout?.ticks(calendar: calendar).map { TickLabel(fraction: $0.fraction, text: formatter.timeOfDay($0.date, calendar: calendar)) } ?? []
+            let hourly = layout?.ticks(calendar: calendar) ?? []
+            hypnogramTicks = hourly.map { TickLabel(fraction: $0.fraction, text: SleepFormat.time($0.date, formatter: formatter, calendar: calendar)) }
+            if let layout {
+                let inner = hourly.filter { $0.fraction > 0.14 && $0.fraction < 0.86 }
+                    .map { TickLabel(fraction: $0.fraction, text: SleepFormat.time($0.date, formatter: formatter, calendar: calendar)) }
+                hypnogramEdgeTicks = [TickLabel(fraction: 0, text: SleepFormat.time(layout.start, formatter: formatter, calendar: calendar))]
+                    + inner
+                    + [TickLabel(fraction: 1, text: SleepFormat.time(layout.end, formatter: formatter, calendar: calendar))]
+            } else {
+                hypnogramEdgeTicks = []
+            }
             stages = Self.stageTiles(night: night, typical: detail.typicalStageShare, formatter: formatter)
         } else {
             hypnogram = nil
             hypnogramTicks = []
+            hypnogramEdgeTicks = []
             stages = []
         }
         if let layout = hypnogram {
             let summary = stages.map { "\($0.name) \($0.time)" }.joined(separator: ", ")
-            hypnogramAccessibility = String(localized: "Sleep stages from \(formatter.timeOfDay(layout.start, calendar: calendar)) to \(formatter.timeOfDay(layout.end, calendar: calendar)). \(summary)")
+            hypnogramAccessibility = String(localized: "Sleep stages from \(SleepFormat.time(layout.start, formatter: formatter, calendar: calendar)) to \(SleepFormat.time(layout.end, formatter: formatter, calendar: calendar)). \(summary)")
         } else {
             hypnogramAccessibility = ""
         }
@@ -159,6 +172,10 @@ struct SleepNightPresentation: Equatable, Sendable {
         case .above: arrow = .up
         case .below: arrow = .down
         case .within, .missing, .noBaseline: arrow = nil
+        }
+        if arrow == nil, reading.status == .within {
+            let offset = reading.delta
+            if let offset, abs(offset) > 1e-9 { arrow = offset > 0 ? .up : .down }
         }
         var tone = VitalRow.Tone.caution
         if let arrow, let higherIsBetter = metric.higherIsBetter {

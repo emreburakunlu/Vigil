@@ -45,6 +45,14 @@ struct SleepScreenTests {
         #expect(SleepFormat.targetCaption(difference: 20 * 60, target: 8 * 3600, formatter: f) == "20 min over your 8h target")
     }
 
+    @Test func timesKeepLeadingZeroIn24HourLocales() {
+        let gb = VigilFormatter(units: .metric, locale: Locale(identifier: "en_GB"))
+        let us = VigilFormatter(units: .metric, locale: TestSupport.enUS)
+        let early = calendar.date(from: DateComponents(year: 2026, month: 10, day: 19, hour: 7, minute: 4))!
+        #expect(SleepFormat.time(early, formatter: gb, calendar: calendar) == "07:04")
+        #expect(SleepFormat.time(early, formatter: us, calendar: calendar).contains("7:04"))
+    }
+
     @Test func minutesAfterSixWrapsPastMidnight() {
         let late = calendar.date(from: DateComponents(year: 2026, month: 10, day: 19, hour: 0, minute: 30))!
         let early = calendar.date(from: DateComponents(year: 2026, month: 10, day: 18, hour: 22, minute: 58))!

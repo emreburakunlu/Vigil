@@ -9,7 +9,7 @@ struct SleepView: View {
     @State private var selectedDay: LocalDay?
 
     private var repository: VigilRepository { container.repository }
-    private var today: LocalDay { repository.today }
+    private var today: LocalDay { container.currentDay }
     private var day: LocalDay { selectedDay ?? today }
 
     var body: some View {
@@ -23,11 +23,14 @@ struct SleepView: View {
         }
         .vNightScreen()
         .toolbar(.hidden, for: .navigationBar)
-        .task(id: day) {
+        .task(id: [AnyHashable(day), AnyHashable(container.dataVersion)]) {
             await model.loadNight(repository: repository, formatter: settingsStore.formatter, day: day)
         }
-        .task(id: today) {
+        .task(id: [AnyHashable(today), AnyHashable(container.dataVersion)]) {
             await model.loadTrends(repository: repository, formatter: settingsStore.formatter)
+        }
+        .onChange(of: container.currentDay) { old, _ in
+            if selectedDay == old { selectedDay = nil }
         }
     }
 
@@ -36,7 +39,7 @@ struct SleepView: View {
             VStack(alignment: .leading, spacing: VSpacing.xxxs) {
                 Text(SleepFormat.nightRange(for: day, calendar: repository.calendar))
                     .vTextStyle(.bodyStrong).foregroundStyle(Color.vNightInkSecondary)
-                Text(day == today ? "Last night" : LocalizedStringKey(SleepFormat.weekdayTitle(for: day, calendar: repository.calendar)))
+                Text(day == today ? LocalizedStringKey("Last night") : LocalizedStringKey(SleepFormat.weekdayTitle(for: day, calendar: repository.calendar)))
                     .vTextStyle(.largeTitle).foregroundStyle(Color.vNightInk)
                     .lineLimit(1).minimumScaleFactor(0.6)
                     .accessibilityAddTraits(.isHeader)
@@ -71,9 +74,9 @@ struct SleepView: View {
     private var content: some View {
         switch model.phase {
         case .loading:
-            SleepSkeleton()
+            VSkeletonStack(heights: [210, 300, 240], label: "Loading sleep")
         case .failed:
-            SleepFailedView {
+            VErrorCard(title: "Couldn't load sleep", message: "Something went wrong reading your sleep data.") {
                 Task { await model.loadNight(repository: repository, formatter: settingsStore.formatter, day: day) }
             }
         case .empty:

@@ -146,7 +146,7 @@ struct SleepTrendChart: Equatable, Sendable {
     private static func clockText(minutesAfterSix: Double, on reference: Date, calendar: Calendar, formatter: VigilFormatter) -> String {
         let total = Int(minutesAfterSix) + 18 * 60
         let date = calendar.date(bySettingHour: (total / 60) % 24, minute: total % 60, second: 0, of: reference) ?? reference
-        return formatter.timeOfDay(date, calendar: calendar)
+        return SleepFormat.time(date, formatter: formatter, calendar: calendar)
     }
 
     /// Joins the history summaries with the night times into trend points, oldest first.
