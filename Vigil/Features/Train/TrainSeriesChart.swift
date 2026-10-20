@@ -24,7 +24,7 @@ struct TrainSeriesChart: View {
         Chart {
             ForEach(data) { point in
                 AreaMark(x: .value("Position", point.x), yStart: .value("Floor", lo - pad), yEnd: .value("Value", point.y))
-                    .interpolationMethod(.monotone)
+                    .interpolationMethod(.linear)
                     .foregroundStyle(LinearGradient(colors: [color.opacity(0.22), color.opacity(0)], startPoint: .top, endPoint: .bottom))
                 LineMark(x: .value("Position", point.x), y: .value("Value", point.y))
                     .vLineStyle(color, width: 2.2)

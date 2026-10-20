@@ -228,7 +228,7 @@ private struct LiftHeartRateChart: View {
             }
             ForEach(points) { point in
                 LineMark(x: .value("Time", point.x), y: .value("Heart rate", point.y))
-                    .interpolationMethod(.monotone)
+                    .interpolationMethod(.linear)
                     .lineStyle(StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
                     .foregroundStyle(Color.vInk)
             }
