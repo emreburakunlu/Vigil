@@ -86,6 +86,15 @@ enum MetricPresentation {
                             status: baseline?.status(of: latest.value) ?? .noBaseline, trend: [])
     }
 
+    /// The series average against the baseline, for the delta shown beside the big "Average" value.
+    static func averageReading(_ series: MetricSeries) -> VitalReading? {
+        guard let average = series.average, let baseline = series.baseline, baseline.isEstablished else { return nil }
+        let delta = average - baseline.mean
+        let percent = baseline.mean != 0 ? delta / baseline.mean * 100 : nil
+        return VitalReading(metric: series.metric, value: average, baseline: baseline, delta: delta, deltaPercent: percent,
+                            status: baseline.status(of: average), trend: [])
+    }
+
     static func latestTitle(_ metric: HealthMetric) -> String {
         HealthMetric.vitals.contains(metric) ? String(localized: "Last night (sleep average)") : String(localized: "Latest reading")
     }

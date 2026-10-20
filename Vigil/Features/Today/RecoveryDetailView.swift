@@ -27,9 +27,15 @@ final class RecoveryDetailModel {
 
     func step(by delta: Int) { day = TodayDayWindow.step(day, by: delta, today: today) }
 
+    /// Follows `AppContainer.currentDay`: a screen showing the old today moves to the new one.
+    func rollOver(to newToday: LocalDay) {
+        guard newToday != today else { return }
+        if day == today { day = newToday }
+        today = newToday
+    }
+
     func load(_ repository: VigilRepository) async {
         let target = day
-        today = repository.today
         phase = overview == nil ? .loading : phase
         do {
             let overview = try await repository.dayOverview(for: target)
@@ -54,19 +60,13 @@ final class RecoveryDetailModel {
     private func loadHistory(_ repository: VigilRepository, endingOn end: LocalDay, todayScore: Int?) async {
         let days = LocalDay.range(from: end.adding(days: -29), through: end)
         var values: [LocalDay: Int] = [:]
-        try? await repository.ensureSummaries(from: days[0], through: end)
-        for summary in repository.summaries.summaries(from: days[0], through: end) {
+        let summaries = (try? await repository.ensuredSummaries(from: days[0], through: end)) ?? []
+        guard !Task.isCancelled, end == day else { return }
+        for summary in summaries {
             if let recovery = summary.recovery { values[summary.day] = recovery.value }
         }
         if let todayScore { values[end] = todayScore }
         history = days.compactMap { d in values[d].map { (d, $0) } }
-        for d in days where values[d] == nil {
-            if Task.isCancelled || end != day { return }
-            if let s = try? await repository.summary(for: d), let recovery = s.recovery {
-                values[d] = recovery.value
-                history = days.compactMap { d in values[d].map { (d, $0) } }
-            }
-        }
     }
 }
 
@@ -78,6 +78,8 @@ struct RecoveryDetailView: View {
     @State private var model: RecoveryDetailModel
     @State private var showsHelp = false
 
+    fileprivate static let cardSpacing: CGFloat = 14
+
     init(day: LocalDay) {
         initialDay = day
         _model = State(initialValue: RecoveryDetailModel(day: day))
@@ -85,16 +87,16 @@ struct RecoveryDetailView: View {
 
     private var formatter: VigilFormatter { settingsStore.formatter }
 
+    private struct LoadKey: Hashable { var day: LocalDay; var version: Int; var current: LocalDay }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: VSpacing.cardGap) {
+            VStack(spacing: Self.cardSpacing) {
                 switch model.phase {
                 case .failed:
-                    EmptyStateView(systemImage: "exclamationmark.triangle", title: "Couldn't load Recovery",
-                                   message: "Something went wrong reading your data.", actionTitle: "Try again") {
+                    VErrorCard(title: "Couldn't load Recovery", message: "Something went wrong reading your data.") {
                         Task { await model.load(container.repository) }
                     }
-                    .vCard()
                 case .loading, .loaded:
                     let overview = model.overview ?? TodayPlaceholder.overview(day: model.day)
                     let isPlaceholder = model.overview == nil || model.isStale
@@ -113,11 +115,13 @@ struct RecoveryDetailView: View {
                 TodayDetailTitle(title: String(localized: "Recovery"), subtitle: TodayPresentation.shortDate(model.day))
             }
             ToolbarItem(placement: .primaryAction) {
-                Button { showsHelp = true } label: { Image(systemName: "questionmark.circle") }
-                    .accessibilityLabel("How recovery is calculated")
+                CircleIconButton(systemImage: "questionmark", label: "How recovery is calculated") { showsHelp = true }
             }
         }
-        .task(id: model.day) { await model.load(container.repository) }
+        .task(id: LoadKey(day: model.day, version: container.dataVersion, current: container.currentDay)) {
+            model.rollOver(to: container.currentDay)
+            await model.load(container.repository)
+        }
         .sheet(isPresented: $showsHelp) { RecoveryExplanationSheet() }
     }
 }
@@ -128,7 +132,7 @@ private struct RecoveryDetailContent: View {
     let formatter: VigilFormatter
 
     var body: some View {
-        VStack(spacing: VSpacing.cardGap) {
+        VStack(spacing: RecoveryDetailView.cardSpacing) {
             RecoveryHero(model: model, recovery: overview.recovery)
             if let recovery = overview.recovery {
                 if recovery.isCalibrating { RecoveryCalibrationCard(recovery: recovery) }
@@ -379,7 +383,7 @@ private struct RecoveryTrendCard: View {
             VStack(alignment: .leading, spacing: VSpacing.l) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(metric.displayName).font(.vCustom(.body, size: 14, weight: .bold, relativeTo: .subheadline)).foregroundStyle(.vInkSecondary)
+                        Text(metric == .heartRateVariability ? "HRV" : metric.displayName).font(.vCustom(.body, size: 14, weight: .bold, relativeTo: .subheadline)).foregroundStyle(.vInkSecondary)
                         HStack(alignment: .firstTextBaseline, spacing: VSpacing.xs) {
                             Text(latest?.value ?? "–").font(.vCustom(.heading, size: 26, weight: .bold, relativeTo: .title)).foregroundStyle(.vInk)
                             Text(latest?.unit ?? "").vTextStyle(.subheadline).foregroundStyle(.vInkSecondary)
@@ -396,7 +400,8 @@ private struct RecoveryTrendCard: View {
                     .foregroundStyle(.vInkSecondary)
                 }
                 TodayLineChart(points: points, band: band, bandColor: bandColor, color: color,
-                               yDomain: TodayChartScale.domain(values: points.map(\.value), band: band), height: 110, showsArea: false)
+                               yDomain: TodayChartScale.domain(values: points.map(\.value), band: band), height: 110, showsArea: false,
+                               showsYAxis: false)
                     .allowsHitTesting(false)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

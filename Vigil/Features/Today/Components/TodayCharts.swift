@@ -22,6 +22,26 @@ enum TodayChartScale {
         return (lo - pad)...(hi + pad)
     }
 
+    /// Four evenly spaced round-number gridlines that cover the values and the band, plus the matching y domain.
+    static func niceAxis(values: [Double], band: ClosedRange<Double>?, count: Int = 4) -> (ticks: [Double], domain: ClosedRange<Double>)? {
+        var all = values
+        if let band { all += [band.lowerBound, band.upperBound] }
+        guard let lo = all.min(), let hi = all.max(), count > 1 else { return nil }
+        let intervals = Double(count - 1)
+        let raw = max((hi - lo) / intervals, max(abs(hi), abs(lo)) * 0.02, 0.01)
+        let magnitude = pow(10, floor(log10(raw)))
+        for factor in [1.0, 2.0, 2.5, 5.0, 10.0, 20.0, 50.0] {
+            let step = magnitude * factor
+            guard step >= raw * 0.999 else { continue }
+            let start = (lo / step).rounded(.down) * step
+            if start + intervals * step >= hi - step * 1e-9 {
+                let ticks = (0..<count).map { start + Double($0) * step }
+                return (ticks, ticks[0]...ticks[count - 1])
+            }
+        }
+        return nil
+    }
+
     /// Evenly thins `points` to at most `limit`, always keeping the last one.
     static func downsample(_ points: [TodayChartPoint], limit: Int = maxPoints) -> [TodayChartPoint] {
         guard points.count > limit, limit > 1 else { return points }
@@ -41,12 +61,16 @@ struct TodayLineChart: View {
     var xFormat: Date.FormatStyle = .dateTime.month(.abbreviated).day()
     var height: CGFloat = 150
     var showsArea = true
+    var showsYAxis = true
+    /// Explicit solid gridlines (also the y labels when `showsYAxis`). Falls back to automatic marks.
+    var yTicks: [Double]?
     @Binding var selection: Date?
+    @Environment(\.vSurface) private var surface
 
     init(points: [TodayChartPoint], band: ClosedRange<Double>? = nil, bandColor: Color = .vRecovery, color: Color = .vRecovery,
          yDomain: ClosedRange<Double>? = nil, xDomain: ClosedRange<Date>? = nil,
          xFormat: Date.FormatStyle = .dateTime.month(.abbreviated).day(), height: CGFloat = 150, showsArea: Bool = true,
-         selection: Binding<Date?> = .constant(nil)) {
+         showsYAxis: Bool = true, yTicks: [Double]? = nil, selection: Binding<Date?> = .constant(nil)) {
         self.points = points
         self.band = band
         self.bandColor = bandColor
@@ -56,6 +80,8 @@ struct TodayLineChart: View {
         self.xFormat = xFormat
         self.height = height
         self.showsArea = showsArea
+        self.showsYAxis = showsYAxis
+        self.yTicks = yTicks
         _selection = selection
     }
 
@@ -77,14 +103,31 @@ struct TodayLineChart: View {
                 }
             }
             if let last = drawn.last, selected == nil {
-                VPointMarker(x: .value("Date", last.date), y: .value("Value", last.value), color: color)
+                VEndDot(x: .value("Date", last.date), y: .value("Value", last.value), color: color)
             }
             if let selected {
                 RuleMark(x: .value("Date", selected.date)).foregroundStyle(Color.vChartBaseline)
                 VPointMarker(x: .value("Date", selected.date), y: .value("Value", selected.value), color: color)
             }
         }
-        .vChartAxes(yCount: 4, showsYAxis: true, xValues: .automatic(desiredCount: 4), xFormat: xFormat)
+        .chartYAxis {
+            if let yTicks {
+                AxisMarks(values: yTicks) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 1)).foregroundStyle(surface == .night ? Color.vNightFill : Color.vChartGrid)
+                    if showsYAxis { AxisValueLabel().font(.vCaption2).foregroundStyle(surface.inkSecondary) }
+                }
+            } else {
+                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 1)).foregroundStyle(surface == .night ? Color.vNightFill : Color.vChartGrid)
+                    if showsYAxis { AxisValueLabel().font(.vCaption2).foregroundStyle(surface.inkSecondary) }
+                }
+            }
+        }
+        .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                AxisValueLabel(format: xFormat).font(.vCaption).foregroundStyle(surface.inkSecondary)
+            }
+        }
         .chartYScale(domain: yDomain ?? 0...1)
         .modifier(OptionalXDomain(domain: xDomain))
         .chartXSelection(value: $selection)
@@ -105,6 +148,8 @@ struct TodayBigValue: View {
     let value: String
     var unit: String?
     var caption: String?
+    /// Change against baseline, shown inline after the unit ("68 ms ↑ 12%").
+    var delta: DeltaBadge?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -112,6 +157,7 @@ struct TodayBigValue: View {
             HStack(alignment: .firstTextBaseline, spacing: VSpacing.xs) {
                 Text(value).font(.vCustom(.heading, size: 40, weight: .bold, relativeTo: .largeTitle)).tracking(-0.02 * 40).foregroundStyle(.vInk)
                 if let unit { Text(unit).font(.vCustom(.body, size: 17, weight: .semibold, relativeTo: .body)).foregroundStyle(.vInkSecondary) }
+                if let delta { delta.padding(.leading, VSpacing.xs) }
             }
             .lineLimit(1)
             .minimumScaleFactor(0.6)
