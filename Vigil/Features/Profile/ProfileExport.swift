@@ -70,7 +70,9 @@ enum ProfileExporter {
         var json: URL
     }
 
-    static func writeFiles(_ data: ProfileExportData, directory: URL = FileManager.default.temporaryDirectory) throws -> Files {
+    /// Runs off the main actor: encoding and disk writes never block the UI.
+    @concurrent
+    static func writeFiles(_ data: ProfileExportData, directory: URL = FileManager.default.temporaryDirectory) async throws -> Files {
         let folder = directory.appending(path: "VigilExport-\(UUID().uuidString)", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let daily = folder.appending(path: "vigil-daily.csv")

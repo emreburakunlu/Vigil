@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import UserNotifications
 
 /// Screen model for Profile: data that is not a plain setting (Health state, export, re-import).
 @MainActor
@@ -18,6 +19,11 @@ final class ProfileModel {
     private(set) var export: ExportState = .idle
     private(set) var importProgress: ImportProgress?
     private(set) var importFailed = false
+    private(set) var notificationStatus: UNAuthorizationStatus = .notDetermined
+
+    func refreshNotificationStatus(container: AppContainer) async {
+        notificationStatus = await container.notifications.authorizationStatus()
+    }
 
     func load(container: AppContainer) async {
         cachedDays = container.summaries.count()
@@ -41,7 +47,7 @@ final class ProfileModel {
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
             let data = ProfileExportData(exportedAt: repository.now(), appVersion: version,
                                          units: "metric (m, kg, seconds, bpm, °C, kcal)", dailySummaries: summaries, workouts: workouts)
-            export = .ready(try ProfileExporter.writeFiles(data), days: summaries.count, workouts: workouts.count)
+            export = .ready(try await ProfileExporter.writeFiles(data), days: summaries.count, workouts: workouts.count)
         } catch {
             export = .failed
         }

@@ -5,6 +5,7 @@ struct ProfileView: View {
     @Environment(AppContainer.self) private var container
     @Environment(SettingsStore.self) private var settingsStore
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @State private var model = ProfileModel()
     @State private var sheet: ProfileSheet?
     @State private var confirmsDelete = false
@@ -53,6 +54,7 @@ struct ProfileView: View {
         .background(Color.vBackground)
         .toolbar(.hidden, for: .navigationBar)
         .task { await model.load(container: container) }
+        .task(id: scenePhase) { if scenePhase == .active { await model.refreshNotificationStatus(container: container) } }
         .sheet(item: $sheet, onDismiss: { model.resetImport(); Task { await model.load(container: container) } }) { sheet in
             switch sheet {
             case .age: ProfileAgeSheet()
@@ -181,13 +183,26 @@ struct ProfileView: View {
         let prefs = settings.notifications
         ProfileSectionLabel("Notifications")
         ProfileCard {
+            if model.notificationStatus == .denied, prefs.morningSummaryEnabled || prefs.bedtimeReminderEnabled {
+                HStack(spacing: VSpacing.l) {
+                    Image(systemName: "bell.slash").foregroundStyle(Color.vDangerInk).accessibilityHidden(true)
+                    Text("Notifications are off for Vigil").vTextStyle(.body).foregroundStyle(Color.vInk)
+                    Spacer(minLength: 0)
+                    Button("Open Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                    }
+                    .vTextStyle(.bodyStrong)
+                }
+                .padding(.vertical, VSpacing.l)
+                .accessibilityElement(children: .combine)
+            }
             toggleRow("Morning recovery summary", subtitle: "After you wake, or at the time below", isOn: Binding(
                 get: { settingsStore.settings.notifications.morningSummaryEnabled },
                 set: { setNotification { $0.morningSummaryEnabled = $1 }($0) }))
             timeRow("Time", minutes: prefs.morningSummaryMinutes, enabled: prefs.morningSummaryEnabled) { minutes in
                 updateNotifications { $0.morningSummaryMinutes = minutes }
             }
-            toggleRow("Bedtime reminder", subtitle: "Based on your \(VigilFormatter.duration(settings.goals.sleepTarget)) sleep target", isOn: Binding(
+            toggleRow("Bedtime reminder", subtitle: "Reminder at \(Self.timeText(minutes: prefs.bedtimeReminderMinutes)) · aim for \(VigilFormatter.duration(settings.goals.sleepTarget)) asleep", isOn: Binding(
                 get: { settingsStore.settings.notifications.bedtimeReminderEnabled },
                 set: { setNotification { $0.bedtimeReminderEnabled = $1 }($0) }))
             timeRow("Remind me at", minutes: prefs.bedtimeReminderMinutes, enabled: prefs.bedtimeReminderEnabled) { minutes in
@@ -222,7 +237,7 @@ struct ProfileView: View {
         { value in
             updateNotifications { change(&$0, value) }
             // RootView reschedules on every notification-settings change; this only asks permission.
-            if value { Task { _ = await container.notifications.requestAuthorizationIfNeeded(); container.settingsDidChange() } }
+            if value { Task { _ = await container.notifications.requestAuthorizationIfNeeded(); container.settingsDidChange(); await model.refreshNotificationStatus(container: container) } }
         }
     }
 
@@ -281,6 +296,10 @@ struct ProfileView: View {
         profile.estimatesMaxHeartRate = true
         return container.engine.heartRateZones(profile: profile, settings: .default, observedMaxHeartRate: nil,
                                                on: container.repository.now()).maxHeartRate
+    }
+
+    static func timeText(minutes: Int) -> String {
+        ProfileLogic.date(fromMinutes: minutes).formatted(date: .omitted, time: .shortened)
     }
 
     static var versionText: String {

@@ -53,6 +53,8 @@ struct ProfileWeightSheet: View {
     let healthBodyMass: Double?
     @Environment(SettingsStore.self) private var settingsStore
     @State private var text = ""
+    /// The text shown on appear; editing is only committed once it differs from this.
+    @State private var seededText = ""
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -74,7 +76,10 @@ struct ProfileWeightSheet: View {
                         .keyboardType(.decimalPad)
                         .focused($focused)
                         .vTextStyle(.title)
-                        .onChange(of: text) { _, newValue in commit(newValue, formatter: formatter) }
+                        .onChange(of: text) { _, newValue in
+                            guard newValue != seededText else { return }
+                            commit(newValue, formatter: formatter)
+                        }
                     Text(formatter.weightUnit).vTextStyle(.body).foregroundStyle(Color.vInkSecondary)
                 }
                 .padding(VSpacing.xl)
@@ -86,7 +91,8 @@ struct ProfileWeightSheet: View {
         }
         .onAppear {
             if let kg = settingsStore.settings.profile.bodyMassKilograms {
-                text = formatter.number(formatter.displayWeight(kilograms: kg), fractionDigits: 1)
+                seededText = formatter.number(formatter.displayWeight(kilograms: kg), fractionDigits: 1)
+                text = seededText
             }
         }
     }
