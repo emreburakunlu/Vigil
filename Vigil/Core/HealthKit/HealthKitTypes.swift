@@ -51,22 +51,22 @@ enum HealthKitTypes {
         ]
     }
 
-    /// Observed sample types → the category they signal, with background-delivery frequency.
+    /// Observed sample types → the category they signal. `backgroundFrequency` is nil for types observed only
+    /// while the app is in the foreground; only sleep, workouts and HRV are delivered in the background.
     ///
     /// Heart rate and steps are deliberately *not* observed: they change every few minutes and
-    /// would trigger a recompute storm. Workouts carry the HR that matters for strain; active
-    /// energy (hourly) carries everyday-movement changes.
-    static let observed: [(type: HKSampleType, category: HealthDataCategory, frequency: HKUpdateFrequency)] = [
+    /// would trigger a recompute storm. Workouts carry the HR that matters for strain.
+    static let observed: [(type: HKSampleType, category: HealthDataCategory, backgroundFrequency: HKUpdateFrequency?)] = [
         (sleepAnalysis, .sleep, .immediate),
         (workout, .workouts, .immediate),
         (heartRateVariability, .heartRateVariability, .hourly),
-        (restingHeartRate, .restingHeartRate, .hourly),
-        (respiratoryRate, .respiratoryRate, .hourly),
-        (wristTemperature, .wristTemperature, .hourly),
-        (oxygenSaturation, .oxygenSaturation, .hourly),
-        (activeEnergy, .activity, .hourly),
-        (vo2Max, .vo2Max, .hourly),
-        (bodyMass, .bodyMass, .hourly),
+        (restingHeartRate, .restingHeartRate, nil),
+        (respiratoryRate, .respiratoryRate, nil),
+        (wristTemperature, .wristTemperature, nil),
+        (oxygenSaturation, .oxygenSaturation, nil),
+        (activeEnergy, .activity, nil),
+        (vo2Max, .vo2Max, nil),
+        (bodyMass, .bodyMass, nil),
     ]
 }
 
