@@ -14,6 +14,7 @@ struct RouteDestinationView: View {
         case .sleepNight(let day): SleepNightView(day: day)
         case .runDetail(let id): RunDetailView(workoutID: id)
         case .liftDetail(let id): LiftDetailView(workoutID: id)
+        case .loggedLift(let id): LoggedLiftDetailView(sessionID: id)
         #if DEBUG
         case .stateGallery: StateGalleryView()
         #endif

@@ -15,7 +15,7 @@ enum PersistenceController {
     }
 
     static func makeContainer(_ storage: Storage) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: VigilSchemaV2.self)
+        let schema = Schema(versionedSchema: VigilSchemaV3.self)
         let configuration: ModelConfiguration
         switch storage {
         case .onDisk(let name):
@@ -30,7 +30,7 @@ enum PersistenceController {
 
     /// On-disk store at an explicit URL (migration tests).
     static func makeContainer(url: URL) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: VigilSchemaV2.self)
+        let schema = Schema(versionedSchema: VigilSchemaV3.self)
         let configuration = ModelConfiguration(schema: schema, url: url, allowsSave: true, cloudKitDatabase: .none)
         return try ModelContainer(for: schema, migrationPlan: VigilMigrationPlan.self, configurations: [configuration])
     }

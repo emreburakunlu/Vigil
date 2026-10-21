@@ -184,13 +184,45 @@ enum VigilSchemaV2: VersionedSchema {
     }
 }
 
+// MARK: - V3
+
+/// V3 adds `LiftSessionRecord` (strength sessions; the full `LiftSession` is JSON in `payload`).
+/// `SettingsRecord` and `DailySummaryRecord` are unchanged and shared with V1/V2.
+enum VigilSchemaV3: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(3, 0, 0) }
+
+    static var models: [any PersistentModel.Type] {
+        [VigilSchemaV1.SettingsRecord.self, VigilSchemaV2.DailySummaryRecord.self, LiftSessionRecord.self]
+    }
+
+    @Model
+    final class LiftSessionRecord {
+        @Attribute(.unique) var id: UUID
+        var start: Date
+        var end: Date?
+        var updatedAt: Date
+        /// JSON-encoded `LiftSession`.
+        var payload: Data
+
+        init(id: UUID, start: Date, end: Date?, updatedAt: Date, payload: Data) {
+            self.id = id
+            self.start = start
+            self.end = end
+            self.updatedAt = updatedAt
+            self.payload = payload
+        }
+    }
+}
+
 typealias SettingsRecord = VigilSchemaV1.SettingsRecord
 typealias DailySummaryRecord = VigilSchemaV2.DailySummaryRecord
+typealias LiftSessionRecord = VigilSchemaV3.LiftSessionRecord
 
-/// Migration plan. V1 → V2 is lightweight (one new optional attribute).
+/// Migration plan. V1 → V2 and V2 → V3 are lightweight (new optional attribute / new model).
 enum VigilMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [VigilSchemaV1.self, VigilSchemaV2.self] }
+    static var schemas: [any VersionedSchema.Type] { [VigilSchemaV1.self, VigilSchemaV2.self, VigilSchemaV3.self] }
     static var stages: [MigrationStage] {
-        [.lightweight(fromVersion: VigilSchemaV1.self, toVersion: VigilSchemaV2.self)]
+        [.lightweight(fromVersion: VigilSchemaV1.self, toVersion: VigilSchemaV2.self),
+         .lightweight(fromVersion: VigilSchemaV2.self, toVersion: VigilSchemaV3.self)]
     }
 }

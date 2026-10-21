@@ -41,6 +41,7 @@ extension View {
     func vigilEnvironment(_ container: AppContainer) -> some View {
         environment(container)
             .environment(container.settings)
+            .environment(container.liftLog)
             .environment(container.router)
             .modelContainer(container.modelContainer)
     }

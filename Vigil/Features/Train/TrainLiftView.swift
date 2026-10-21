@@ -1,21 +1,45 @@
 import SwiftUI
 
-/// Train · Lift: weekly sessions vs. goal and the paginated list of strength workouts.
+/// Train · Lift: start/resume a logged workout, weekly sessions vs. goal, workouts logged in Vigil
+/// and the paginated list of strength workouts from Health.
 struct TrainLiftView: View {
     let model: TrainModel
     @Environment(AppContainer.self) private var container
+    @Environment(AppRouter.self) private var router
+    @Environment(LiftLogStore.self) private var liftLog
+    @State private var presentedWorkout: LiftSession?
 
     var body: some View {
+        LiftLogStartButton(onStart: { presentedWorkout = liftLog.startSession(title: LiftLogFormatting.defaultTitle()) },
+                           onResume: { presentedWorkout = $0 })
+            .fullScreenCover(item: $presentedWorkout) { session in
+                ActiveWorkoutView(session: session) { finishedID in
+                    if liftLog.session(id: finishedID) != nil { router.push(.loggedLift(finishedID), on: .train) }
+                }
+            }
         if let weekly = model.weekly {
             TrainLiftWeekCard(weekly: weekly, calendar: model.calendar)
-            if weekly.liftSessions == 0 { TrainNoLiftsCard() }
-            Label("Vigil shows workout-level data from Health. Sets, reps and weights stay in your lifting app.",
+            if weekly.liftSessions == 0 && liftLog.recent.isEmpty { TrainNoLiftsCard() }
+            Label("Workouts you log here keep every set, rep and weight. Strength workouts from Health are shown alongside them.",
                   systemImage: "info.circle")
                 .vTextStyle(.footnote)
                 .foregroundStyle(Color.vInkLabel)
                 .labelStyle(TrainInfoLabelStyle())
                 .padding(.horizontal, VSpacing.s)
-            if !model.lifts.items.isEmpty { list }
+        }
+        if !liftLog.recent.isEmpty { loggedList }
+        if model.weekly != nil && !model.lifts.items.isEmpty { list }
+    }
+
+    @ViewBuilder private var loggedList: some View {
+        Group {
+            SectionHeader("Logged workouts").padding(.top, VSpacing.l)
+            ForEach(liftLog.recent) { session in
+                NavigationLink(value: AppRoute.loggedLift(session.id)) {
+                    LoggedLiftRow(session: session, model: model)
+                }
+                .buttonStyle(.vPress)
+            }
         }
     }
 
@@ -133,7 +157,7 @@ struct TrainNoLiftsCard: View {
                 .accessibilityHidden(true)
             Text("No strength workouts this week").vTextStyle(.title2).foregroundStyle(Color.vInk).multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
-            Text("Workouts from Hevy, your Apple Watch, or any app that saves to Health appear here on their own.")
+            Text("Start a workout above, or log one in Hevy, on your Apple Watch, or any app that saves to Health.")
                 .vTextStyle(.callout).foregroundStyle(Color.vInkLabel).multilineTextAlignment(.center)
         }
         .padding(.horizontal, 22)
@@ -194,7 +218,7 @@ struct TrainLiftRow: View {
     }
 }
 
-private struct TrainLiftMetric: View {
+struct TrainLiftMetric: View {
     let value: String
     let label: String
 

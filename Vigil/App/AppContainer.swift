@@ -23,6 +23,7 @@ final class AppContainer {
     let dataSource: any HealthDataSource
     let engine: any ScoreEngine
     let settings: SettingsStore
+    let liftLog: LiftLogStore
     let summaries: DailySummaryStore
     let repository: VigilRepository
     let widgetSnapshots: WidgetSnapshotService
@@ -58,6 +59,7 @@ final class AppContainer {
         if configuration.resetData {
             try? context.delete(model: SettingsRecord.self)
             try? context.delete(model: DailySummaryRecord.self)
+            try? context.delete(model: LiftSessionRecord.self)
             try? context.save()
             personalBests.reset()
         }
@@ -69,6 +71,7 @@ final class AppContainer {
         }
         engine = DefaultScoreEngine(calendar: calendar)
         settings = SettingsStore(container: modelContainer)
+        liftLog = LiftLogStore(container: modelContainer)
         summaries = DailySummaryStore(container: modelContainer)
         repository = VigilRepository(dataSource: dataSource, engine: engine, settings: settings, summaries: summaries,
                                      calendar: calendar, now: now, personalBestCache: personalBests)
@@ -233,5 +236,6 @@ final class AppContainer {
             noteDataChanged()
         }
         try summaries.deleteAll()
+        liftLog.deleteAll()
     }
 }

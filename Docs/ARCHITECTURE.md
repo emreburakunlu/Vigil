@@ -237,7 +237,7 @@ Tests construct containers explicitly with a fixed clock:
 
 ## 8. Persistence, import & widgets
 
-- SwiftData schema `VigilSchemaV2` (`SettingsRecord` singleton, `DailySummaryRecord` per day with a JSON
+- SwiftData schema `VigilSchemaV3` (`LiftSessionRecord` per strength session with a JSON `LiftSession` payload, added in V3 via lightweight migration; `SettingsRecord` singleton, `DailySummaryRecord` per day with a JSON
   `DailySummary` payload plus denormalized `computedAt`, `engineVersion`, `settingsFingerprint`). V1 → V2 is a
   lightweight migration. Changes need a new `VersionedSchema` + migration stage.
 - Store lives in the app sandbox (`groupContainer: .none`, `cloudKitDatabase: .none`). Personal bests found per run

@@ -57,6 +57,8 @@ enum AppRoute: Hashable, Sendable {
     case sleepNight(LocalDay)
     case runDetail(UUID)
     case liftDetail(UUID)
+    /// A workout logged in Vigil (`LiftLogStore`).
+    case loggedLift(UUID)
     #if DEBUG
     /// Developer gallery of empty/error states.
     case stateGallery
