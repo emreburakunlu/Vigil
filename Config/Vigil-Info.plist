@@ -4,6 +4,8 @@
 <dict>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Vigil reads your sleep, heart rate, HRV, workouts, running routes, activity and body weight from Apple Health to calculate your Recovery, Sleep and Strain scores. Everything stays on this iPhone, and Vigil never writes to Health.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Vigil does not currently save any data to Apple Health. If a future version lets you save workouts to Health, it will only do so with your permission.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>BricolageGrotesque-Variable.ttf</string>
